@@ -1,7 +1,27 @@
-import Vue from 'vue';
-import Vuetify from 'vuetify/lib/framework';
+import Vue from 'vue'
+import Vuetify from 'vuetify/lib/framework'
+import getColors from '@/lib/styling/colors'
 
-Vue.use(Vuetify);
+import '@mdi/font/css/materialdesignicons.css'
+
+Vue.use(Vuetify)
+
+const colors = getColors('light')
+
 
 export default new Vuetify({
+    icons: {
+        iconfont: 'mdi'
+    },
+    customVariables: ['@/assets/variables.scss'],
+    treeShake: true,
+    theme: {
+        options: {
+            customProperties: true
+        },
+        dark: false,
+        themes: {
+            dark: colors
+        }
+    }
 });
