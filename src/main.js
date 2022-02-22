@@ -5,6 +5,8 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import './plugins/composition-api'
 
+import '@/css/main.css'
+
 import App from './App.vue'
 
 Vue.config.productionTip = false

@@ -3,6 +3,7 @@
     <mapbox-map
       slot="map"
       :access-token="accessToken"
+      mapboxStyle="mapbox://styles/global-data-viewer/cjtss3jfb05w71fmra13u4qqm"
     >
     </mapbox-map>
   </app-shell>
