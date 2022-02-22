@@ -1,0 +1,11 @@
+<template>
+  <v-navigation-drawer
+    absolute
+    floating
+    fixed
+  >
+    <div>
+      Menu
+    </div>
+  </v-navigation-drawer>
+</template>

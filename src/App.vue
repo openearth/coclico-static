@@ -1,31 +1,26 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
+  <app-shell>
+    <mapbox-map
+      slot="map"
+      :access-token="accessToken"
     >
-        <div class="d-flex align-center">
-            Menu
-        </div>
-
-      <v-spacer></v-spacer>
-
-    </v-app-bar>
-
-    <v-main>
-      <router-view/>
-    </v-main>
-  </v-app>
+    </mapbox-map>
+  </app-shell>
 </template>
 
 <script>
+import { MapboxMap } from '@deltares/vue-components' 
+import AppShell from  './components/AppShell'
 
 export default {
-  name: 'App',
-
+  
+  components: {
+    AppShell,
+    MapboxMap
+  },
   data: () => ({
-    //
+    accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
   }),
 };
 </script>
+
