@@ -2,9 +2,11 @@
   <v-app>
     <app-header/>
     <v-main>
-      <router-view/>
       <slot name="map" />
+      <router-view />
       <slot />
+    
+      
       <!--TODO: app-sidebar is not finished -->
       <app-sidebar/>
     </v-main>
