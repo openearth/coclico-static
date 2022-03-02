@@ -21,6 +21,7 @@
     "register-service-worker": "^1.7.2",
     "sortablejs": "^1.14.0",
     "vue": "^2.6.14",
+    "vue-html-loader": "^1.2.4",
     "vue-router": "^3.5.1",
     "vue2mapbox-gl": "^0.13.0",
     "vuetify": "^2.4.0",
