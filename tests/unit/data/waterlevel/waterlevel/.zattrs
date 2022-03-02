@@ -1,0 +1,8 @@
+{
+    "_ARRAY_DIMENSIONS": [
+        "x",
+        "y",
+        "time"
+    ],
+    "coordinates": "lat lon reference_time"
+}
