@@ -16,7 +16,7 @@
 import { MapboxMap } from '@deltares/vue-components' 
 import AppShell from  './components/AppShell'
 
-import { mapActions, mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   
