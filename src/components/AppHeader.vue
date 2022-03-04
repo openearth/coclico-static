@@ -1,0 +1,9 @@
+<template>
+    <v-app-bar
+      app
+      color="background"
+      flat
+    >
+      <v-spacer></v-spacer>
+    </v-app-bar>
+</template>

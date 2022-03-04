@@ -6,7 +6,7 @@ import '@mdi/font/css/materialdesignicons.css'
 
 Vue.use(Vuetify)
 
-const colors = getColors('light')
+const colors = getColors('dark')
 
 
 export default new Vuetify({
@@ -19,7 +19,7 @@ export default new Vuetify({
         options: {
             customProperties: true
         },
-        dark: false,
+        dark: true,
         themes: {
             dark: colors
         }
