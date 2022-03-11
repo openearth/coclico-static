@@ -1,6 +1,11 @@
+import Vue from 'vue'
+
 
 export default {
-  namespaced: true,
-  state: () => ({
-  })
+  state: () => ({}),
+  mutations: {
+    addDataset (state, dataset) {
+    Vue.set(state, dataset.id, dataset)
+  }
+  }
 }
