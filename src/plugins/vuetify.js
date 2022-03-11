@@ -6,7 +6,7 @@ import '@mdi/font/css/materialdesignicons.css'
 
 Vue.use(Vuetify)
 
-const colors = getColors('dark')
+const colors = getColors('coclico')
 
 
 export default new Vuetify({
@@ -21,7 +21,7 @@ export default new Vuetify({
         },
         dark: true,
         themes: {
-            dark: colors
+            coclico: colors
         }
     }
 });

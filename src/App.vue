@@ -3,7 +3,7 @@
     <mapbox-map
       slot="map"
       :access-token="accessToken"
-      mapboxStyle="mapbox://styles/global-data-viewer/cjtss3jfb05w71fmra13u4qqm"
+      mapboxStyle="mapbox://styles/global-data-viewer/cjtslsula05as1fppvrh7n4rv"
     >
       <v-mapbox-layer
           :options="testLayer"

@@ -1,5 +1,5 @@
 <template>
-<v-card dark raised max-height="80vh" class="pa-0 data-layers-card"  data-v-step="3">
+<v-card light raised max-height="80vh" class="pa-0 data-layers-card"  data-v-step="3">
   <v-card-title class="h3">
     All datasets
   </v-card-title>
@@ -20,7 +20,7 @@
           <v-expansion-panel-header
             hide-actions
             color="background"
-            dark
+            coclico
           > 
             <v-row>
               <v-col cols="1" class="ma-auto pa-0">
@@ -33,9 +33,8 @@
                   <v-switch
                     class="my-auto switch"
                     dense
-                    flat
                     v-model="dataset.visible"
-                    color="formActive"
+                    color="#ffa827"
                     @change="toggleVectorDataset(dataset.id)"
                   ></v-switch>
                 </v-col>
@@ -45,7 +44,7 @@
                     class="ma-auto radio"
                     :value="dataset.id"
                     @click="setRasterLayer(dataset.id)"
-                    color="formActive"
+                    color="#ffa827"
                   ></v-radio>
                   <v-progress-circular
                     dense
