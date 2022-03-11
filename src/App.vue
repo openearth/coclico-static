@@ -6,7 +6,9 @@
       mapboxStyle="mapbox://styles/global-data-viewer/cjtss3jfb05w71fmra13u4qqm"
     >
       <v-mapbox-layer
-          :options="testLayer"
+          v-if="activeMapboxLayers"
+          :options="activeMapboxLayers"
+          :key="activeMapboxLayers.id"
         />
     </mapbox-map>
   </app-shell>
@@ -16,7 +18,7 @@
 import { MapboxMap } from '@deltares/vue-components' 
 import AppShell from  './components/AppShell'
 
-import { mapState, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   
@@ -27,11 +29,11 @@ export default {
   data: () => ({
     accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
   }),
-  computed: { 
-    ...mapState('map', ['testLayer'])
+  computed: {
+    ...mapGetters(['activeMapboxLayers'])
   },
   methods: { 
-    ...mapActions('map', ['loadDatasets'])
+    ...mapActions({ loadDatasets: 'loadDatasets' }),
   },
   mounted() { 
     this.loadDatasets()
