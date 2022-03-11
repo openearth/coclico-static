@@ -31,12 +31,13 @@
               </v-col>
               <v-col cols="2" class="ma-auto pa-0">
                   <v-switch
+                    :disabled="nonSelections"
                     class="my-auto switch"
                     dense
                     flat
                     v-model="dataset.visible"
                     color="formActive"
-                    @change="toggleVectorDataset(dataset.id)"
+                    @change="toggleMapboxLayer(dataset)"
                   ></v-switch>
                 </v-col>
                 <v-col cols="1" class="ma-auto pa-0">
@@ -67,21 +68,23 @@
               <v-col cols="6" class="ma-auto pa-0">
                  <v-select
                   class="pa-2"
-                  :items="returnPeriods"
+                  v-model="chosenPeriod"
+                  :items="dataset.summaries.return_period"
                   :label="`Periods`"
                   flat
                   dense
-                  @change="updateVectorLayer"
+                  @change="updateMapboxLayer(dataset)"
                 />
               </v-col>
               <v-col cols="6" class="ma-auto pa-0">
                  <v-select
                   class="pa-2"
-                  :items="scenarios"
+                  v-model="chosenScenario"
+                  :items="dataset.summaries.scenario"
                   :label="`Scenarios`"
                   flat
                   dense
-                  @change="updateVectorLayer"
+                  @change="updateMapboxLayer(dataset)"
                 />             
               </v-col>
             </v-row>
@@ -95,6 +98,8 @@
 </template>
 <script>
 import CustomIcon from "./CustomIcon.vue"
+import toLower from 'lodash/toLower'
+import { mapActions } from "vuex"
 
 export default {
   props: {
@@ -109,23 +114,39 @@ export default {
   data () {
     return {
       panel: [],
-      returnPeriods: [5, 10],
-      scenarios: [ "Historical",
-                    "RCP45"],      
+      chosenPeriod: null,
+      chosenScenario: null,
+      
     }
   },
+  computed: {
+    nonSelections() { 
+      return this.chosenPeriod && this.chosenScenario ? false : true
+    },
+  },
   methods: {
-    toggleVectorDataset(id) {
-      console.log('id', id)
+    ...mapActions ({loadMapboxLayer: 'loadMapboxLayer'}),
+    toggleMapboxLayer(dataset) {
+      this.loadLayerToMap(dataset)
     },
-    setRasterLayer(id) {
-      console.log('id', id)
+    updateMapboxLayer(dataset) {
+      if (!dataset.visible) {
+        return
+      }
+      this.loadLayerToMap(dataset)
     },
-    onTooltipClick(id) {
-      console.log('id', id)
+    setRasterLayer() {
+      console.log('setRasterLayer')
     },
-    updateVectorLayer() {
-      console.log('update layer with selected values')
+    onTooltipClick() {
+      console.log('onTooltipClick')
+    },
+    loadLayerToMap(dataset) {
+          const { chosenPeriod, chosenScenario } = this
+          const { id, links } = dataset
+          const title = `${id.split("-")[2]}-mapbox-${chosenPeriod}-${toLower(chosenScenario)}`
+          const chosenLayer = links.find(link => link.title === title )
+          this.loadMapboxLayer(chosenLayer)
     }
     
   }

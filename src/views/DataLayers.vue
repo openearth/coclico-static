@@ -1,22 +1,22 @@
 <template>
   <div class='data-layers'>
-    <data-layers-card :datasets="testDatasetsInActiveTheme"/>
+    <data-layers-card :datasets="availableDatasets"/>
   </div>
 </template>
 
 <script>
 import DataLayersCard from '@/components/DataLayersCard.vue'
-import {mapState} from "vuex"
-
+import { mapGetters } from 'vuex'
 
 export default {
   name:'DataLayers',
   components: {
     DataLayersCard,
   },
-  computed: { 
-    ...mapState('map', ['testDatasetsInActiveTheme'])
+  computed: {
+    ...mapGetters(['availableDatasets'])
   }
+
 }
 </script>
 
