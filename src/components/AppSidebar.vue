@@ -22,7 +22,6 @@
               <v-list-item-icon class="ml-4">
               <custom-icon name="Flooding" iconFolder="themes"/>
             </v-list-item-icon>
-          </v-list-item>
         </v-list-item-group>
       </v-list>
       <template v-slot:append>

@@ -9,16 +9,16 @@ export default {
         "id": "EU_EESSL_JRC_Hist_RP_flat-74xh1t",
         "type": "circle",
         "source": {
-          "url": "mapbox://global-data-viewer.6v63xk2e", 
+          "url": "mapbox://global-data-viewer.6v63xk2e",
           "type": "vector"
         },
-      "source-layer": "EU_EESSL_JRC_Hist_RP_flat-74xh1t", 
+      "source-layer": "EU_EESSL_JRC_Hist_RP_flat-74xh1t",
       "paint": {
 
         "circle-radius": 5,
         "circle-stroke-color": "#1e1688",
         "circle-stroke-width": 1,
-        "circle-color": [ 
+        "circle-color": [
               "interpolate",
                 ["linear"],
                 ["get", "rp_5"],
@@ -67,7 +67,7 @@ export default {
 				"type": "application/json"
 			}
 		],
-		"title": "Discharge",
+		"title": "Extreme surge level",
 		"extent": {
 			"spatial": {
 				"bbox": [
@@ -144,7 +144,7 @@ export default {
 				"type": "application/json"
 			}
 		],
-		"title": "Discharge",
+		"title": "Extreme wave energy",
 		"extent": {
 			"spatial": {
 				"bbox": [
@@ -190,7 +190,7 @@ export default {
   }
   },
   }),
- 
+
   getters: {
   },
   actions: {
