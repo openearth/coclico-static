@@ -30,6 +30,7 @@
                 <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span> 
               </v-col>
               <v-col cols="2" class="ma-auto pa-0">
+                <!-- TODO: refer to colors from CoCliCo theme, rather than hardcoding here (Ioanna) -->
                   <v-switch
                     class="my-auto switch"
                     dense

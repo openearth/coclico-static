@@ -15,6 +15,7 @@ export default new Vuetify({
     },
     customVariables: ['@/assets/variables.scss'],
     treeShake: true,
+    // TODO: check if coclico style is loaded well (Ioanna)
     theme: {
         options: {
             customProperties: true

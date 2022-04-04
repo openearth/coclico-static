@@ -8,6 +8,8 @@
       expand-on-hover
       color="#068B95"
     >
+    <!-- TODO: refer to colors from CoCliCo theme, rather than hardcoding here (Ioanna) -->
+    <!-- TODO: now "hardcoded" one theme, and removed tour in and account options. Make new copy from BlueEarth Data Sidebar and grey out features not used yet instead? Also, text next to theme icon was not formatted well, so removed in below example (Ioanna) -->
      <v-list dense class="pa-0">
         <v-list-item class="px-2">
           <v-list-item-avatar >

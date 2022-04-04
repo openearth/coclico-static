@@ -1,4 +1,6 @@
 <template>
+    <!-- TODO: refer to colors from CoCliCo theme, rather than hardcoding here (Ioanna) -->
+    <!-- TODO: grey out options for landing page, stories and workbench (Ioanna) -->
     <v-app-bar
        app
         height="57px"

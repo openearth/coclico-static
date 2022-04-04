@@ -56,6 +56,7 @@ export const dark = {
   blueDeltares: '#0a28a3'
 }
 
+// TODO: check whether all CoCliCo colors are in (Daniel)
 export const coclico = {
   black100: '#000000',
   blue: '#0ab6ff',
@@ -182,6 +183,7 @@ const context = {
   }
 }
 
+// TODO: also add CoCliCo style here? (Ioanna)
 export default function getColors (theme) {
   const baseColors = theme === 'dark' ? dark : light
   const contextColors = entries(context)
