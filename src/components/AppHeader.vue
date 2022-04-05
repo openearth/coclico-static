@@ -1,6 +1,8 @@
 <template>
     <v-app-bar
       app
+      height="57px"
+      clipped-left
       color="background"
       flat
     >
