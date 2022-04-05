@@ -18,12 +18,10 @@
           </v-list-item-content>
         </v-list-item>
         <v-divider></v-divider>
-        <v-list-item-group color="primary" active-class="active-theme" v-if="dataRoute">
+        <v-list-item-group color="primary" active-class="active-theme" >
           <v-list-item
-            v-for="item in getThemes"
+            v-for="item in getThemes" 
             :key="item"
-            @click="toggleTheme(item)"
-            :active="isActive(item)"
           >
             <v-list-item-icon class="mr-6">
               <custom-icon :name="item" iconFolder="themes"/>
@@ -70,12 +68,16 @@
   </v-card>
 </template>
 <script>
-  import CustomIcon from '@/components/CustomIcon'
+import CustomIcon from '@/components/CustomIcon'
+import { mapGetters } from 'vuex'
 
   export default {
     components: {
       CustomIcon
     },
+    computed: {
+    ...mapGetters(['getThemes', 'getActiveTheme']),
+  },
     data() { 
       return { 
         drawer: true,
