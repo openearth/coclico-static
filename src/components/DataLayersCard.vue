@@ -31,7 +31,6 @@
               </v-col>
               <v-col cols="2" class="ma-auto pa-0">
                   <v-switch
-                    :disabled="nonSelections"
                     class="my-auto switch"
                     dense
                     flat
@@ -65,30 +64,18 @@
            </v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-row>
-              <v-col cols="6" class="ma-auto pa-0">
-                 <v-select
+              <v-col cols="6" class="ma-auto pa-0" v-for="summary in dataset.summaries" :key="summary.id">
+                <v-select
                   class="pa-2"
-                  v-model="chosenPeriod"
-                  :items="dataset.summaries.return_period"
-                  :label="`Periods`"
+                  v-model="summary.chosenValue"
+                  :items="summary.allowedValues"
+                  :label="summary.id"
                   flat
                   dense
-                  @change="updateMapboxLayer(dataset)"
-                />
-              </v-col>
-              <v-col cols="6" class="ma-auto pa-0">
-                 <v-select
-                  class="pa-2"
-                  v-model="chosenScenario"
-                  :items="dataset.summaries.scenario"
-                  :label="`Scenarios`"
-                  flat
-                  dense
-                  @change="updateMapboxLayer(dataset)"
-                />             
+                  @change="toggleMapboxLayer(dataset)"
+                  />          
               </v-col>
             </v-row>
-            
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-radio-group>
@@ -114,22 +101,11 @@ export default {
   data () {
     return {
       panel: [],
-      chosenPeriod: null,
-      chosenScenario: null,
-      
     }
-  },
-  computed: {
-    nonSelections() { 
-      return this.chosenPeriod && this.chosenScenario ? false : true
-    },
   },
   methods: {
     ...mapActions ({loadMapboxLayer: 'loadMapboxLayer'}),
     toggleMapboxLayer(dataset) {
-      this.loadLayerToMap(dataset)
-    },
-    updateMapboxLayer(dataset) {
       if (!dataset.visible) {
         return
       }
@@ -142,13 +118,21 @@ export default {
       console.log('onTooltipClick')
     },
     loadLayerToMap(dataset) {
-          const { chosenPeriod, chosenScenario } = this
-          const { id, links } = dataset
+         
+          const { id, links, summaries } = dataset
+          //TODO: see how we are going to create the layername
+          const chosenPeriod = summaries[0].chosenValue
+          const chosenScenario = summaries[1].chosenValue
+
           const title = `${id.split("-")[2]}-mapbox-${chosenPeriod}-${toLower(chosenScenario)}`
-          const chosenLayer = links.find(link => link.title === title )
-          this.loadMapboxLayer(chosenLayer)
-    }
-    
+         
+          const layer = links.find(link => link.title === title )
+          //TODO: see why not all combinations of period and scenario are working
+          if (!layer) {
+            return
+          }
+          this.loadMapboxLayer(layer)
+    },
   }
 }
 

@@ -33,12 +33,25 @@ export default {
         return children.forEach(child => {
           return getCatalog(child.href) 
             .then(dataset => {
+              //All the below functionality will be added in a function at the end
+              const summaries = _.get(dataset, 'summaries')
+              const mappedSummaries = Object.keys(summaries).map(id => {
+                const summary = _.get(summaries, id)
+                return {
+                  id: id,
+                  allowedValues: summary,
+                  chosenValue: summary[0]
+                }
+              })
+              _.set(dataset, 'summaries', mappedSummaries)
+              
               commit('addDataset', dataset)
             })
         })
       })
     },
     loadMapboxLayer({commit}, layer) {
+      console.log('layer that is passes in loadMapboxLayer', layer)
       //get info of the layer from stac catalog
       getCatalog(layer.href) 
         .then(layerInfo => {
