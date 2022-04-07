@@ -1,10 +1,13 @@
 import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
+import _ from 'lodash'
+import themes from './themes.js'
 
 export default {
   modules: {
     datasets,
+    themes
   },
   state: () => ({
     activeMapboxLayers: null // TODO: list of layers ready to be added.
@@ -23,8 +26,10 @@ export default {
 			//Get STAC collection
     getCatalog(process.env.VUE_APP_CATALOG_URL)
       .then(datasets => {
-				//const themes = _.get(datasets, 'summaries.keywords') //TODO: At this point no themes are used. Placeholder for the future
+				const themes = _.get(datasets, 'summaries.keywords') 
+        themes.forEach(theme => commit('addTheme', theme))
 				const children = datasets.links.filter(ds => ds.rel === 'child')
+        
         return children.forEach(child => {
           return getCatalog(child.href) 
             .then(dataset => {
