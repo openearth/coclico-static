@@ -29,7 +29,7 @@
         </v-list-item>
         <v-divider />
         <v-list-item-group
-          color="primary"
+          color="secondary"
           active-class="active-theme"
         >
           <v-list-item
@@ -53,6 +53,7 @@
           <v-list
             dense
             class="pa-0"
+            color="secondary"
           >
             <v-list-item @click="$emit('toggle-tour')">
               <v-list-item-icon class="mr-6">

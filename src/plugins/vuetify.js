@@ -21,7 +21,7 @@ export default new Vuetify({
         },
         themes: {
             dark: colors,
-            light: colors
+            light: colors,
         },
         
     }

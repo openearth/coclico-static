@@ -1,5 +1,8 @@
 import entries from 'lodash/entries'
 import merge from 'lodash/fp/merge'
+//the light theme has the Coclico colors
+//TODO: remove dart configuration since we are not going to use it after all?
+//      if so, then we could translate the primary etc directly to one list of
 
 export const light = {
   black100: '#000000',
@@ -26,8 +29,8 @@ export const light = {
   turqoise: '#28cc9b',
   warning: '#f79502',
   white100: '#ffffff',
-  greenCocliCo: '#068B95 ',
-  orangeCoClico: '#ffa827'
+  orangeCoclico: '#ffa827',
+  greenCoclico: '#068B95',
 }
 
 export const dark = {
@@ -60,35 +63,35 @@ export const dark = {
 
 const context = {
   primary: {
-    light: light.greenCocliCo,
+    light: light.greenCoclico,
     dark: dark.white100
   },
   primaryHover: {
-    light: light.blue60,
+    light: light.orangeCoclico,
     dark: dark.blue20
   },
   primaryFocus: {
-    light: light.blue60,
+    light: light.orangeCoclico,
     dark: dark.blue20
   },
   primaryPressed: {
-    light: light.blue120,
+    light: light.orangeCoclico,
     dark: dark.blue120
   },
   secondary: {
-    light: light.blue40,
+    light: light.orangeCoclico,
     dark: dark.blue20
   },
   secondaryHover: {
-    light: light.blue20,
+    light: light.white100,
     dark: dark.white100
   },
   secondaryFocus: {
-    light: light.blue20,
+    light: light.white100,
     dark: dark.white100
   },
   secondaryPressed: {
-    light: light.blue60,
+    light: light.white100,
     dark: dark.blue40
   },
   quiet: {
@@ -96,11 +99,11 @@ const context = {
     dark: 'transparent'
   },
   quietHover: {
-    light: light.blue20,
+    light: light.white100,
     dark: dark.grey80
   },
   quietFocus: {
-    light: light.blue20,
+    light: light.white100,
     dark: dark.grey80
   },
   quietPressed: {
@@ -108,7 +111,7 @@ const context = {
     dark: dark.grey100
   },
   background: {
-    light: light.greenCocliCo,
+    light: light.greenCoclico,
     dark: dark.grey100
   },
   buttonColor: {
@@ -116,23 +119,23 @@ const context = {
     dark: dark.blue120
   },
   buttonColorContrast: {
-    light: light.greenCocliCo,
+    light: light.white100,
     dark: dark.blue120
   },
   textColor: {
-    light: light.black100,
+    light: light.white100,
     dark: dark.white100
   },
   textInverted: {
-    light: light.greenCocliCo,
+    light: light.white100,
     dark: dark.black100
   },
   formBase: {
-    light: light.grey20,
+    light: light.white100,
     dark: dark.grey60
   },
   formActive: {
-    light: light.orangeCoClico,
+    light: light.orangeCoclico,
     dark: dark.blue80
   }
 }

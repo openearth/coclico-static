@@ -1,3 +1,7 @@
+import getColors from '../../lib/styling/colors'
+
+const color = getColors('light')
+
 export default {
   state: () => ({
     steppers: [ 
@@ -5,25 +9,25 @@ export default {
     name: 'Landing page',
     step: 1,
     icon: 'mdi-information-outline',
-    color: 'orangeCoClico'  
+    color: color.secondary  
     },
     {
     name: 'Stories',
     step: 2,
     icon: 'mdi-account-details',
-    color: 'orangeCoClico'  
+    color: color.secondary
     },
     {
     name: 'Platform',
     step: 3,
     icon: 'mdi-database-search',
-    color: 'orangeCoClico'  
+    color: color.secondary 
     },
     {
     name: 'Workbench',
     step: 4,
     icon: 'mdi-hammer',
-    color: 'orangeCoClico'  
+    color: color.secondary 
     } ]
 }),
   getters: { 

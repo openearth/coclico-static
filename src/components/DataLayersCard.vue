@@ -24,7 +24,7 @@
           >
             <v-expansion-panel-header
               hide-actions
-              color="background"
+              color="white100"
               dark
             > 
               <v-row>
