@@ -8,23 +8,39 @@
       expand-on-hover
       color="background"
     >
-    <v-list dense class="pa-0">
-        <v-list-item class="px-2" @click="$router.push({ name: 'home' })" data-v-step="1"> <!-- TODO: add routing -->
-          <v-list-item-avatar >
+      <v-list
+        dense
+        class="pa-0"
+      >
+        <v-list-item
+          class="px-2"
+          @click="$router.push({ name: 'home' })"
+          data-v-step="1"
+        >
+          <!-- TODO: add routing -->
+          <v-list-item-avatar>
             <custom-icon name="deltares" />
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title color="primary">Deltares</v-list-item-title>
+            <v-list-item-title color="primary">
+              Deltares
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-divider></v-divider>
-        <v-list-item-group color="primary" active-class="active-theme" >
+        <v-divider />
+        <v-list-item-group
+          color="primary"
+          active-class="active-theme"
+        >
           <v-list-item
             v-for="item in getThemes" 
             :key="item"
           >
             <v-list-item-icon class="mr-6">
-              <custom-icon :name="item" iconFolder="themes"/>
+              <custom-icon
+                :name="item"
+                icon-folder="themes"
+              />
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>{{ item }}</v-list-item-title>
@@ -32,9 +48,12 @@
           </v-list-item>
         </v-list-item-group>
       </v-list>
-      <template v-slot:append>
+      <template #append>
         <div>
-          <v-list dense class="pa-0">
+          <v-list
+            dense
+            class="pa-0"
+          >
             <v-list-item @click="$emit('toggle-tour')">
               <v-list-item-icon class="mr-6">
                 <v-icon>mdi-flag-outline</v-icon>
@@ -57,7 +76,9 @@
                   <custom-icon name="account" />
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title data-v-step="6">Account</v-list-item-title>
+                  <v-list-item-title data-v-step="6">
+                    Account
+                  </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
@@ -68,16 +89,16 @@
   </v-card>
 </template>
 <script>
-import CustomIcon from '@/components/CustomIcon'
-import { mapGetters } from 'vuex'
+  import CustomIcon from '@/components/CustomIcon'
+  import { mapGetters } from 'vuex'
 
   export default {
     components: {
       CustomIcon
     },
     computed: {
-    ...mapGetters(['getThemes', 'getActiveTheme']),
-  },
+      ...mapGetters([ 'getThemes', 'getActiveTheme' ]),
+    },
     data() { 
       return { 
         drawer: true,
