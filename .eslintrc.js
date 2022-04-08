@@ -5,6 +5,7 @@ module.exports = {
   },
   'extends': [
     'plugin:vue/essential',
+    'plugin:vue/strongly-recommended',
     'eslint:recommended'
   ],
   parserOptions: {
@@ -12,9 +13,14 @@ module.exports = {
   },
   plugins: [ 'vue' ],
   rules: {
-    'eol-last': ["error", "always"],
+    'array-bracket-spacing': [ 'warn', 'always' ],
+    'eol-last': [ "error", "always" ],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-unused-vars': 'warn',
+    'vue/script-indent': [ 'error', 2, { baseIndent: 1 } ],
+    'vue/no-unused-components': 'warn',
+    'vue/no-v-html': 'off',
   },
   overrides: [
     {
