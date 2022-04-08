@@ -5,19 +5,19 @@ import getColors from '../lib/styling/colors'
 
 export function generateCustomProperties (theme) {
   const colors = getColors(theme)
-  return entries(colors).map(([_key, value]) => {
-    const [, ...parts] = /([a-z]+)([A-Za-z]+)?(\d+)?/.exec(_key)
+  return entries(colors).map(([ _key, value ]) => {
+    const [ , ...parts ] = /([a-z]+)([A-Za-z]+)?(\d+)?/.exec(_key)
     const key = parts
       .filter(identity)
       .map(toLower)
       .join('-')
-    return [`--color-${key}`, value]
+    return [ `--color-${key}`, value ]
   })
 }
 
 export default function customProperties ({ store }, inject) {
   const setCustomProperties = theme => {
-    generateCustomProperties(theme).forEach(([key, value]) => {
+    generateCustomProperties(theme).forEach(([ key, value ]) => {
       document.documentElement.style.setProperty(key, value)
     })
   }

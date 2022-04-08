@@ -25,7 +25,9 @@ export const light = {
   success: '#028200',
   turqoise: '#28cc9b',
   warning: '#f79502',
-  white100: '#ffffff'
+  white100: '#ffffff',
+  greenCocliCo: '#068B95 ',
+  orangeCoClico: '#ffa827'
 }
 
 export const dark = {
@@ -58,7 +60,7 @@ export const dark = {
 
 const context = {
   primary: {
-    light: light.blue,
+    light: light.greenCocliCo,
     dark: dark.white100
   },
   primaryHover: {
@@ -106,7 +108,7 @@ const context = {
     dark: dark.grey100
   },
   background: {
-    light: light.white100,
+    light: light.greenCocliCo,
     dark: dark.grey100
   },
   buttonColor: {
@@ -114,7 +116,7 @@ const context = {
     dark: dark.blue120
   },
   buttonColorContrast: {
-    light: light.white100,
+    light: light.greenCocliCo,
     dark: dark.blue120
   },
   textColor: {
@@ -122,7 +124,7 @@ const context = {
     dark: dark.white100
   },
   textInverted: {
-    light: light.white100,
+    light: light.greenCocliCo,
     dark: dark.black100
   },
   formBase: {
@@ -130,7 +132,7 @@ const context = {
     dark: dark.grey60
   },
   formActive: {
-    light: light.blue100,
+    light: light.orangeCoClico,
     dark: dark.blue80
   }
 }
@@ -138,7 +140,7 @@ const context = {
 export default function getColors (theme) {
   const baseColors = theme === 'dark' ? dark : light
   const contextColors = entries(context)
-    .map(([key, value]) => ({ [key]: value[theme] }))
+    .map(([ key, value ]) => ({ [key]: value[theme] }))
     .reduce(merge)
 
   return merge(baseColors, contextColors)

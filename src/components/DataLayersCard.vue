@@ -1,35 +1,52 @@
 <template>
-<v-card dark raised max-height="80vh" class="pa-0 data-layers-card"  data-v-step="3">
-  <v-card-title class="h3">
-    All datasets
-  </v-card-title>
-  <v-card-text class='scrollbar data-layers-card__text px-0 pb-0'> 
-    <v-expansion-panels
-    v-model="panel"
-    multiple
-    accordion
-    flat
-    color="background"
-    >
-      <v-radio-group class='data-layers-card__group ma-0'>
-        <v-expansion-panel
-          v-for="(dataset, index) in datasets"
-          :key="index"
-          :data-v-step="index === 1 ? '4' : false"
-        >
-          <v-expansion-panel-header
-            hide-actions
-            color="background"
-            dark
-          > 
-            <v-row>
-              <v-col cols="1" class="ma-auto pa-0">
-                <custom-icon name="cc" iconFolder="datasets"/>  
-              </v-col>
-              <v-col cols="7" class="ma-auto pa-0">
-                <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span> 
-              </v-col>
-              <v-col cols="2" class="ma-auto pa-0">
+  <v-card
+    raised
+    max-height="80vh"
+    class="pa-0 data-layers-card"
+    data-v-step="3"
+  >
+    <v-card-title class="h3">
+      All datasets
+    </v-card-title>
+    <v-card-text class="scrollbar data-layers-card__text px-0 pb-0"> 
+      <v-expansion-panels
+        v-model="panel"
+        multiple
+        accordion
+        flat
+        color="background"
+      >
+        <v-radio-group class="data-layers-card__group ma-0">
+          <v-expansion-panel
+            v-for="(dataset, index) in datasets"
+            :key="index"
+            :data-v-step="index === 1 ? '4' : false"
+          >
+            <v-expansion-panel-header
+              hide-actions
+              color="background"
+              dark
+            > 
+              <v-row>
+                <v-col
+                  cols="1"
+                  class="ma-auto pa-0"
+                >
+                  <custom-icon
+                    name="cc"
+                    icon-folder="datasets"
+                  />  
+                </v-col>
+                <v-col
+                  cols="7"
+                  class="ma-auto pa-0"
+                >
+                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span> 
+                </v-col>
+                <v-col
+                  cols="2"
+                  class="ma-auto pa-0"
+                >
                   <v-switch
                     :disabled="nonSelections"
                     class="my-auto switch"
@@ -38,119 +55,137 @@
                     v-model="dataset.visible"
                     color="formActive"
                     @change="toggleMapboxLayer(dataset)"
-                  ></v-switch>
+                  />
                 </v-col>
-                <v-col cols="1" class="ma-auto pa-0">
+                <v-col
+                  cols="1"
+                  class="ma-auto pa-0"
+                >
                   <v-radio
                     dense
                     class="ma-auto radio"
                     :value="dataset.id"
                     @click="setRasterLayer(dataset.id)"
                     color="formActive"
-                  ></v-radio>
+                  />
                   <v-progress-circular
                     dense
                     class="ma-auto"
                     v-show="false"
                     indeterminate
                     color="formActive"
-                  ></v-progress-circular>
+                  />
                 </v-col>
-                <v-col cols="1" class="ma-auto pa-0">
-                   <v-btn icon class="my-auto" @click="onTooltipClick(dataset.id)" >
-                    <custom-icon v-if="dataset.description" name="info" />
+                <v-col
+                  cols="1"
+                  class="ma-auto pa-0"
+                >
+                  <v-btn
+                    icon
+                    class="my-auto"
+                    @click="onTooltipClick(dataset.id)"
+                  >
+                    <custom-icon
+                      v-if="dataset.description"
+                      name="info"
+                    />
                   </v-btn>
                 </v-col>
-            </v-row>
-           </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-row>
-              <v-col cols="6" class="ma-auto pa-0">
-                 <v-select
-                  class="pa-2"
-                  v-model="chosenPeriod"
-                  :items="dataset.summaries.return_period"
-                  :label="`Periods`"
-                  flat
-                  dense
-                  @change="updateMapboxLayer(dataset)"
-                />
-              </v-col>
-              <v-col cols="6" class="ma-auto pa-0">
-                 <v-select
-                  class="pa-2"
-                  v-model="chosenScenario"
-                  :items="dataset.summaries.scenario"
-                  :label="`Scenarios`"
-                  flat
-                  dense
-                  @change="updateMapboxLayer(dataset)"
-                />             
-              </v-col>
-            </v-row>
-            
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-radio-group>
-    </v-expansion-panels>
-  </v-card-text>
-</v-card>
+              </v-row>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row>
+                <v-col
+                  cols="6"
+                  class="ma-auto pa-0"
+                >
+                  <v-select
+                    class="pa-2"
+                    v-model="chosenPeriod"
+                    :items="dataset.summaries.return_period"
+                    :label="`Periods`"
+                    flat
+                    dense
+                    @change="updateMapboxLayer(dataset)"
+                  />
+                </v-col>
+                <v-col
+                  cols="6"
+                  class="ma-auto pa-0"
+                >
+                  <v-select
+                    class="pa-2"
+                    v-model="chosenScenario"
+                    :items="dataset.summaries.scenario"
+                    :label="`Scenarios`"
+                    flat
+                    dense
+                    @change="updateMapboxLayer(dataset)"
+                  />             
+                </v-col>
+              </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-radio-group>
+      </v-expansion-panels>
+    </v-card-text>
+  </v-card>
 </template>
 <script>
-import CustomIcon from "./CustomIcon.vue"
-import toLower from 'lodash/toLower'
-import { mapActions } from "vuex"
+  import CustomIcon from "./CustomIcon.vue"
+  import toLower from 'lodash/toLower'
+  import { mapActions } from "vuex"
 
-export default {
-  props: {
-    datasets: {
-      type: Object,
-      default: () => {}
-    }
-  },
-  components: {
-    CustomIcon,
-  },
-  data () {
-    return {
-      panel: [],
-      chosenPeriod: null,
-      chosenScenario: null,
-      
-    }
-  },
-  computed: {
-    nonSelections() { 
-      return this.chosenPeriod && this.chosenScenario ? false : true
-    },
-  },
-  methods: {
-    ...mapActions ({loadMapboxLayer: 'loadMapboxLayer'}),
-    toggleMapboxLayer(dataset) {
-      this.loadLayerToMap(dataset)
-    },
-    updateMapboxLayer(dataset) {
-      if (!dataset.visible) {
-        return
+  export default {
+    props: {
+      datasets: {
+        type: Object,
+        default: () => {}
       }
-      this.loadLayerToMap(dataset)
     },
-    setRasterLayer() {
-      console.log('setRasterLayer')
+    components: {
+      CustomIcon,
     },
-    onTooltipClick() {
-      console.log('onTooltipClick')
+    data () {
+      return {
+        panel: [],
+        chosenPeriod: null,
+        chosenScenario: null,
+      
+      }
     },
-    loadLayerToMap(dataset) {
-          const { chosenPeriod, chosenScenario } = this
-          const { id, links } = dataset
-          const title = `${id.split("-")[2]}-mapbox-${chosenPeriod}-${toLower(chosenScenario)}`
-          const chosenLayer = links.find(link => link.title === title )
-          this.loadMapboxLayer(chosenLayer)
-    }
+    computed: {
+      nonSelections() { 
+        return this.chosenPeriod && this.chosenScenario ? false : true
+      },
+    },
+    methods: {
+      ...mapActions ({loadMapboxLayer: 'loadMapboxLayer'}),
+      toggleMapboxLayer(dataset) {
+        this.loadLayerToMap(dataset)
+      },
+      updateMapboxLayer(dataset) {
+        if (!dataset.visible) {
+          return
+        }
+        this.loadLayerToMap(dataset)
+      },
+      setRasterLayer() {
+        console.log('setRasterLayer')
+      },
+      onTooltipClick() {
+        console.log('onTooltipClick')
+      },
+      loadLayerToMap(dataset) {
+        const { chosenPeriod, chosenScenario } = this
+        const { id, links } = dataset
+        const title = `${id.split("-")[2]}-mapbox-${chosenPeriod}-${toLower(chosenScenario)}`
+        const chosenLayer = links.find(link => link.title === title )
+        this.loadMapboxLayer(chosenLayer)
+      }
     
+    }
   }
-}
 
 </script>
 <style scoped>
