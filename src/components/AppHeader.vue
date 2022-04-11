@@ -9,10 +9,12 @@
     <v-spacer />
     
     <v-stepper
-      class="stepper pa-0"
+      class="pa-0"
       flat
       non-linear
       elevation="0"
+      width="800px"
+      height="57px" 
       dark
     >
       <v-stepper-header
@@ -52,11 +54,6 @@
   }
 </script>
 <style>
-.stepper {
-  width: 800px;
-  height: 57px;
-  box-shadow: 0px 0px 0px;
-}
 
 .stepper-header {
   background-color: var(--v-background-base);
