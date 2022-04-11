@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import './registerServiceWorker'
+/* The vue-composition API should always being imported before all others plugins */
+import './plugins/composition-api' 
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
-import './plugins/composition-api'
+
 
 import '@/css/main.css'
 

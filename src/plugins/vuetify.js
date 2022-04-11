@@ -6,22 +6,22 @@ import '@mdi/font/css/materialdesignicons.css'
 
 Vue.use(Vuetify)
 
-const colors = getColors('dark')
+const colors = getColors('coclico')
 
 
 export default new Vuetify({
     icons: {
         iconfont: 'mdi'
     },
-    customVariables: ['@/assets/variables.scss'],
+    customVariables: [ '@/assets/variables.scss' ],
     treeShake: true,
     theme: {
         options: {
             customProperties: true
         },
-        dark: true,
         themes: {
-            dark: colors
-        }
+            light: colors,
+        },
+        
     }
 });
