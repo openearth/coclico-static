@@ -1,6 +1,6 @@
 import getColors from '../../lib/styling/colors'
 
-const color = getColors('light')
+const color = getColors('coclico')
 
 export default {
   state: () => ({
