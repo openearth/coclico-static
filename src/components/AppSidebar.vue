@@ -11,6 +11,7 @@
       <v-list
         dense
         class="pa-0"
+        dark
       >
         <v-list-item
           class="px-2"
@@ -19,10 +20,10 @@
         >
           <!-- TODO: add routing -->
           <v-list-item-avatar>
-            <custom-icon name="deltares" />
+            <custom-icon name="coclico" />
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title color="primary">
+            <v-list-item-title>
               Deltares
             </v-list-item-title>
           </v-list-item-content>

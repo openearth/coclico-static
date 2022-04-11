@@ -13,6 +13,7 @@
       flat
       non-linear
       elevation="0"
+      dark
     >
       <v-stepper-header
         class="stepper-header"
