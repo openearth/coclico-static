@@ -1,15 +1,38 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import DataLayers from '../views/DataLayers.vue'
+import LandPage from '../views/LandPage.vue'
+import StoriesPage from '../views/StoriesPage.vue'
+import WorkbenchPage from '../views/WorkbenchPage.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-  {
+ {
     path: '/',
+    name: 'home',
+    redirect: '/data'
+  }, 
+  {
     name: 'data',
+    path: '/data',
     component: DataLayers
   },
+    {
+    name: 'landpage',
+    path: '/landpage',
+    component: LandPage
+  },
+    {
+    name: 'workbench',
+    path: '/workbench',
+    component: WorkbenchPage
+  },
+  {
+    name: 'stories',
+    path: '/stories',
+    component: StoriesPage
+  }
 ]
 
 const router = new VueRouter({
