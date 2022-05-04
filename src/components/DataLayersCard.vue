@@ -20,7 +20,6 @@
           <v-expansion-panel
             v-for="(dataset, index) in datasets"
             :key="index"
-            :data-v-step="index === 1 ? '4' : false"
           >
             <v-expansion-panel-header
               hide-actions
@@ -60,6 +59,7 @@
                   cols="1"
                   class="ma-auto pa-0"
                 >
+                  <!-- TODO: to be added functionality to radio button -->
                   <v-radio
                     dense
                     class="ma-auto radio"
@@ -120,8 +120,8 @@
 </template>
 <script>
   import CustomIcon from "./CustomIcon.vue"
-  import toLower from 'lodash/toLower'
   import { mapActions } from "vuex"
+  import _ from 'lodash'
 
   export default {
     props: {
@@ -141,36 +141,33 @@
     methods: {
       ...mapActions ({loadMapboxLayer: 'loadMapboxLayer'}),
       toggleMapboxLayer(dataset) {
+
         if (!dataset.visible) {
           return
         }
-      },
-      components: {
-        CustomIcon,
-      },
-      data () {
-        return {
-          panel: [],
-          chosenPeriod: null,
-          chosenScenario: null,
-      
+        //find the layer of the dataset to load on the map based on the chosen values
+        const {links,  summaries } = dataset
+        const filterByProperty = ({properties})=> {
+          if (properties) {
+            const array =  summaries.map(({id, chosenValue }) => {
+              const propVal = _.get(properties, id)
+              return propVal === chosenValue
+            })
+            return array.every(Boolean)
+          }
         }
-      },
-      loadLayerToMap(dataset) {
-         
-        const { id, links, summaries } = dataset
-        //TODO: see how we are going to create the layername
-        const chosenPeriod = summaries[0].chosenValue
-        const chosenScenario = summaries[1].chosenValue
+        const layer = links.find(filterByProperty)
 
-        const title = `${id.split("-")[2]}-mapbox-${chosenPeriod}-${toLower(chosenScenario)}`
-         
-        const layer = links.find(link => link.title === title )
-        //TODO: see why not all combinations of period and scenario are working
         if (!layer) {
           return
         }
         this.loadMapboxLayer(layer)
+      },
+
+      data () {
+        return {
+          panel: [],
+        }
       },
     }
   }
