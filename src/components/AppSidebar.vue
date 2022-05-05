@@ -24,7 +24,7 @@
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>
-              Deltares
+              CoCliCo
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
