@@ -20,7 +20,6 @@
           <v-expansion-panel
             v-for="(dataset, index) in datasets"
             :key="index"
-            :data-v-step="index === 1 ? '4' : false"
           >
             <v-expansion-panel-header
               hide-actions
@@ -48,7 +47,6 @@
                   class="ma-auto pa-0"
                 >
                   <v-switch
-                    :disabled="nonSelections"
                     class="my-auto switch"
                     dense
                     flat
@@ -61,6 +59,7 @@
                   cols="1"
                   class="ma-auto pa-0"
                 >
+                  <!-- TODO: to be added functionality to radio button -->
                   <v-radio
                     dense
                     class="ma-auto radio"
@@ -98,30 +97,18 @@
                 <v-col
                   cols="6"
                   class="ma-auto pa-0"
+                  v-for="summary in dataset.summaries"
+                  :key="summary.id"
                 >
                   <v-select
                     class="pa-2"
-                    v-model="chosenPeriod"
-                    :items="dataset.summaries.return_period"
-                    :label="`Periods`"
+                    v-model="summary.chosenValue"
+                    :items="summary.allowedValues"
+                    :label="summary.id"
                     flat
                     dense
-                    @change="updateMapboxLayer(dataset)"
-                  />
-                </v-col>
-                <v-col
-                  cols="6"
-                  class="ma-auto pa-0"
-                >
-                  <v-select
-                    class="pa-2"
-                    v-model="chosenScenario"
-                    :items="dataset.summaries.scenario"
-                    :label="`Scenarios`"
-                    flat
-                    dense
-                    @change="updateMapboxLayer(dataset)"
-                  />             
+                    @change="toggleMapboxLayer(dataset)"
+                  />          
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
@@ -133,8 +120,8 @@
 </template>
 <script>
   import CustomIcon from "./CustomIcon.vue"
-  import toLower from 'lodash/toLower'
   import { mapActions } from "vuex"
+  import _ from 'lodash'
 
   export default {
     props: {
@@ -149,44 +136,41 @@
     data () {
       return {
         panel: [],
-        chosenPeriod: null,
-        chosenScenario: null,
-      
       }
-    },
-    computed: {
-      nonSelections() { 
-        return this.chosenPeriod && this.chosenScenario ? false : true
-      },
     },
     methods: {
       ...mapActions ({loadMapboxLayer: 'loadMapboxLayer'}),
       toggleMapboxLayer(dataset) {
-        this.loadLayerToMap(dataset)
-      },
-      updateMapboxLayer(dataset) {
+
         if (!dataset.visible) {
           return
         }
-        this.loadLayerToMap(dataset)
+        //find the layer of the dataset to load on the map based on the chosen values
+        const {links,  summaries } = dataset
+        const filterByProperty = ({properties})=> {
+          if (properties) {
+            const array =  summaries.map(({id, chosenValue }) => {
+              const propVal = _.get(properties, id)
+              return propVal === chosenValue
+            })
+            return array.every(Boolean)
+          }
+        }
+        const layer = links.find(filterByProperty)
+
+        if (!layer) {
+          return
+        }
+        this.loadMapboxLayer(layer)
       },
-      setRasterLayer() {
-        console.log('setRasterLayer')
+
+      data () {
+        return {
+          panel: [],
+        }
       },
-      onTooltipClick() {
-        console.log('onTooltipClick')
-      },
-      loadLayerToMap(dataset) {
-        const { chosenPeriod, chosenScenario } = this
-        const { id, links } = dataset
-        const title = `${id.split("-")[2]}-mapbox-${chosenPeriod}-${toLower(chosenScenario)}`
-        const chosenLayer = links.find(link => link.title === title )
-        this.loadMapboxLayer(chosenLayer)
-      }
-    
     }
   }
-
 </script>
 <style scoped>
 .data-layers-card {

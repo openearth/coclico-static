@@ -26,6 +26,7 @@ export default {
 			//Get STAC collection
     getCatalog(process.env.VUE_APP_CATALOG_URL)
       .then(datasets => {
+      
 				const themes = _.get(datasets, 'summaries.keywords') 
         themes.forEach(theme => commit('addTheme', theme))
 				const children = datasets.links.filter(ds => ds.rel === 'child')
@@ -33,6 +34,19 @@ export default {
         return children.forEach(child => {
           return getCatalog(child.href) 
             .then(dataset => {
+            
+              //All the below functionality will be added in a function at the end
+              const summaries = _.get(dataset, 'summaries')
+              const mappedSummaries = Object.keys(summaries).map(id => {
+                const summary = _.get(summaries, id)
+                return {
+                  id: id,
+                  allowedValues: summary,
+                  chosenValue: summary[0]
+                }
+              })
+              _.set(dataset, 'summaries', mappedSummaries)
+              
               commit('addDataset', dataset)
             })
         })

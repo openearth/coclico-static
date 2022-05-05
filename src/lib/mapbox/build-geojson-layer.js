@@ -5,9 +5,9 @@ export default ({id, properties, assets }) => {
     type: properties['deltares:type'],
     source: {
       type: mapbox.type,
-      url: 'mapbox://global-data-viewer.6v63xk2e'//mapbox.href
+      url: mapbox.href 
     },
-    'source-layer': 'EU_EESSL_JRC_Hist_RP_flat-74xh1t', //mapbox.source
+    'source-layer': mapbox.source,  
     paint: properties['deltares:paint'],
   }
 }
