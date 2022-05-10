@@ -10,6 +10,8 @@
         v-if="activeMapboxLayers"
         :options="activeMapboxLayers"
         :key="activeMapboxLayers.id"
+        clickable
+        @click="showTimeseries"
       />
     </mapbox-map>
     <router-view />
@@ -19,7 +21,7 @@
 <script>
   import { MapboxMap } from '@deltares/vue-components'
   import DataLayersCard from '@/components/DataLayersCard.vue'
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
 
   export default {
     name:'DataLayers',
@@ -32,8 +34,29 @@
     },
     computed: {
       ...mapGetters([ 'availableDatasets', 'activeMapboxLayers' ])
-    }
+    },
+    methods: {
+      ...mapActions([ 'loadDatasets', 'loadPointDataForLocation' ]),
+      mapPanTo (event, duration) {
+        const { clientWidth } = event.target.getCanvas()
 
+        // the timeseries panel is max 600px wide otherwise the half of the screen
+        const visibleMapWidth =
+          clientWidth > 1200 ? (clientWidth - 600) * 0.25 : (clientWidth / 2) * 0.5
+        const targetLocation = event.target.unproject({
+          x: event.point.x - visibleMapWidth,
+          y: event.point.y
+        })
+        event.target.panTo(targetLocation, { duration })
+      },
+      showTimeseries (event) {
+        this.mapPanTo(event, 500)
+
+        const features = event.target.queryRenderedFeatures(event.point)
+        console.log(features, event)
+        this.loadPointDataForLocation()
+      },
+    }
   }
 </script>
 

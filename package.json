@@ -25,7 +25,9 @@
     "vue-router": "^3.5.1",
     "vue2mapbox-gl": "^0.13.0",
     "vuetify": "^2.4.0",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "zarr": "^0.5.1",
+    "zarr-js": "^2.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

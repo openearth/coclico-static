@@ -18,10 +18,10 @@ export default async function get (endpoint, parameters, baseUrl) {
   const fullPath = `${baseUrl}/${endpoint}`
 
   const paramString = entries(parameters)
-    .map(([key, value]) => `${key}=${value}`)
+    .map(([ key, value ]) => `${key}=${value}`)
     .join('&')
 
-  const url = [fullPath, paramString].filter(identity).join('?')
+  const url = [ fullPath, paramString ].filter(identity).join('?')
   const result = fetch(url)
 
   try {
