@@ -4,6 +4,7 @@
     <app-sidebar />
     <v-main>
       <router-view />
+      <legal-dialog />
     </v-main>
   </v-app>
 </template>
@@ -11,14 +12,15 @@
 <script>
   import AppHeader from './components/AppHeader'
   import AppSidebar from './components/AppSidebar'
-
+  import LegalDialog from './components/LegalDialog'
   import { mapActions } from 'vuex'
 
   export default {
   
     components: {
       AppHeader,
-      AppSidebar
+      AppSidebar,
+      LegalDialog
     },
     methods: { 
       ...mapActions({ loadDatasets: 'loadDatasets' }),
