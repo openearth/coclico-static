@@ -11,18 +11,17 @@
     watch: {
       '$route.params.datasetIds': {
         handler () {
-          this.storeActiveVectorIds(this.$route.params.datasetIds)
-          //this.triggerActiveVector()
+          this.storeActiveDatasetIds(this.$route.params.datasetIds)
         },
         deep: true
       }
     },
     mounted () {
-      this.storeActiveVectorIds(this.$route.params.datasetIds)
-      //this.triggerActiveVector()
+      this.storeActiveDatasetIds(this.$route.params.datasetIds)
+      //TODO: need to create function that finds layer and load it
     },
     methods: {
-      ...mapActions([ 'storeActiveVectorIds' ])
+      ...mapActions([ 'storeActiveDatasetIds' ])
     }
   }
 </script>

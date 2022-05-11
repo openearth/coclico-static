@@ -141,15 +141,7 @@
     methods: {
       ...mapActions ([ 'loadMapboxLayer','clearActiveDatasetIds' ]),
       toggleLocationDataset(dataset) {
-        console.log('dataset', dataset)
-        if (!dataset.visible) {
-          console.log('clear')
-          this.clearActiveDatasetIds()
-          return
-        }
-       
         const {links,  summaries, id } = dataset
-
         let oldParams = _.get(this.$route, 'params.datasetIds')
         const params = this.$route.params
         let newParams 
@@ -184,7 +176,13 @@
           this.$router.push('/data')
         }
 
-        //find the layer of the dataset to load on the map based on the chosen values
+        //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
+        if (!dataset.visible) {
+          this.clearActiveDatasetIds()
+          return
+        }
+       
+        
         const filterByProperty = ({properties})=> {
           if (properties) {
             const array =  summaries.map(({id, chosenValue }) => {

@@ -22,10 +22,9 @@ const routes = [
         children: [ {
       path: ':datasetIds',
       component: DatasetIds,
-/*       children: [ {
-        path: ':locationId',
-        component: LocationId
-      } ] */
+      children: [ {
+        path: ':locationId'
+      } ]
     } ]
   },
     {

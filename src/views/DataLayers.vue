@@ -10,6 +10,8 @@
         v-if="activeMapboxLayers"
         :options="activeMapboxLayers"
         :key="activeMapboxLayers.id"
+        clickable
+        @click="selectLocation"
       />
     </mapbox-map>
     <router-view />
@@ -17,6 +19,7 @@
 </template>
 
 <script>
+  import _ from 'lodash'
   import { MapboxMap } from '@deltares/vue-components'
   import DataLayersCard from '@/components/DataLayersCard.vue'
   import { mapGetters } from 'vuex'
@@ -32,6 +35,18 @@
     },
     computed: {
       ...mapGetters([ 'availableDatasets', 'activeMapboxLayers' ])
+    },
+    methods: {
+      selectLocation(e) {
+        
+        const {properties} = e.features[0]
+        const {locationId} = properties
+        if (locationId) {
+          const params = this.$route.params
+          params.locationId = locationId
+          this.$router.push({ path: `/data/${params.datasetIds}/${params.locationId}`, params })
+        }
+      }
     }
 
   }

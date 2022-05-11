@@ -58,6 +58,7 @@ export default {
         })
       })
     },
+    //commits the  building the mapbox layer format
     loadMapboxLayer({commit}, layer) {
       //get info of the layer from stac catalog
       getCatalog(layer.href) 
@@ -65,8 +66,9 @@ export default {
           commit('addMapboxLayer', buildGeojsonLayer(layerInfo))
         })
     },
-    storeActiveVectorIds ({ commit }, _ids) {
-      // First set the activeDatasetIds
+ 
+    storeActiveDatasetIds ({ commit }, _ids) {
+      // First set of the activeDatasetIds
       const ids = isArray(_ids) ? _ids : _ids.split(',')
       commit('setActiveDatasetIds', ids)
     },
