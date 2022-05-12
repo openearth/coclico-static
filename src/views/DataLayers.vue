@@ -19,7 +19,6 @@
 </template>
 
 <script>
-  import _ from 'lodash'
   import { MapboxMap } from '@deltares/vue-components'
   import DataLayersCard from '@/components/DataLayersCard.vue'
   import { mapGetters } from 'vuex'
