@@ -1,6 +1,7 @@
 import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
+import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes from './themes.js'
 
@@ -10,7 +11,9 @@ export default {
     themes
   },
   state: () => ({
-    activeMapboxLayers: null // TODO: list of layers ready to be added.
+    activeMapboxLayers: null, // TODO: list of layers ready to be added.
+    activeDatasetIds: [],
+  
   }),
  
   getters: {
@@ -19,6 +22,9 @@ export default {
     },
     activeMapboxLayers(state) {
       return state.activeMapboxLayers 
+    },
+    activeDatasetIds(state) {
+      return state.activeDatasetIds
     }
   },
   actions: {
@@ -52,18 +58,35 @@ export default {
         })
       })
     },
+    //commits the  building the mapbox layer format
     loadMapboxLayer({commit}, layer) {
       //get info of the layer from stac catalog
       getCatalog(layer.href) 
         .then(layerInfo => {
           commit('addMapboxLayer', buildGeojsonLayer(layerInfo))
         })
+    },
+ 
+    storeActiveDatasetIds ({ commit }, _ids) {
+      // First set of the activeDatasetIds
+      const ids = isArray(_ids) ? _ids : _ids.split(',')
+      commit('setActiveDatasetIds', ids)
+    },
+    clearActiveDatasetIds({commit}) {
+      commit('clearActiveDatasetIds')
     }
+
   },
   mutations: {
     addMapboxLayer(state, mapboxLayer) {
       //TODO: allow multiple layers to loaded on the map from different collections. Allow only one layer from each collection?
       state.activeMapboxLayers  = mapboxLayer
-    }
+    },
+    setActiveDatasetIds (state, ids) {
+      state.activeDatasetIds = ids
+    },
+    clearActiveDatasetIds (state) {
+      state.activeDatasetIds = []
+    },
   },
 }

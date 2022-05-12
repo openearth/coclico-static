@@ -4,6 +4,8 @@ import DataLayers from '../views/DataLayers.vue'
 import LandPage from '../views/LandPage.vue'
 import StoriesPage from '../views/StoriesPage.vue'
 import WorkbenchPage from '../views/WorkbenchPage.vue'
+import DatasetIds from '../views/data/DatasetIds.vue'
+
 
 Vue.use(VueRouter)
 
@@ -16,7 +18,14 @@ const routes = [
   {
     name: 'data',
     path: '/data',
-    component: DataLayers
+    component: DataLayers, // this is the Platform page
+        children: [ {
+      path: ':datasetIds',
+      component: DatasetIds,
+      children: [ {
+        path: ':locationId'
+      } ]
+    } ]
   },
     {
     name: 'landpage',

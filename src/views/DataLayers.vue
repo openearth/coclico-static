@@ -10,6 +10,8 @@
         v-if="activeMapboxLayers"
         :options="activeMapboxLayers"
         :key="activeMapboxLayers.id"
+        clickable
+        @click="selectLocation"
       />
     </mapbox-map>
     <router-view />
@@ -32,6 +34,18 @@
     },
     computed: {
       ...mapGetters([ 'availableDatasets', 'activeMapboxLayers' ])
+    },
+    methods: {
+      selectLocation(e) {
+        
+        const {properties} = e.features[0]
+        const {locationId} = properties
+        if (locationId) {
+          const params = this.$route.params
+          params.locationId = locationId
+          this.$router.push({ path: `/data/${params.datasetIds}/${params.locationId}`, params })
+        }
+      }
     }
 
   }

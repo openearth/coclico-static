@@ -52,7 +52,7 @@
                     flat
                     v-model="dataset.visible"
                     color="formActive"
-                    @change="toggleMapboxLayer(dataset)"
+                    @change="toggleLocationDataset(dataset)"
                   />
                 </v-col>
                 <v-col
@@ -139,14 +139,50 @@
       }
     },
     methods: {
-      ...mapActions ({loadMapboxLayer: 'loadMapboxLayer'}),
-      toggleMapboxLayer(dataset) {
+      ...mapActions ([ 'loadMapboxLayer','clearActiveDatasetIds' ]),
+      toggleLocationDataset(dataset) {
+        const {links,  summaries, id } = dataset
+        let oldParams = _.get(this.$route, 'params.datasetIds')
+        const params = this.$route.params
+        let newParams 
 
+        if (!oldParams) {
+          //if oldPrams is undefined, set newParams by id
+          newParams = id
+        }else {
+          // Else check if new id should be removed or added to new route
+          oldParams = oldParams.split(',')
+          if (oldParams.includes(id)) {
+            // if oldparams already includes id, remove from route
+            newParams = oldParams.filter(param => param !== id)
+            if (newParams.length === 0) {
+              newParams = undefined
+            } else {
+              newParams = newParams.join(',')
+            }
+          } else {
+            // else add id to route and zoomtobbox
+            newParams = `${oldParams},${id}`
+          }
+        }
+        params.datasetIds = newParams
+        let path = `/data/${params.datasetIds}`
+        if (_.has(params, 'locationId')) {
+          path = `/data/${params.datasetIds}/${params.locationId}`
+        }
+        if (newParams) {
+          this.$router.push({ path, params })
+        } else {
+          this.$router.push('/data')
+        }
+
+        //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
         if (!dataset.visible) {
+          this.clearActiveDatasetIds()
           return
         }
-        //find the layer of the dataset to load on the map based on the chosen values
-        const {links,  summaries } = dataset
+       
+        
         const filterByProperty = ({properties})=> {
           if (properties) {
             const array =  summaries.map(({id, chosenValue }) => {
