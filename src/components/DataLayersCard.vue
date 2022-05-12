@@ -107,8 +107,13 @@
                     :label="summary.id"
                     flat
                     dense
-                    @change="toggleMapboxLayer(dataset)"
+                    @change="toggleLocationDataset(dataset)"
                   />          
+                </v-col>
+              </v-row>
+              <v-row v-if="dataset.visible"> 
+                <v-col>
+                  <layer-legend />
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
@@ -120,6 +125,8 @@
 </template>
 <script>
   import CustomIcon from "./CustomIcon.vue"
+  import LayerLegend from "./LayerLegend.vue"
+
   import { mapActions } from "vuex"
   import _ from 'lodash'
 
@@ -132,6 +139,7 @@
     },
     components: {
       CustomIcon,
+      LayerLegend
     },
     data () {
       return {
