@@ -11,7 +11,7 @@
         :options="activeMapboxLayers"
         :key="activeMapboxLayers.id"
         clickable
-        @click="showTimeseries"
+        @click="selectLocation"
       />
       <v-mapbox-layer
         :options="selectedPointLayer"
@@ -67,6 +67,16 @@
       ...mapActions([ 'loadDatasets', 'loadPointDataForLocation' ]),
       isEmpty(obj) {
         return _.isEmpty(obj)
+      },
+      selectLocation(e) {
+        this.showTimeseries(e)
+        const {properties} = e.features[0]
+        const {locationId} = properties
+        if (locationId) {
+          const params = this.$route.params
+          params.locationId = locationId
+          this.$router.push({ path: `/data/${params.datasetIds}/${params.locationId}`, params })
+        }
       },
       mapPanTo (event, duration) {
         const { clientWidth } = event.target.getCanvas()

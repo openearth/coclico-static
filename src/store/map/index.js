@@ -1,6 +1,7 @@
 import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
+import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes, { state } from './themes.js'
 import { openArray } from 'zarr'
@@ -12,7 +13,8 @@ export default {
   },
   state: () => ({
     activeMapboxLayers: null, // TODO: list of layers ready to be added.
-    selectedPointData: {}
+    selectedPointData: {},
+    activeDatasetIds: [],
   }),
 
   getters: {
@@ -20,16 +22,69 @@ export default {
       return state.datasets
     },
     activeMapboxLayers(state) {
-      return state.activeMapboxLayers
+    return state.activeMapboxLayers
     },
     selectedPointData(state) {
       return state.selectedPointData
+    },
+    activeDatasetIds(state) {
+      return state.activeDatasetIds
     }
+  },
+  actions: {
+    loadDatasets ({commit}) {
+			//Get STAC collection
+    getCatalog(process.env.VUE_APP_CATALOG_URL)
+      .then(datasets => {
+
+				const themes = _.get(datasets, 'summaries.keywords')
+        themes.forEach(theme => commit('addTheme', theme))
+				const children = datasets.links.filter(ds => ds.rel === 'child')
+
+        return children.forEach(child => {
+          return getCatalog(child.href)
+            .then(dataset => {
+
+              //All the below functionality will be added in a function at the end
+              const summaries = _.get(dataset, 'summaries')
+              const mappedSummaries = Object.keys(summaries).map(id => {
+                const summary = _.get(summaries, id)
+                return {
+                  id: id,
+                  allowedValues: summary,
+                  chosenValue: summary[0]
+                }
+              })
+              _.set(dataset, 'summaries', mappedSummaries)
+
+              commit('addDataset', dataset)
+            })
+        })
+      })
+    },
+    //commits the  building the mapbox layer format
+    loadMapboxLayer({commit}, layer) {
+      //get info of the layer from stac catalog
+      getCatalog(layer.href)
+        .then(layerInfo => {
+          commit('addMapboxLayer', buildGeojsonLayer(layerInfo))
+        })
+    },
+
+    storeActiveDatasetIds ({ commit }, _ids) {
+      // First set of the activeDatasetIds
+      const ids = isArray(_ids) ? _ids : _ids.split(',')
+      commit('setActiveDatasetIds', ids)
+    },
+    clearActiveDatasetIds({commit}) {
+      commit('clearActiveDatasetIds')
+    }
+
   },
   mutations: {
     addMapboxLayer(state, mapboxLayer) {
       //TODO: allow multiple layers to loaded on the map from different collections. Allow only one layer from each collection?
-      state.activeMapboxLayers = mapboxLayer
+      state.activeMapboxLayers  = mapboxLayer
     },
     setSelectedPointData(state, pointData) {
       state.selectedPointData = pointData
@@ -37,7 +92,13 @@ export default {
     addDatasetPointData(state, pointData) {
       console.log(pointData)
       state.selectedPointData.data = pointData
-    }
+    },
+    setActiveDatasetIds (state, ids) {
+      state.activeDatasetIds = ids
+    },
+    clearActiveDatasetIds (state) {
+      state.activeDatasetIds = []
+    },
   },
   actions: {
     loadDatasets ({commit}) {
