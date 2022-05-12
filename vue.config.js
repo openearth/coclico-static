@@ -1,4 +1,12 @@
 const { defineConfig } = require('@vue/cli-service')
+const marked = require('marked')
+const renderer = new marked.Renderer()
+
+renderer.link = function (href, title, text) {
+  return `<a target="_blank" href="${href}" title="${title}">${text}</a>`
+}
+
+
 module.exports = defineConfig({
   transpileDependencies: [
     'vuetify'
@@ -23,6 +31,7 @@ module.exports = defineConfig({
               loader: 'markdown-loader',
               options: {
                 pedantic: true,
+                renderer
               }
             }
           ]
