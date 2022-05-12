@@ -2,7 +2,7 @@ import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
 import _ from 'lodash'
-import themes from './themes.js'
+import themes, { state } from './themes.js'
 import { openArray } from 'zarr'
 
 export default {
@@ -11,7 +11,8 @@ export default {
     themes
   },
   state: () => ({
-    activeMapboxLayers: null // TODO: list of layers ready to be added.
+    activeMapboxLayers: null, // TODO: list of layers ready to be added.
+    selectedPointData: {}
   }),
 
   getters: {
@@ -20,6 +21,22 @@ export default {
     },
     activeMapboxLayers(state) {
       return state.activeMapboxLayers
+    },
+    selectedPointData(state) {
+      return state.selectedPointData
+    }
+  },
+  mutations: {
+    addMapboxLayer(state, mapboxLayer) {
+      //TODO: allow multiple layers to loaded on the map from different collections. Allow only one layer from each collection?
+      state.activeMapboxLayers = mapboxLayer
+    },
+    setSelectedPointData(state, pointData) {
+      state.selectedPointData = pointData
+    },
+    addDatasetPointData(state, pointData) {
+      console.log(pointData)
+      state.selectedPointData.data = pointData
     }
   },
   actions: {
@@ -58,47 +75,60 @@ export default {
         })
     },
     loadPointDataForLocation({ state, commit }) {
+      const datasetId = 'deltares-coclico-ssl'
       // TODO: we need a state for clicked dataset (preferrably within the router)
-      const dataset = _.get(state, 'datasets.deltares-coclico-ssl')
+      const dataset = _.get(state.datasets, datasetId)
       console.log(dataset)
-      // const url = _.get(dataset, 'assets.data.href')
-      const url = 'https://storage.googleapis.com/dgds-data-public/coclico/CoastAlRisk_Europe_EESSL.zarr'
+      let url = _.get(dataset, 'assets.data.href')
+      console.log(url)
+      url = 'https://storage.googleapis.com/dgds-data-public/coclico/CoastAlRisk_Europe_EESSL.zarr'
       const path = Object.keys(dataset['cube:variables'])[0]
       console.log(path)
+
+      const station = state.selectedPointData.properties.locationId
+
+      fetch(`${url}/${path}/.zattrs`)
+        .then(res => res.json())
+        .then(res => {
+          console.log(res, station)
+          const dimensions = res._ARRAY_DIMENSIONS
+          let slice = dimensions.map(dim => {
+            if (dim === 'stations') {
+              return station
+            } else if (dim === 'scenarios') {
+              return null
+            } else {
+              return null
+            }
+          })
+
+          slice = [null, station, null]
+          openArray({
+            store: url,
+            path: path,
+            mode: 'r'
+          })
+            .then(res => {
+              console.log(res)
+              res.get(slice).then(data => {
+                console.log(slice, data)
+                const series = data.data.map(serie => {
+                  return {
+                    type: 'line',
+                    data: Array.from(serie)
+                  }
+                })
+                commit('addDatasetPointData', {
+                  series,
+                  category: _.get(dataset, '["cube:dimensions"].RP.values')
+                })
+              })
+            })
+        })
       // const dimensions = _.get(dataset, `cube:variables[${path}].dimensions`)
 
       // console.log(dataset, url)
 
-      openArray({
-        store: url,
-        path: path,
-        mode: 'r'
-      })
-        .then(res => {
-          console.log(res)
-          res.get([ 0, 0, 0, null, null ]).then(data => {
-            const series = [ 0, 1, 2 ].map(p => {
-              return data.data.map(d => d[p])
-            })
-            console.log(series)
-            // commit('addDatasetPointData', {
-            //   id: datasetId,
-            //   data: {
-            //     [locationId]: {
-            //       type: 'multiple',
-            //       serie: series,
-            //       category: Array.from(Array(data.data.length).keys())
-            //     }
-            //   }
-            // })
-          })
-        })
     }
-  },
-  mutations: {
-    addMapboxLayer(state, mapboxLayer) {
-      //TODO: allow multiple layers to loaded on the map from different collections. Allow only one layer from each collection?
-      state.activeMapboxLayers = mapboxLayer
-    }
-  },
+  }
 }

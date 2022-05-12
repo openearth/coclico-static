@@ -6,7 +6,7 @@
     width="40vw"
     color="background"
   >
-    <v-container class="account d-flex flex-column">
+    <v-container class="graph-menu d-flex flex-column">
       <h2 class="h2">
         {{ locations }}
       </h2>
@@ -22,7 +22,7 @@
         align-space-between
       >
         <v-expansion-panels
-          v-if="hasSerieData"
+          v-if="true"
           flat
           accordion
           multiple
@@ -41,19 +41,19 @@
               {{ data.datasetName }}
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
-              <graph-line
-                :image-url="data.imageUrl"
-                :category="data.category"
-                :series="[data.serie]"
-                theme="dark"
-                :collapsible="true"
-                :units="data.units"
-                :type="data.type"
-                :parameter-id="data.id"
-                :title="data.datasetName"
-                :set-mark-point="data.id === getActiveRasterLayer"
-                :time-step="getTimeStep"
-              />
+              <v-container class="pa-0">
+                <v-col
+                  cols="12"
+                  class="graph-line pa-0"
+                >
+                  <v-chart
+                    :ref="title"
+                    :option="option"
+                    :autoresize="true"
+                    class="graph-line__chart"
+                  />
+                </v-col>
+              </v-container>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -69,5 +69,172 @@
   </v-navigation-drawer>
 </template>
 
+<script>
+  import VChart from 'vue-echarts'
+  import { mapGetters } from 'vuex'
+  import moment from 'moment'
+  // import ECharts modules manually to reduce bundle size
+  import {
+    SVGRenderer,
+    CanvasRenderer
+  } from 'echarts/renderers'
 
+  import {
+    LineChart,
+    ScatterChart,
+    LinesChart
+  } from 'echarts/charts'
 
+  import {
+    GridComponent,
+    TooltipComponent,
+    MarkLineComponent,
+    MarkPointComponent,
+    DataZoomComponent,
+    TimelineComponent
+  } from 'echarts/components'
+
+  import { use } from 'echarts/core'
+
+  use([
+    ScatterChart,
+    CanvasRenderer,
+    LineChart,
+    GridComponent,
+    TooltipComponent,
+    MarkLineComponent,
+    MarkPointComponent,
+    DataZoomComponent,
+    TimelineComponent,
+    LinesChart
+  ])
+
+  use([ CanvasRenderer ])
+  use([ SVGRenderer ])
+  export default {
+    name:'GraphSideMenu',
+    components: {
+      VChart
+    },
+    computed: {
+      ...mapGetters([ 'selectedPointData', 'datasets' ]),
+      locations () {
+        // TODO: is it always locationId?
+        return `Location id: ${this.selectedPointData.properties.locationId}`
+      },
+      option () {
+        return {
+          xAxis: {
+            type: 'category',
+            data: this.selectedPointData.data.category
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: this.selectedPointData.data.series
+        }
+      }
+    },
+    data () {
+      return {
+        expandedDatasets: [],
+        datasets: []
+      }
+    },
+    methods: {
+      close () {
+        console.log('close panel, change route')
+        // this.$router.push({
+        //   path: `/data/${this.$route.params.datasetIds}`,
+        //   params: { datasetIds: this.$route.params.datasetIds }
+        // })
+      },
+      addLineToGraph (graphSerie) {
+        console.log(graphSerie)
+        let data = graphSerie.map((col, i) => [this.category[i], col])
+        // Make sure that all data is in chronological order to plot it correctly
+        data = data.sort((colA, colB) => {
+          return moment(colA[0]) - moment(colB[0])
+        })
+
+        return {
+          type: 'line',
+          showAllSymbol: true,
+          data,
+          itemStyle: {
+            normal: {
+              borderWidth: 1
+            }
+          }
+        }
+      },
+      addAreaToGraph (serie, label, color = null, legend = false) {
+        let data = serie.map((col, i) => [this.category[i], col])
+        // Make sure that all data is in chronological order to plot it correctly
+        data = data.sort((colA, colB) => {
+          return moment(colA[0]) - moment(colB[0])
+        })
+
+        const series = {
+          name: label,
+          data: data,
+          type: 'line',
+          symbol: 'none',
+          lineStyle: {
+            opacity: 0
+          },
+          z: -1,
+          color: color
+        }
+        if (color) {
+          series.areaStyle = {
+            color: color,
+            origin: 'start',
+            opacity: 0.3
+          }
+        } else {
+          series.areaStyle = {
+            color: '#202020', // TODO: get from custom style
+            opacity: 1,
+            origin: 'start'
+          }
+        }
+        return series
+      }
+    }
+  }
+</script>
+
+<style>
+.graph-menu {
+  height: 100%;
+}
+
+.graph-line__aspect-ratio--image {
+  height: 1200px;
+}
+
+.graph-line__image {
+  height: 1200px;
+  max-width: 100%;
+  background-repeat: no-repeat;
+  background-size: 50% 100%;
+}
+
+.graph-line {
+  position: relative;
+  min-height: 400px;
+}
+
+.graph-line__chart {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 85%;
+}
+
+.disclaimer {
+  text-align: center;
+}
+</style>
