@@ -5,6 +5,7 @@ import LandPage from '../views/LandPage.vue'
 import StoriesPage from '../views/StoriesPage.vue'
 import WorkbenchPage from '../views/WorkbenchPage.vue'
 import DatasetIds from '../views/data/DatasetIds.vue'
+import LocationIds from '../views/data/locations/LocationIds.vue'
 
 
 Vue.use(VueRouter)
@@ -14,7 +15,7 @@ const routes = [
     path: '/',
     name: 'home',
     redirect: '/data'
-  }, 
+  },
   {
     name: 'data',
     path: '/data',
@@ -23,7 +24,8 @@ const routes = [
       path: ':datasetIds',
       component: DatasetIds,
       children: [ {
-        path: ':locationId'
+        path: ':locationId',
+        component: LocationIds,
       } ]
     } ]
   },

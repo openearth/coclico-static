@@ -18,7 +18,6 @@
         key="selectedPoint"
       />
     </mapbox-map>
-    <graph-side-menu v-if="!isEmpty(selectedPointData)" />
     <router-view />
   </div>
 </template>
@@ -26,7 +25,6 @@
 <script>
   import { MapboxMap } from '@deltares/vue-components'
   import DataLayersCard from '@/components/DataLayersCard.vue'
-  import GraphSideMenu from '@/components/GraphSideMenu.vue'
   import { mapGetters, mapActions, mapMutations } from 'vuex'
   import _ from 'lodash'
 
@@ -56,14 +54,13 @@
     }),
     components: {
       DataLayersCard,
-      MapboxMap,
-      GraphSideMenu
+      MapboxMap
     },
     computed: {
-      ...mapGetters([ 'availableDatasets', 'activeMapboxLayers', 'selectedPointData']),
+      ...mapGetters([ 'availableDatasets', 'activeMapboxLayers', 'selectedPointData' ]),
     },
     methods: {
-      ...mapMutations(['setSelectedPointData']),
+      ...mapMutations([ 'setSelectedPointData' ]),
       ...mapActions([ 'loadDatasets', 'loadPointDataForLocation' ]),
       isEmpty(obj) {
         return _.isEmpty(obj)
@@ -72,6 +69,7 @@
         this.showTimeseries(e)
         const {properties} = e.features[0]
         const {locationId} = properties
+        console.log(properties, locationId)
         if (locationId) {
           const params = this.$route.params
           params.locationId = locationId

@@ -8,7 +8,7 @@
   >
     <v-container class="graph-menu d-flex flex-column">
       <h2 class="h2">
-        {{ locations }}
+        Location id: {{ $route.params.locationId }}
       </h2>
       <v-btn
         icon
@@ -71,7 +71,7 @@
 
 <script>
   import VChart from 'vue-echarts'
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
   import moment from 'moment'
   // import ECharts modules manually to reduce bundle size
   import {
@@ -116,6 +116,14 @@
     components: {
       VChart
     },
+    watch: {
+      '$route.params.datasetIds': {
+        handler () {
+          this.storeActiveDatasetIds(this.$route.params.datasetIds)
+        },
+        deep: true
+      }
+    },
     computed: {
       ...mapGetters([ 'selectedPointData', 'datasets' ]),
       locations () {
@@ -137,21 +145,20 @@
     },
     data () {
       return {
-        expandedDatasets: [],
-        datasets: []
+        expandedDatasets: []
       }
     },
     methods: {
+      ...mapActions([ 'storeActiveDatasetIds' ]),
       close () {
-        console.log('close panel, change route')
-        // this.$router.push({
-        //   path: `/data/${this.$route.params.datasetIds}`,
-        //   params: { datasetIds: this.$route.params.datasetIds }
-        // })
+        this.$router.push({
+          path: `/data/${this.$route.params.datasetIds}`,
+          params: { datasetIds: this.$route.params.datasetIds }
+        })
       },
       addLineToGraph (graphSerie) {
         console.log(graphSerie)
-        let data = graphSerie.map((col, i) => [this.category[i], col])
+        let data = graphSerie.map((col, i) => [ this.category[i], col ])
         // Make sure that all data is in chronological order to plot it correctly
         data = data.sort((colA, colB) => {
           return moment(colA[0]) - moment(colB[0])
@@ -169,7 +176,7 @@
         }
       },
       addAreaToGraph (serie, label, color = null, legend = false) {
-        let data = serie.map((col, i) => [this.category[i], col])
+        let data = serie.map((col, i) => [ this.category[i], col ])
         // Make sure that all data is in chronological order to plot it correctly
         data = data.sort((colA, colB) => {
           return moment(colA[0]) - moment(colB[0])
