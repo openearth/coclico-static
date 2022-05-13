@@ -30,7 +30,7 @@
           color="background"
         >
           <v-expansion-panel
-            v-for="data in datasets"
+            v-for="data in selectedDatasets"
             :key="data.id"
           >
             <v-expansion-panel-header
@@ -47,7 +47,6 @@
                   class="graph-line pa-0"
                 >
                   <v-chart
-                    :ref="title"
                     :option="option"
                     :autoresize="true"
                     class="graph-line__chart"
@@ -71,8 +70,9 @@
 
 <script>
   import VChart from 'vue-echarts'
-  import { mapGetters, mapActions } from 'vuex'
+  import { mapGetters, mapActions, mapMutations } from 'vuex'
   import moment from 'moment'
+  import _ from 'lodash'
   // import ECharts modules manually to reduce bundle size
   import {
     SVGRenderer,
@@ -111,8 +111,81 @@
 
   use([ CanvasRenderer ])
   use([ SVGRenderer ])
+
+  const getStyle = (colors = {}) => ({
+    backgroundColor: colors.background,
+    textStyle: {
+      color: colors.textColor
+    },
+    xAxis: {
+      axisLine: {
+        lineStyle: {
+          color: colors.textColor
+        }
+      }
+    },
+    yAxis: {
+      axisLine: {
+        lineStyle: {
+          color: colors.textColor
+        }
+      },
+      splitLine: {
+        lineStyle: {
+          color: colors.formBase
+        }
+      }
+    }
+  })
+
+  const baseOptions = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      },
+      backgroundColor: 'rgba(50,50,50,0.7)',
+      textStyle: {
+        color: '#fff'
+      }
+    },
+    grid: {
+      show: true,
+      top: 30,
+      bottom: 50,
+      right: 20,
+      left: 90
+    },
+    dataZoom: [
+      {
+        type: 'inside',
+        realtime: true
+      }
+    ],
+    textStyle: {
+      fontFamily: 'Helvetica'
+    },
+    xAxis: {
+      splitLine: {
+        show: true
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        fontSize: 14
+      },
+      nameLocation: 'middle',
+      nameGap: 55,
+      nameTextStyle: {
+        fontSize: 14,
+        fontFamily: 'Helvetica'
+      }
+    }
+  }
+
   export default {
-    name:'GraphSideMenu',
+    name:'LocationIds',
     components: {
       VChart
     },
@@ -125,22 +198,36 @@
       }
     },
     computed: {
-      ...mapGetters([ 'selectedPointData', 'datasets' ]),
-      locations () {
-        // TODO: is it always locationId?
-        return `Location id: ${this.selectedPointData.properties.locationId}`
-      },
+      ...mapGetters([ 'selectedPointData', 'selectedDatasets' ]),
       option () {
-        return {
+        //   const option = {
+        //     xAxis: {
+        //       type: 'category',
+        //       data: _.get(this.selectedPointData, 'data.category')
+        //     },
+        //     yAxis: {
+        //       type: 'value'
+        //     },
+        //     series: _.get(this.selectedPointData, 'data.series')
+        //   }
+        //   console.log(option)
+        //   return option
+        // }
+        console.log(this.selectedPointData, _.get(this.selectedPointData, 'data.series'))
+        // console.log(this.selectedPointData.data.series)
+        const dataOptions = {
+          series: _.get(this.selectedPointData, 'data.series'),
+          yAxis: {
+            name: 'test'
+          },
           xAxis: {
             type: 'category',
-            data: this.selectedPointData.data.category
+            data: _.get(this.selectedPointData, 'data.category')
           },
-          yAxis: {
-            type: 'value'
-          },
-          series: this.selectedPointData.data.series
         }
+        const theme = getStyle(this.colors)
+        const result = _.merge(dataOptions, baseOptions)
+        return result
       }
     },
     data () {
@@ -148,8 +235,16 @@
         expandedDatasets: []
       }
     },
+    mounted () {
+      this.updateLocationPanel()
+      this.expandedDatasets = [...Array(this.selectedDatasets.length).keys()]
+    },
     methods: {
-      ...mapActions([ 'storeActiveDatasetIds' ]),
+      ...mapActions([ 'storeActiveDatasetIds', 'loadPointDataForLocation' ]),
+      ...mapMutations([ 'setActiveDatasetIds' ]),
+      updateLocationPanel () {
+        this.loadPointDataForLocation()
+      },
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,

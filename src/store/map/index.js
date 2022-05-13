@@ -22,6 +22,11 @@ export default {
     availableDatasets(state) {
       return state.datasets
     },
+    selectedDatasets(state) {
+      return state.activeDatasetIds.map(datasetId => {
+        return state.datasets[datasetId]
+      })
+    },
     activeMapboxLayers(state) {
     return state.activeMapboxLayers
     },
@@ -41,7 +46,6 @@ export default {
       state.selectedPointData = pointData
     },
     addDatasetPointData(state, pointData) {
-      console.log(pointData)
       state.selectedPointData.data = pointData
     },
     setActiveDatasetIds (state, ids) {
@@ -95,49 +99,47 @@ export default {
       // TODO: only works now with 1 param selected!!
       const dataset = _.get(state.datasets, datasetId)
       const url = _.get(dataset, 'assets.data.href')
-      console.log(url)
-      const path = Object.keys(dataset['cube:variables'])[0]
-      console.log(path)
+      const path = Object.keys(_.get(dataset, 'cube:variables'))[0]
+      const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
 
-      const station = state.selectedPointData.properties.locationId
+      let slice = dimensions.map(dim => {
+        if (dim[1] === 'stations') {
+          return state.selectedPointData.properties.locationId
+        } else {
+          return null
+        }
+      })
 
-      fetch(`${url}/${path}/.zattrs`)
-        .then(res => res.json())
+
+      openArray({
+        store: url,
+        path: path,
+        mode: 'r'
+      })
         .then(res => {
-          console.log(res, station)
-          const dimensions = res._ARRAY_DIMENSIONS
-          let slice = dimensions.map(dim => {
-            if (dim === 'stations') {
-              return station
-            } else if (dim === 'scenarios') {
-              return null
-            } else {
-              return null
-            }
-          })
-
-          slice = [ null, station, null ]
-          openArray({
-            store: url,
-            path: path,
-            mode: 'r'
-          })
-            .then(res => {
-              console.log(res)
-              res.get(slice).then(data => {
-                console.log(slice, data)
-                const series = data.data.map(serie => {
-                  return {
-                    type: 'line',
-                    data: Array.from(serie)
-                  }
-                })
-                commit('addDatasetPointData', {
-                  series,
-                  category: _.get(dataset, '["cube:dimensions"].RP.values')
-                })
-              })
+          res.get(slice).then(data => {
+            console.log(slice, data)
+            const series = data.data.map(serie => {
+              return {
+                type: 'line',
+                data: Array.from(serie)
+              }
             })
+            let cubeDimensions = _.get(dataset, 'cube:dimensions')
+            // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
+            const xAxis = Object.keys(cubeDimensions)[0]
+            commit('addDatasetPointData', {
+              series,
+              category: cubeDimensions[xAxis].values,
+              xAxis: {
+                title: `${xAxis} [${cubeDimensions[xAxis].unit}]`,
+
+              },
+              yAxis: {
+                title: `${Object.keys(cubeDimensions)[2]} [${cubeDimensions[xAxis].unit}]`,
+              }
+            })
+          })
         })
       // const dimensions = _.get(dataset, `cube:variables[${path}].dimensions`)
 
