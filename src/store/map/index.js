@@ -11,7 +11,7 @@ export default {
     themes
   },
   state: () => ({
-    activeMapboxLayers: null, // TODO: list of layers ready to be added.
+    activeMapboxLayers: [],
     activeDatasetIds: [],
   
   }),
@@ -66,6 +66,16 @@ export default {
           commit('addMapboxLayer', buildGeojsonLayer(layerInfo))
         })
     },
+
+    reclassifyMapboxLayer({state, commit}, dataset) {
+      //console.log('dataset', dataset)
+      //console.log('dataset')
+      //console.log('state activeDatasetIds', state.activeDatasetIds)
+      //TODO: 
+      //removes layer from state
+      //commit('removeMapboxLayer', id)
+      //getCatalog(layer)
+    },
  
     storeActiveDatasetIds ({ commit }, _ids) {
       // First set of the activeDatasetIds
@@ -79,8 +89,17 @@ export default {
   },
   mutations: {
     addMapboxLayer(state, mapboxLayer) {
-      //TODO: allow multiple layers to loaded on the map from different collections. Allow only one layer from each collection?
-      state.activeMapboxLayers  = mapboxLayer
+      const layerExists = state.activeMapboxLayers.some(storedLayer => storedLayer.id === mapboxLayer.id);
+      if (!layerExists) {
+        state.activeMapboxLayers  =  state.activeMapboxLayers = [
+          ...state.activeMapboxLayers, {
+            ...mapboxLayer
+          }
+        ];
+      }
+    },
+    removeMapboxLayer(state, id) {
+      state.activeMapboxLayers = state.activeMapboxLayers.filter({id})
     },
     setActiveDatasetIds (state, ids) {
       state.activeDatasetIds = ids

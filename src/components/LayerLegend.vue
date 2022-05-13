@@ -131,13 +131,12 @@
 </template>
 
 <script>
-  /* import { mapActions, mapGetters } from 'vuex' */
   import _ from 'lodash'
 
   export default {
     props: {
-      datasetId: {
-        type: String,
+      dataset: {
+        type: Object,
         required: true
       }
     },
@@ -148,48 +147,23 @@
         minValue: '',
         defaultMaxValue: '',
         maxValue: '',
-        dataset: {},
         unit: '',
-        linearGradient: {}
+        linearGradient: {},
+        datasetId: ''
       }
     },
-    /*     computed: {
-      ...mapGetters([ 'getDatasets', 'activeRasterData' ])
-    }, */
     mounted () {
       
-      this.unit = '-'
+      this.datasetId = _.get(this.dataset, 'id')
+      this.unit = _.get(this.dataset, 'properties.deltares:units')
+      console.log('this.unit', this.unit)
       this.updateMinMax()
-      this.linearGradient = [ //TODO: read it from Catalogue. 
-        {
-          color: 'hsl(0, 90%, 80%)',
-          offset: '0.000%',
-          opacity: 100
-        },
-        {
-          color: 'hsla(55, 88%, 53%, 0.15)',
-          offset: '50.000%',
-          opacity: 100
-        },
-        {
-          color: 'hsl(110, 90%, 80%)',
-          offset: '100.000%',
-          opacity: 100
-        }
-      ]
+      this.linearGradient =  _.get(this.dataset, 'properties.deltares:linearGradient')
     },
-    /*     watch: {
-      activeRasterData () {
-        this.updateMinMax()
-        this.linearGradient = {}
-        this.linearGradient = _.get(this.activeRasterData, 'layer.properties.deltares:linearGradient')
-      }
-    }, */
     methods: {
-      //...mapActions([ 'loadActiveRasterLayer' ]),
       updateMinMax () {
-        const min = -1//TODO: read it from stacCatalog
-        const max =  1//TODO: read it from stacCatalog
+        const min = _.get(this.dataset, 'properties.deltares:min', '')
+        const max =  _.get(this.dataset, 'properties.deltares:max', '')
         this.minValue = min.toString()
         this.maxValue = max.toString()
         this.defaultMinValue = min.toString()
@@ -205,9 +179,9 @@
       },
       saveRange () {
         this.editingRange = false
-        //_.set(this.activeRasterData, 'layer.properties.deltares:min', this.minValue)
-        //_.set(this.activeRasterData, 'layer.properties.deltares:max', this.maxValue)
-        //this.loadActiveRasterLayer()
+        _.set(this.dataset, 'properties.deltares:min', this.minValue)
+        _.set(this.dataset, 'properties.deltares:max', this.maxValue)
+        //this.loadActiveRasterLayer() //in my case I need to find the href, call it get the geojson and there store the new min max
       },
       resetRange () {
         this.minValue = this.defaultMinValue

@@ -113,7 +113,7 @@
               </v-row>
               <v-row v-if="dataset.visible"> 
                 <v-col>
-                  <layer-legend />
+                  <layer-legend :dataset="dataset" />
                 </v-col>
               </v-row>
             </v-expansion-panel-content>

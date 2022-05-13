@@ -7,9 +7,9 @@
       mapbox-style="mapbox://styles/global-data-viewer/cjtslsula05as1fppvrh7n4rv"
     >
       <v-mapbox-layer
-        v-if="activeMapboxLayers"
-        :options="activeMapboxLayers"
-        :key="activeMapboxLayers.id"
+        v-for="layer in activeMapboxLayers"
+        :key="layer.id"
+        :options="layer"
         clickable
         @click="selectLocation"
       />
