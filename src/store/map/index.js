@@ -4,6 +4,7 @@ import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes from './themes.js'
+import {active} from 'sortablejs'
 
 export default {
   modules: {
@@ -28,11 +29,11 @@ export default {
     }
   },
   actions: {
-    loadDatasets ({commit}) {
+    //get datasets from StacCatalogue
+    loadDatasets ({state, commit, dispatch}) {
 			//Get STAC collection
     getCatalog(process.env.VUE_APP_CATALOG_URL)
       .then(datasets => {
-      
 				const themes = _.get(datasets, 'summaries.keywords') 
         themes.forEach(theme => commit('addTheme', theme))
 				const children = datasets.links.filter(ds => ds.rel === 'child')
@@ -40,7 +41,6 @@ export default {
         return children.forEach(child => {
           return getCatalog(child.href) 
             .then(dataset => {
-            
               //All the below functionality will be added in a function at the end
               const summaries = _.get(dataset, 'summaries')
               const mappedSummaries = Object.keys(summaries).map(id => {
@@ -52,13 +52,18 @@ export default {
                 }
               })
               _.set(dataset, 'summaries', mappedSummaries)
-              
               commit('addDataset', dataset)
+              //if we start a subroute with active dataset ids, directly load the layer
+              if (state.activeDatasetIds.includes(dataset.id)) {
+                _.set(state.datasets, `${dataset.id}.visible`, true)
+                dispatch('loadLocationDataset', dataset)
+              }
             })
         })
-      })
+        
+      })      
     },
-    //commits the  building the mapbox layer format
+    //builds format for mapbox 
     loadMapboxLayer({commit}, layer) {
       //get info of the layer from stac catalog
       getCatalog(layer.href) 
@@ -74,6 +79,25 @@ export default {
     },
     clearActiveDatasetIds({commit}) {
       commit('clearActiveDatasetIds')
+    },
+    //
+    loadLocationDataset({dispatch}, dataset) {
+      const {links,  summaries } = dataset
+      const filterByProperty = ({properties})=> {
+        if (properties) {
+          const array =  summaries.map(({id, chosenValue }) => {
+            const propVal = _.get(properties, id)
+          return propVal === chosenValue
+        })
+        return array.every(Boolean)
+      }
+      }
+      const layer = links.find(filterByProperty)
+
+      if (!layer) {
+          return
+      }
+      dispatch('loadMapboxLayer',layer)  
     }
 
   },

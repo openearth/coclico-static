@@ -18,7 +18,6 @@
     },
     mounted () {
       this.storeActiveDatasetIds(this.$route.params.datasetIds)
-      //TODO: need to create function that finds layer and load it
     },
     methods: {
       ...mapActions([ 'storeActiveDatasetIds' ])
