@@ -226,7 +226,7 @@
           },
         }
         const theme = getStyle(this.colors)
-        const result = _.merge(dataOptions, baseOptions)
+        const result = _.merge(this.selectedPointData, baseOptions)
         return result
       }
     },

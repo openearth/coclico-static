@@ -4,6 +4,7 @@ import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes, { state } from './themes.js'
+import {active} from 'sortablejs'
 import { openArray } from 'zarr'
 import router from '@/router'
 
@@ -56,36 +57,42 @@ export default {
     },
   },
   actions: {
-    loadDatasets ({commit}) {
+    loadDatasets ({state, commit, dispatch}) {
 			//Get STAC collection
-      getCatalog(process.env.VUE_APP_CATALOG_URL)
-        .then(datasets => {
-          const themes = _.get(datasets, 'summaries.keywords')
-          themes.forEach(theme => commit('addTheme', theme))
-          const children = datasets.links.filter(ds => ds.rel === 'child')
+    getCatalog(process.env.VUE_APP_CATALOG_URL)
+      .then(datasets => {
+				const themes = _.get(datasets, 'summaries.keywords')
+        themes.forEach(theme => commit('addTheme', theme))
+				const children = datasets.links.filter(ds => ds.rel === 'child')
 
-          return children.forEach(child => {
-            // TODO: Extra Storm Surge Level is the template layer, filter this out!
-            if (child.title === 'Extra Storm Surge Level') {
-              return
-            }
-            return getCatalog(child.href)
-              .then(dataset => {
-                //All the below functionality will be added in a function at the end
-                const summaries = _.get(dataset, 'summaries')
-                const mappedSummaries = Object.keys(summaries).map(id => {
-                  const summary = _.get(summaries, id)
-                  return {
-                    id: id,
-                    allowedValues: summary,
-                    chosenValue: summary[0]
-                  }
-                })
-                _.set(dataset, 'summaries', mappedSummaries)
-                commit('addDataset', dataset)
+        return children.forEach(child => {
+          return getCatalog(child.href)
+            .then(dataset => {
+              // TODO: Extra Storm Surge Level is the template layer, filter this out!
+              if (child.title === 'Extra Storm Surge Level') {
+                return
+              }
+              //All the below functionality will be added in a function at the end
+              const summaries = _.get(dataset, 'summaries')
+              const mappedSummaries = Object.keys(summaries).map(id => {
+                const summary = _.get(summaries, id)
+                return {
+                  id: id,
+                  allowedValues: summary,
+                  chosenValue: summary[0]
+                }
               })
-          })
+              _.set(dataset, 'summaries', mappedSummaries)
+              commit('addDataset', dataset)
+              //if we start a subroute with active dataset ids, directly load the layer
+              if (state.activeDatasetIds.includes(dataset.id)) {
+                _.set(state.datasets, `${dataset.id}.visible`, true)
+                dispatch('loadLocationDataset', dataset)
+              }
+            })
         })
+
+      })
     },
     loadMapboxLayer({ commit }, layer) {
       //get info of the layer from stac catalog
@@ -101,7 +108,6 @@ export default {
       const url = _.get(dataset, 'assets.data.href')
       const path = Object.keys(_.get(dataset, 'cube:variables'))[0]
       const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
-
       let slice = dimensions.map(dim => {
         if (dim[1] === 'stations') {
           return state.selectedPointData.properties.locationId
@@ -110,21 +116,20 @@ export default {
         }
       })
 
-
-      openArray({
+    openArray({
         store: url,
         path: path,
         mode: 'r'
       })
         .then(res => {
           res.get(slice).then(data => {
-            console.log(slice, data)
             const series = data.data.map(serie => {
               return {
                 type: 'line',
                 data: Array.from(serie)
               }
             })
+
             let cubeDimensions = _.get(dataset, 'cube:dimensions')
             // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
             const xAxis = Object.keys(cubeDimensions)[0]
@@ -132,8 +137,7 @@ export default {
               series,
               category: cubeDimensions[xAxis].values,
               xAxis: {
-                title: `${xAxis} [${cubeDimensions[xAxis].unit}]`,
-
+                title: `${xAxis} [${cubeDimensions[xAxis].unit}]`
               },
               yAxis: {
                 title: `${Object.keys(cubeDimensions)[2]} [${cubeDimensions[xAxis].unit}]`,
@@ -141,10 +145,6 @@ export default {
             })
           })
         })
-      // const dimensions = _.get(dataset, `cube:variables[${path}].dimensions`)
-
-      // console.log(dataset, url)
-
     },
     storeActiveDatasetIds ({ commit }, _ids) {
       // First set of the activeDatasetIds
@@ -153,6 +153,24 @@ export default {
     },
     clearActiveDatasetIds({commit}) {
       commit('clearActiveDatasetIds')
+    },
+    loadLocationDataset({dispatch}, dataset) {
+      const {links,  summaries } = dataset
+      const filterByProperty = ({properties})=> {
+        if (properties) {
+          const array =  summaries.map(({id, chosenValue }) => {
+            const propVal = _.get(properties, id)
+          return propVal === chosenValue
+        })
+        return array.every(Boolean)
+      }
+      }
+      const layer = links.find(filterByProperty)
+
+      if (!layer) {
+          return
+      }
+      dispatch('loadMapboxLayer',layer)
     }
   }
 }
