@@ -5,7 +5,7 @@
       slot="map"
       :access-token="accessToken"
       mapbox-style="mapbox://styles/global-data-viewer/cjtslsula05as1fppvrh7n4rv"
-      @load="map = $event.target"
+      @load="initializeMap"
     >
       <v-mapbox-layer
         v-if="activeMapboxLayers"
@@ -31,7 +31,6 @@
 
   import getColors from '@/lib/styling/colors'
   const color = getColors('coclico')
-  console.log(color.sand100)
   export default {
     name:'DataLayers',
     data: () => ({
@@ -62,14 +61,28 @@
     computed: {
       ...mapGetters([ 'availableDatasets', 'activeMapboxLayers', 'selectedPointData' ]),
     },
-    watch: {
-      '$route.params.locationId' () {
-        console.log('changing location Id', this.$route.params.locationId)
-      }
-    },
     methods: {
       ...mapMutations([ 'setSelectedPointData' ]),
       ...mapActions([ 'loadDatasets', 'loadPointDataForLocation' ]),
+      initializeMap (evt) {
+        this.map = evt.target
+        setTimeout(() => {
+          const location = this.$route.params.locationId
+          if (!location) {
+            return
+          }
+          const features = this.map.queryRenderedFeatures()
+          const feature = features.find(feat => toString(feat.properties.locationId) === toString(location))
+          if (!feature) {
+            return
+          }
+          this.updateSelectedPoint(feature.geometry)
+          this.map.panTo({
+            lng: feature.geometry.coordinates[0],
+            lat: feature.geometry.coordinates[1]
+          })
+        }, 500)
+      },
       isEmpty(obj) {
         return _.isEmpty(obj)
       },
@@ -100,11 +113,11 @@
 
         const features = this.map.queryRenderedFeatures(event.point)
         this.setSelectedPointData(features[0])
-        this.updateSelectedPoint(this.map, features[0].geometry)
+        this.updateSelectedPoint(features[0].geometry)
         this.loadPointDataForLocation()
       },
-      updateSelectedPoint(map, geometry) {
-        const selectedPoint = map.getSource('selected_point')
+      updateSelectedPoint(geometry) {
+        const selectedPoint = this.map.getSource('selected_point')
         selectedPoint.setData(geometry)
       }
     }

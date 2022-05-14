@@ -22,7 +22,7 @@
         align-space-between
       >
         <v-expansion-panels
-          v-if="true"
+          v-if="selectedDatasets[0]"
           flat
           accordion
           multiple
@@ -30,7 +30,7 @@
           color="background"
         >
           <v-expansion-panel
-            v-for="data in selectedDatasets"
+            v-for="data in datasets"
             :key="data.id"
           >
             <v-expansion-panel-header
@@ -38,7 +38,7 @@
               color="background"
               dark
             >
-              {{ data.datasetName }}
+              {{ data.id }}
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -47,7 +47,7 @@
                   class="graph-line pa-0"
                 >
                   <v-chart
-                    :option="option"
+                    :option="data"
                     :autoresize="true"
                     class="graph-line__chart"
                   />
@@ -199,35 +199,11 @@
     },
     computed: {
       ...mapGetters([ 'selectedPointData', 'selectedDatasets' ]),
-      option () {
-        //   const option = {
-        //     xAxis: {
-        //       type: 'category',
-        //       data: _.get(this.selectedPointData, 'data.category')
-        //     },
-        //     yAxis: {
-        //       type: 'value'
-        //     },
-        //     series: _.get(this.selectedPointData, 'data.series')
-        //   }
-        //   console.log(option)
-        //   return option
-        // }
-        console.log(this.selectedPointData, _.get(this.selectedPointData, 'data.series'))
-        // console.log(this.selectedPointData.data.series)
-        const dataOptions = {
-          series: _.get(this.selectedPointData, 'data.series'),
-          yAxis: {
-            name: 'test'
-          },
-          xAxis: {
-            type: 'category',
-            data: _.get(this.selectedPointData, 'data.category')
-          },
-        }
-        const theme = getStyle(this.colors)
-        const result = _.merge(this.selectedPointData, baseOptions)
-        return result
+      datasets () {
+        return this.selectedDatasets.map(set => {
+          console.log(set, this.selectedPointData, _.get(this.selectedPointData, `data[${set.id}]`, {}))
+          return _.merge(set, baseOptions)
+        })
       }
     },
     data () {
@@ -250,58 +226,6 @@
           path: `/data/${this.$route.params.datasetIds}`,
           params: { datasetIds: this.$route.params.datasetIds }
         })
-      },
-      addLineToGraph (graphSerie) {
-        console.log(graphSerie)
-        let data = graphSerie.map((col, i) => [ this.category[i], col ])
-        // Make sure that all data is in chronological order to plot it correctly
-        data = data.sort((colA, colB) => {
-          return moment(colA[0]) - moment(colB[0])
-        })
-
-        return {
-          type: 'line',
-          showAllSymbol: true,
-          data,
-          itemStyle: {
-            normal: {
-              borderWidth: 1
-            }
-          }
-        }
-      },
-      addAreaToGraph (serie, label, color = null, legend = false) {
-        let data = serie.map((col, i) => [ this.category[i], col ])
-        // Make sure that all data is in chronological order to plot it correctly
-        data = data.sort((colA, colB) => {
-          return moment(colA[0]) - moment(colB[0])
-        })
-
-        const series = {
-          name: label,
-          data: data,
-          type: 'line',
-          symbol: 'none',
-          lineStyle: {
-            opacity: 0
-          },
-          z: -1,
-          color: color
-        }
-        if (color) {
-          series.areaStyle = {
-            color: color,
-            origin: 'start',
-            opacity: 0.3
-          }
-        } else {
-          series.areaStyle = {
-            color: '#202020', // TODO: get from custom style
-            opacity: 1,
-            origin: 'start'
-          }
-        }
-        return series
       }
     }
   }

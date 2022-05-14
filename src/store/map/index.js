@@ -4,9 +4,9 @@ import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes, { state } from './themes.js'
-import {active} from 'sortablejs'
 import { openArray } from 'zarr'
 import router from '@/router'
+import Vue from 'vue'
 
 export default {
   modules: {
@@ -25,7 +25,7 @@ export default {
     },
     selectedDatasets(state) {
       return state.activeDatasetIds.map(datasetId => {
-        return state.datasets[datasetId]
+        return _.get(state.selectedPointData, `data.${datasetId}`)
       })
     },
     activeMapboxLayers(state) {
@@ -47,7 +47,8 @@ export default {
       state.selectedPointData = pointData
     },
     addDatasetPointData(state, pointData) {
-      state.selectedPointData.data = pointData
+      console.log(pointData)
+      Vue.set(state.selectedPointData, `data.${pointData.id}`, pointData)
     },
     setActiveDatasetIds (state, ids) {
       state.activeDatasetIds = ids
@@ -69,9 +70,9 @@ export default {
           return getCatalog(child.href)
             .then(dataset => {
               // TODO: Extra Storm Surge Level is the template layer, filter this out!
-              if (child.title === 'Extra Storm Surge Level') {
-                return
-              }
+              // if (child.title === 'Extra Storm Surge Level') {
+              //   return
+              // }
               //All the below functionality will be added in a function at the end
               const summaries = _.get(dataset, 'summaries')
               const mappedSummaries = Object.keys(summaries).map(id => {
@@ -83,6 +84,7 @@ export default {
                 }
               })
               _.set(dataset, 'summaries', mappedSummaries)
+
               commit('addDataset', dataset)
               //if we start a subroute with active dataset ids, directly load the layer
               if (state.activeDatasetIds.includes(dataset.id)) {
@@ -103,12 +105,16 @@ export default {
     },
     loadPointDataForLocation({ state, commit }) {
       const datasetId = router.currentRoute.params.datasetIds
-      // TODO: only works now with 1 param selected!!
       const dataset = _.get(state.datasets, datasetId)
+      if (!dataset) {
+        return
+      }
       const url = _.get(dataset, 'assets.data.href')
       const path = Object.keys(_.get(dataset, 'cube:variables'))[0]
       const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
       let slice = dimensions.map(dim => {
+        // TODO: make sure that the stations always correspond to the mapbox layers and that the
+        // other layers are the temporal layers used in the graphs..
         if (dim[1] === 'stations') {
           return state.selectedPointData.properties.locationId
         } else {
@@ -116,7 +122,7 @@ export default {
         }
       })
 
-    openArray({
+      openArray({
         store: url,
         path: path,
         mode: 'r'
@@ -130,13 +136,16 @@ export default {
               }
             })
 
+            // TODO: Which axis belongs to which dimension????
             let cubeDimensions = _.get(dataset, 'cube:dimensions')
             // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
-            const xAxis = Object.keys(cubeDimensions)[0]
+            const xAxis = Object.keys(cubeDimensions)[2]
             commit('addDatasetPointData', {
+              id: datasetId,
               series,
-              category: cubeDimensions[xAxis].values,
               xAxis: {
+                type: 'category',
+                data: cubeDimensions[xAxis].values,
                 title: `${xAxis} [${cubeDimensions[xAxis].unit}]`
               },
               yAxis: {
@@ -144,7 +153,7 @@ export default {
               }
             })
           })
-        })
+      })
     },
     storeActiveDatasetIds ({ commit }, _ids) {
       // First set of the activeDatasetIds
