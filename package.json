@@ -20,6 +20,7 @@
     "lodash": "^4.17.21",
     "mapbox-gl": "^2.7.0",
     "markdown-loader": "^8.0.0",
+    "moment": "^2.29.3",
     "register-service-worker": "^1.7.2",
     "sortablejs": "^1.14.0",
     "tiny-cookie": "^2.3.2",
