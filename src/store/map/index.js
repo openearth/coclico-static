@@ -114,6 +114,7 @@ export default {
       const url = _.get(dataset, 'assets.data.href')
       const path = Object.keys(_.get(dataset, 'cube:variables'))[0]
       const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
+      const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
       let slice = dimensions.map(dim => {
         // TODO: make sure that the stations always correspond to the mapbox layers and that the
         // other layers are the temporal layers used in the graphs..
@@ -142,16 +143,20 @@ export default {
             let cubeDimensions = _.get(dataset, 'cube:dimensions')
             // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
             const xAxis = Object.keys(cubeDimensions)[2]
+            const yAxis = variableUnit[0][1]
+            for (var i = 0; i < cubeDimensions.scenario.values.length; i++) {
+              series[i].name = cubeDimensions.scenario.values[i]
+            }
             commit('addDatasetPointData', {
               id: datasetId,
               series,
               xAxis: {
                 type: 'category',
                 data: cubeDimensions[xAxis].values,
-                title: `${xAxis} [${cubeDimensions[xAxis].unit}]`
+                title: `${xAxis}`
               },
               yAxis: {
-                title: `${Object.keys(cubeDimensions)[2]} [${cubeDimensions[xAxis].unit}]`,
+                title: `${variableUnit[0][1]}`,
               }
             })
           })

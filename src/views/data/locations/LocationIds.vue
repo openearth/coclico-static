@@ -84,7 +84,8 @@
   import {
     LineChart,
     ScatterChart,
-    LinesChart
+    LinesChart,
+    BarChart
   } from 'echarts/charts'
 
   import {
@@ -93,7 +94,9 @@
     MarkLineComponent,
     MarkPointComponent,
     DataZoomComponent,
-    TimelineComponent
+    TimelineComponent,
+    LegendComponent,
+    ToolboxComponent
   } from 'echarts/components'
 
   import { use } from 'echarts/core'
@@ -108,7 +111,10 @@
     MarkPointComponent,
     DataZoomComponent,
     TimelineComponent,
-    LinesChart
+    LinesChart,
+    LegendComponent,
+    ToolboxComponent,
+    BarChart
   ])
 
   use([ CanvasRenderer ])
@@ -152,6 +158,21 @@
         color: '#fff'
       }
     },
+    //toolbox: {
+    //  show: true,
+    //  feature: {
+    //    dataZoom: {
+    //      yAxisIndex: 'none'
+    //    },
+    //    dataView: { readOnly: false },
+    //    magicType: { type: ['line', 'bar'] },
+    //    restore: {},
+    //    saveAsImage: {}
+    //  }
+    //},
+    legend: {
+      top: 'horizontal'
+    },
     grid: {
       show: true,
       top: 30,
@@ -170,7 +191,18 @@
     },
     xAxis: {
       splitLine: {
-        show: true
+        show: true,
+      },
+      axisLabel: {
+        fontSize: 14
+      },
+      nameLocation: 'center',
+      nameGap: 20,
+      name: "-",
+      nameTextStyle: {
+        color: 'white',
+        fontSize: 14,
+        fontFamily: 'Helvetica'
       }
     },
     yAxis: {
@@ -178,8 +210,9 @@
       axisLabel: {
         fontSize: 14
       },
-      nameLocation: 'middle',
-      nameGap: 55,
+      nameLocation: 'center',
+      name: '-',
+      nameGap: 30,
       nameTextStyle: {
         color: 'white',
         fontSize: 14,
@@ -203,9 +236,12 @@
     },
     computed: {
       ...mapGetters([ 'selectedPointData', 'selectedDatasets' ]),
-      datasets () {
+      datasets (selectedPointData) {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
+          // does not seem a very neat way to do this. Is there a better way?
+          baseOptions.xAxis.name = set.xAxis.title
+          baseOptions.yAxis.name = set.yAxis.title
           return _.merge(set, baseOptions, theme)
         })
       }
