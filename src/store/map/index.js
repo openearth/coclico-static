@@ -47,7 +47,6 @@ export default {
       state.selectedPointData = pointData
     },
     addDatasetPointData(state, pointData) {
-      console.log(pointData)
       Vue.set(state.selectedPointData, `data.${pointData.id}`, pointData)
     },
     setActiveDatasetIds (state, ids) {
@@ -70,9 +69,9 @@ export default {
           return getCatalog(child.href)
             .then(dataset => {
               // TODO: Extra Storm Surge Level is the template layer, filter this out!
-              // if (child.title === 'Extra Storm Surge Level') {
-              //   return
-              // }
+              if (child.title === 'Extra Storm Surge Level') {
+                return
+              }
               //All the below functionality will be added in a function at the end
               const summaries = _.get(dataset, 'summaries')
               const mappedSummaries = Object.keys(summaries).map(id => {
@@ -90,6 +89,7 @@ export default {
               if (state.activeDatasetIds.includes(dataset.id)) {
                 _.set(state.datasets, `${dataset.id}.visible`, true)
                 dispatch('loadLocationDataset', dataset)
+                dispatch('loadPointDataForLocation')
               }
             })
         })
@@ -104,6 +104,8 @@ export default {
         })
     },
     loadPointDataForLocation({ state, commit }) {
+      // Retrieve per point data from a zarr file corresponding to the href in the
+      // data attributes and it's dimensions and variables
       const datasetId = router.currentRoute.params.datasetIds
       const dataset = _.get(state.datasets, datasetId)
       if (!dataset) {
@@ -116,7 +118,7 @@ export default {
         // TODO: make sure that the stations always correspond to the mapbox layers and that the
         // other layers are the temporal layers used in the graphs..
         if (dim[1] === 'stations') {
-          return state.selectedPointData.properties.locationId
+          return _.get(state.selectedPointData, 'properties.locationId', 0)
         } else {
           return null
         }

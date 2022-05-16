@@ -73,6 +73,8 @@
   import { mapGetters, mapActions, mapMutations } from 'vuex'
   import moment from 'moment'
   import _ from 'lodash'
+  import getColors from '@/lib/styling/colors'
+
   // import ECharts modules manually to reduce bundle size
   import {
     SVGRenderer,
@@ -111,6 +113,7 @@
 
   use([ CanvasRenderer ])
   use([ SVGRenderer ])
+
 
   const getStyle = (colors = {}) => ({
     backgroundColor: colors.background,
@@ -154,7 +157,7 @@
       top: 30,
       bottom: 50,
       right: 20,
-      left: 90
+      left: 50
     },
     dataZoom: [
       {
@@ -178,6 +181,7 @@
       nameLocation: 'middle',
       nameGap: 55,
       nameTextStyle: {
+        color: 'white',
         fontSize: 14,
         fontFamily: 'Helvetica'
       }
@@ -201,8 +205,8 @@
       ...mapGetters([ 'selectedPointData', 'selectedDatasets' ]),
       datasets () {
         return this.selectedDatasets.map(set => {
-          console.log(set, this.selectedPointData, _.get(this.selectedPointData, `data[${set.id}]`, {}))
-          return _.merge(set, baseOptions)
+          const theme = getStyle(getColors('coclico'))
+          return _.merge(set, baseOptions, theme)
         })
       }
     },
@@ -212,15 +216,12 @@
       }
     },
     mounted () {
-      this.updateLocationPanel()
-      this.expandedDatasets = [...Array(this.selectedDatasets.length).keys()]
+      this.loadPointDataForLocation()
+      this.expandedDatasets = [...Array(this.datasets.length).keys()]
     },
     methods: {
       ...mapActions([ 'storeActiveDatasetIds', 'loadPointDataForLocation' ]),
       ...mapMutations([ 'setActiveDatasetIds' ]),
-      updateLocationPanel () {
-        this.loadPointDataForLocation()
-      },
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,
