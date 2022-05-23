@@ -127,7 +127,7 @@
   import CustomIcon from "./CustomIcon.vue"
   import LayerLegend from "./LayerLegend.vue"
 
-  import { mapActions } from "vuex"
+  import { mapGetters, mapMutations, mapActions } from "vuex"
   import _ from 'lodash'
 
   export default {
@@ -141,6 +141,9 @@
       CustomIcon,
       LayerLegend
     },
+    computed: { 
+      ...mapGetters([ 'activeMapboxLayers' ])
+    },
     data () {
       return {
         panel: [],
@@ -148,6 +151,7 @@
     },
     methods: {
       ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
+      ...mapMutations([ 'removeMapboxLayer' ]),
       toggleLocationDataset(dataset) {
         const { id } = dataset
         let oldParams = _.get(this.$route, 'params.datasetIds')
@@ -182,17 +186,15 @@
           this.$router.push({ path, params })
         } else {
           this.$router.push('/data')
-        }
-
-        //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
-        
+        }        
         if (!dataset.visible) {
           this.clearActiveDatasetIds()
-          //TODO: add removeMapboxLayer
+          //TODO: check if there is a better way. I need the layerId to check if the layer is in the activeMapboxLayers
+          //right now checking if one of the layerIds has the dataset id in its string. 
+          const mapboxLayer = this.activeMapboxLayers.find(({id}) => id.includes(dataset.id))
+          this.removeMapboxLayer(mapboxLayer.id)
           return
         }
-       
-        
         this.loadLocationDataset(dataset)
       },
 

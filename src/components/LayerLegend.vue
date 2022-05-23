@@ -156,9 +156,7 @@
     mounted () {
       
       this.datasetId = _.get(this.dataset, 'id')
-    
       this.unit = _.get(this.dataset, 'properties.deltares:units')
-      console.log('this.unit', this.unit)
       this.updateMinMax()
       this.linearGradient =  _.get(this.dataset, 'properties.deltares:linearGradient')
     },
@@ -185,7 +183,6 @@
         _.set(this.dataset, 'properties.deltares:min', this.minValue)
         _.set(this.dataset, 'properties.deltares:max', this.maxValue)
         this.reclassifyMapboxLayer(this.dataset)
-        //this.loadActiveRasterLayer() //in my case I need to find the href, call it get the geojson and there store the new min max
       },
       resetRange () {
         this.minValue = this.defaultMinValue

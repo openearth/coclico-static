@@ -1,6 +1,7 @@
 import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
+import matchLayerIdToProperties from '@/lib/match-layerId-to-properties.js'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes, { state } from './themes.js'
@@ -125,16 +126,16 @@ export default {
       const circleColors = _.get(mapboxLayer, 'paint.circle-color')
       //remove mapboxlayer in order to re-add it with the new colors
       commit('removeMapboxLayer',mapboxLayerId)
-      //create new colors
+      //create new colors //TODO: asses if reasonable way
+      console.log('circleColors', JSON.stringify(circleColors))
       const newCircleColors = circleColors.map((item, index) => {
-        
+        //index is based on the format of 
         if (index === 3) {
           return parseFloat(newMin)
         }
         if (index === 5) {
-          return  parseFloat((newMin+newMax)/2) 
+          return  ((parseFloat(newMin)+parseFloat(newMax))/2.0) 
         }
-
         if (index === 7) {
           return parseFloat(newMax)
         }
@@ -215,20 +216,7 @@ export default {
       commit('clearActiveDatasetIds')
     },
     loadLocationDataset({dispatch}, dataset) {
-      const {links,  summaries } = dataset
-      const filterByProperty = ({properties})=> {
-        if (properties) {
-          const array =  summaries.map(({id, chosenValue }) => {
-            const propVal = _.get(properties, id)
-          return propVal === chosenValue
-        })
-        return array.every(Boolean)
-      }
-      }
-      const layer = links.find(filterByProperty)
-            if (!layer) {
-          return
-      }
+      const layer = matchLayerIdToProperties(dataset)
       dispatch('loadMapboxLayer',layer)
     }
 
