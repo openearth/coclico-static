@@ -68,13 +68,37 @@ export default {
     },
 
     reclassifyMapboxLayer({state, commit}, dataset) {
-      //console.log('dataset', dataset)
-      //console.log('dataset')
-      //console.log('state activeDatasetIds', state.activeDatasetIds)
-      //TODO: 
-      //removes layer from state
-      //commit('removeMapboxLayer', id)
-      //getCatalog(layer)
+      
+      const newMin = _.get(dataset, 'properties.deltares:min', '')
+      const newMax =  _.get(dataset, 'properties.deltares:max', '')
+      const datasetId = _.get(dataset, 'id')
+      
+      
+      const mapboxLayer = state.activeMapboxLayers.find(({id}) => id.includes(datasetId))
+      const mapboxLayerId = _.get(mapboxLayer, 'id')
+      const circleColors = _.get(mapboxLayer, 'paint.circle-color')
+      //remove mapboxlayer in order to re-add it with the new colors
+      commit('removeMapboxLayer',mapboxLayerId)
+      //create new colors
+      const newCircleColors = circleColors.map((item, index) => {
+        
+        if (index === 3) {
+          return parseFloat(newMin)
+        }
+        if (index === 5) {
+          return  parseFloat((newMin+newMax)/2) 
+        }
+
+        if (index === 7) {
+          return parseFloat(newMax)
+        }
+        return item
+      })
+
+      _.set(mapboxLayer, 'paint.circle-color', newCircleColors)
+      //add layer again in the activeMapboxLayers array
+      commit('addMapboxLayer', mapboxLayer)
+
     },
  
     storeActiveDatasetIds ({ commit }, _ids) {
@@ -98,8 +122,8 @@ export default {
         ];
       }
     },
-    removeMapboxLayer(state, id) {
-      state.activeMapboxLayers = state.activeMapboxLayers.filter({id})
+    removeMapboxLayer(state, mapboxLayerId) {
+      state.activeMapboxLayers = state.activeMapboxLayers.filter(({id}) => id !== mapboxLayerId)
     },
     setActiveDatasetIds (state, ids) {
       state.activeDatasetIds = ids

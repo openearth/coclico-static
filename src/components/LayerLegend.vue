@@ -132,6 +132,7 @@
 
 <script>
   import _ from 'lodash'
+  import {mapActions} from 'vuex'
 
   export default {
     props: {
@@ -144,7 +145,7 @@
       return {
         editingRange: false,
         defaultMinValue: '',
-        minValue: '',
+        minValue: '', //at the beginning equal to defaultMinValues. Same when reset. 
         defaultMaxValue: '',
         maxValue: '',
         unit: '',
@@ -155,12 +156,14 @@
     mounted () {
       
       this.datasetId = _.get(this.dataset, 'id')
+    
       this.unit = _.get(this.dataset, 'properties.deltares:units')
       console.log('this.unit', this.unit)
       this.updateMinMax()
       this.linearGradient =  _.get(this.dataset, 'properties.deltares:linearGradient')
     },
     methods: {
+      ...mapActions([ 'reclassifyMapboxLayer' ]),
       updateMinMax () {
         const min = _.get(this.dataset, 'properties.deltares:min', '')
         const max =  _.get(this.dataset, 'properties.deltares:max', '')
@@ -181,6 +184,7 @@
         this.editingRange = false
         _.set(this.dataset, 'properties.deltares:min', this.minValue)
         _.set(this.dataset, 'properties.deltares:max', this.maxValue)
+        this.reclassifyMapboxLayer(this.dataset)
         //this.loadActiveRasterLayer() //in my case I need to find the href, call it get the geojson and there store the new min max
       },
       resetRange () {

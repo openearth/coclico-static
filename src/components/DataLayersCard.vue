@@ -185,8 +185,10 @@
         }
 
         //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
+        
         if (!dataset.visible) {
           this.clearActiveDatasetIds()
+          //TODO: add removeMapboxLayer
           return
         }
        
