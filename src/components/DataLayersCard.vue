@@ -147,9 +147,9 @@
       }
     },
     methods: {
-      ...mapActions ([ 'loadMapboxLayer','clearActiveDatasetIds' ]),
+      ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
       toggleLocationDataset(dataset) {
-        const {links,  summaries, id } = dataset
+        const { id } = dataset
         let oldParams = _.get(this.$route, 'params.datasetIds')
         const params = this.$route.params
         let newParams 
@@ -193,21 +193,7 @@
         }
        
         
-        const filterByProperty = ({properties})=> {
-          if (properties) {
-            const array =  summaries.map(({id, chosenValue }) => {
-              const propVal = _.get(properties, id)
-              return propVal === chosenValue
-            })
-            return array.every(Boolean)
-          }
-        }
-        const layer = links.find(filterByProperty)
-
-        if (!layer) {
-          return
-        }
-        this.loadMapboxLayer(layer)
+        this.loadLocationDataset(dataset)
       },
 
       data () {
