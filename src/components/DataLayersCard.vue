@@ -40,7 +40,7 @@
                   cols="7"
                   class="ma-auto pa-0"
                 >
-                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span> 
+                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.name }}</span> 
                 </v-col>
                 <v-col
                   cols="2"
@@ -107,7 +107,7 @@
                     :label="summary.id"
                     flat
                     dense
-                    @change="toggleMapboxLayer(dataset)"
+                    @change="toggleLocationDataset(dataset)"
                   />          
                 </v-col>
               </v-row>
@@ -141,48 +141,20 @@
     methods: {
       ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
       toggleLocationDataset(dataset) {
-        const { id } = dataset
-        let oldParams = _.get(this.$route, 'params.datasetIds')
-        const params = this.$route.params
-        let newParams 
 
-        if (!oldParams) {
-          //if oldPrams is undefined, set newParams by id
-          newParams = id
-        }else {
-          // Else check if new id should be removed or added to new route
-          oldParams = oldParams.split(',')
-          if (oldParams.includes(id)) {
-            // if oldparams already includes id, remove from route
-            newParams = oldParams.filter(param => param !== id)
-            if (newParams.length === 0) {
-              newParams = undefined
-            } else {
-              newParams = newParams.join(',')
-            }
-          } else {
-            // else add id to route and zoomtobbox
-            newParams = `${oldParams},${id}`
-          }
-        }
-        params.datasetIds = newParams
+        // Removed code to add multiple params in route, as this did not work anymore
+        const { id } = dataset
+        const params = this.$route.params
+        params.datasetIds = id
         let path = `/data/${params.datasetIds}`
         if (_.has(params, 'locationId')) {
           path = `/data/${params.datasetIds}/${params.locationId}`
         }
-        if (newParams) {
-          this.$router.push({ path, params })
-        } else {
-          this.$router.push('/data')
-        }
-
         //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
         if (!dataset.visible) {
           this.clearActiveDatasetIds()
           return
         }
-       
-        
         this.loadLocationDataset(dataset)
       },
 
