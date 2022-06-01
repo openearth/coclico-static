@@ -1,7 +1,7 @@
 import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
-import matchLayerIdToProperties from '@/lib/match-layerId-to-properties.js'
+import matchLayerIdToProperties from '@/lib/match-layer-id-to-properties.js'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes, { state } from './themes.js'
@@ -115,7 +115,25 @@ export default {
     },
 
     reclassifyMapboxLayer({state, commit}, dataset) {
-      
+      /* 
+      This implementation is only checked with paint that has the below format
+       "circle-color": [
+                "interpolate",
+                [
+                    "linear"
+                ],
+                [
+                    "get",
+                    "scenario-Historical-RP-10.0"
+                ],
+                -1,
+                "hsl(0, 90%, 80%)",
+                0,
+                "hsla(55, 88%, 53%, 0.15)",
+                1,
+                "hsl(110, 90%, 80%)"
+            ],
+      */
       const newMin = _.get(dataset, 'properties.deltares:min', '')
       const newMax =  _.get(dataset, 'properties.deltares:max', '')
       const datasetId = _.get(dataset, 'id')
@@ -124,10 +142,11 @@ export default {
       const mapboxLayer = state.activeMapboxLayers.find(({id}) => id.includes(datasetId))
       const mapboxLayerId = _.get(mapboxLayer, 'id')
       const circleColors = _.get(mapboxLayer, 'paint.circle-color')
-      //remove mapboxlayer in order to re-add it with the new colors
+      //remove mapboxlayer in order and update paint
+      // 
       commit('removeMapboxLayer',mapboxLayerId)
-      //create new colors //TODO: asses if reasonable way
-      console.log('circleColors', JSON.stringify(circleColors))
+      //create new colors 
+    
       const newCircleColors = circleColors.map((item, index) => {
         //index is based on the format of 
         if (index === 3) {

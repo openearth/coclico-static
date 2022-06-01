@@ -8,7 +8,6 @@
 import _ from 'lodash'
 
 export default function(dataset) {
-  console.log('function', dataset)
   if (!dataset) {
     return 
   }

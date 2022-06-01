@@ -97,7 +97,6 @@
         [{{ unit }}]
       </v-col>
     </v-row>
-    <!-- TODO: ask if we want that -->
     <v-row
       v-if="editingRange"
       justify="space-between"
