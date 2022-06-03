@@ -40,7 +40,7 @@
                   cols="7"
                   class="ma-auto pa-0"
                 >
-                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.name }}</span> 
+                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.id }}</span> 
                 </v-col>
                 <v-col
                   cols="2"

@@ -38,7 +38,7 @@
               color="background"
               dark
             >
-              {{ data.name }}
+              {{ data.id }}
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
