@@ -8,9 +8,9 @@
       @load="initializeMap"
     >
       <v-mapbox-layer
-        v-if="activeMapboxLayers"
-        :options="activeMapboxLayers"
-        :key="activeMapboxLayers.id"
+        v-for="layer in activeMapboxLayers"
+        :key="layer.id"
+        :options="layer"
         clickable
         @click="selectLocation"
       />

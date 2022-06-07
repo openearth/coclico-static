@@ -1,6 +1,7 @@
 import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
+import matchLayerIdToProperties from '@/lib/match-layer-id-to-properties.js'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
 import themes, { state } from './themes.js'
@@ -14,7 +15,7 @@ export default {
     themes
   },
   state: () => ({
-    activeMapboxLayers: null, // TODO: list of layers ready to be added.
+    activeMapboxLayers: [],
     selectedPointData: {},
     activeDatasetIds: [],
   }),
@@ -40,8 +41,17 @@ export default {
   },
   mutations: {
     addMapboxLayer(state, mapboxLayer) {
-      //TODO: allow multiple layers to loaded on the map from different collections. Allow only one layer from each collection?
-      state.activeMapboxLayers  = mapboxLayer
+      const layerExists = state.activeMapboxLayers.some(storedLayer => storedLayer.id === mapboxLayer.id);
+      if (!layerExists) {
+        state.activeMapboxLayers  =  state.activeMapboxLayers = [
+          ...state.activeMapboxLayers, {
+            ...mapboxLayer
+          }
+        ];
+      }
+    },
+    removeMapboxLayer(state, mapboxLayerId) {
+      state.activeMapboxLayers = state.activeMapboxLayers.filter(({id}) => id !== mapboxLayerId)
     },
     setSelectedPointData(state, pointData) {
       state.selectedPointData = pointData
@@ -103,6 +113,60 @@ export default {
           commit('addMapboxLayer', buildGeojsonLayer(layerInfo))
         })
     },
+
+    reclassifyMapboxLayer({state, commit}, dataset) {
+      /* 
+      This implementation is only checked with paint that has the below format
+       "circle-color": [
+                "interpolate",
+                [
+                    "linear"
+                ],
+                [
+                    "get",
+                    "scenario-Historical-RP-10.0"
+                ],
+                -1,
+                "hsl(0, 90%, 80%)",
+                0,
+                "hsla(55, 88%, 53%, 0.15)",
+                1,
+                "hsl(110, 90%, 80%)"
+            ],
+      */
+      const newMin = _.get(dataset, 'properties.deltares:min', '')
+      const newMax =  _.get(dataset, 'properties.deltares:max', '')
+      const datasetId = _.get(dataset, 'id')
+      
+      
+      const mapboxLayer = state.activeMapboxLayers.find(({id}) => id.includes(datasetId))
+      const mapboxLayerId = _.get(mapboxLayer, 'id')
+      const circleColors = _.get(mapboxLayer, 'paint.circle-color')
+      //remove mapboxlayer in order and update paint
+      // 
+      commit('removeMapboxLayer',mapboxLayerId)
+      //create new colors 
+    
+      const newCircleColors = circleColors.map((item, index) => {
+        //index is based on the format of 
+        if (index === 3) {
+          return parseFloat(newMin)
+        }
+        if (index === 5) {
+          return  ((parseFloat(newMin)+parseFloat(newMax))/2.0) 
+        }
+        if (index === 7) {
+          return parseFloat(newMax)
+        }
+        return item
+      })
+
+      _.set(mapboxLayer, 'paint.circle-color', newCircleColors)
+      //add layer again in the activeMapboxLayers array
+      commit('addMapboxLayer', mapboxLayer)
+
+    },
+ 
     loadPointDataForLocation({ state, commit }) {
       // Retrieve per point data from a zarr file corresponding to the href in the
       // data attributes and it's dimensions and variables
@@ -171,22 +235,10 @@ export default {
       commit('clearActiveDatasetIds')
     },
     loadLocationDataset({dispatch}, dataset) {
-      const {links,  summaries } = dataset
-      const filterByProperty = ({properties})=> {
-        if (properties) {
-          const array =  summaries.map(({id, chosenValue }) => {
-            const propVal = _.get(properties, id)
-          return propVal === chosenValue
-        })
-        return array.every(Boolean)
-      }
-      }
-      const layer = links.find(filterByProperty)
-
-      if (!layer) {
-          return
-      }
+      const layer = matchLayerIdToProperties(dataset)
       dispatch('loadMapboxLayer',layer)
     }
-  }
+
+  },
 }
+

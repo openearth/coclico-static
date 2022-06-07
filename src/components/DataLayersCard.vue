@@ -107,8 +107,13 @@
                     :label="summary.id"
                     flat
                     dense
-                    @change="toggleMapboxLayer(dataset)"
+                    @change="toggleLocationDataset(dataset)"
                   />          
+                </v-col>
+              </v-row>
+              <v-row v-if="dataset.visible"> 
+                <v-col>
+                  <layer-legend :dataset="dataset" />
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
@@ -120,7 +125,9 @@
 </template>
 <script>
   import CustomIcon from "./CustomIcon.vue"
-  import { mapActions } from "vuex"
+  import LayerLegend from "./LayerLegend.vue"
+
+  import { mapGetters, mapMutations, mapActions } from "vuex"
   import _ from 'lodash'
 
   export default {
@@ -132,6 +139,10 @@
     },
     components: {
       CustomIcon,
+      LayerLegend
+    },
+    computed: { 
+      ...mapGetters([ 'activeMapboxLayers' ])
     },
     data () {
       return {
@@ -140,6 +151,7 @@
     },
     methods: {
       ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
+      ...mapMutations([ 'removeMapboxLayer' ]),
       toggleLocationDataset(dataset) {
         const { id } = dataset
         let oldParams = _.get(this.$route, 'params.datasetIds')
@@ -174,15 +186,15 @@
           this.$router.push({ path, params })
         } else {
           this.$router.push('/data')
-        }
-
-        //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
+        }        
         if (!dataset.visible) {
           this.clearActiveDatasetIds()
+          //TODO: check if there is a better way. I need the layerId to check if the layer is in the activeMapboxLayers
+          //right now checking if one of the layerIds has the dataset id in its string. 
+          const mapboxLayer = this.activeMapboxLayers.find(({id}) => id.includes(dataset.id))
+          this.removeMapboxLayer(mapboxLayer.id)
           return
         }
-       
-        
         this.loadLocationDataset(dataset)
       },
 
