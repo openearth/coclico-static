@@ -40,7 +40,7 @@
                   cols="7"
                   class="ma-auto pa-0"
                 >
-                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span> 
+                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.id }}</span> 
                 </v-col>
                 <v-col
                   cols="2"
@@ -153,7 +153,10 @@
       ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
       ...mapMutations([ 'removeMapboxLayer' ]),
       toggleLocationDataset(dataset) {
-        const { id } = dataset
+
+        // Comment out code to add multiple params in route, as this did not work anymore
+
+        /*           const { id } = dataset
         let oldParams = _.get(this.$route, 'params.datasetIds')
         const params = this.$route.params
         let newParams 
@@ -186,7 +189,15 @@
           this.$router.push({ path, params })
         } else {
           this.$router.push('/data')
-        }        
+        }         */
+        const { id } = dataset
+        const params = this.$route.params
+        params.datasetIds = id
+        let path = `/data/${params.datasetIds}`
+        if (_.has(params, 'locationId')) {
+          path = `/data/${params.datasetIds}/${params.locationId}`
+        }
+        //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
         if (!dataset.visible) {
           this.clearActiveDatasetIds()
           //TODO: check if there is a better way. I need the layerId to check if the layer is in the activeMapboxLayers

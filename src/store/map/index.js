@@ -78,10 +78,6 @@ export default {
         return children.forEach(child => {
           return getCatalog(child.href)
             .then(dataset => {
-              // TODO: Extra Storm Surge Level is the template layer, filter this out!
-              if (child.title === 'Extra Storm Surge Level') {
-                return
-              }
               //All the below functionality will be added in a function at the end
               const summaries = _.get(dataset, 'summaries')
               const mappedSummaries = Object.keys(summaries).map(id => {
@@ -176,6 +172,8 @@ export default {
         return
       }
       const url = _.get(dataset, 'assets.data.href')
+      // const datasetName = "replace"
+      const datasetName = _.get(dataset, 'name')
       const path = Object.keys(_.get(dataset, 'cube:variables'))[0]
       const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
       const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
@@ -202,17 +200,21 @@ export default {
                 data: Array.from(serie)
               }
             })
-
             // TODO: Which axis belongs to which dimension????
             let cubeDimensions = _.get(dataset, 'cube:dimensions')
             // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
             const xAxis = Object.keys(cubeDimensions)[2]
             const yAxis = variableUnit[0][1]
-            for (var i = 0; i < cubeDimensions.scenario.values.length; i++) {
-              series[i].name = cubeDimensions.scenario.values[i]
+            // Name based on properties.deltares:plotSeries from STAC
+            const plotSeries = _.get(dataset, 'properties.deltares:plotSeries')
+            const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
+
+            for (var i = 0; i < dimensionNames.length; i++) {
+              series[i].name = dimensionNames[i][1]
             }
             commit('addDatasetPointData', {
               id: datasetId,
+              name: datasetName,
               series,
               xAxis: {
                 type: 'category',

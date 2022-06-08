@@ -253,7 +253,8 @@
     },
     mounted () {
       this.loadPointDataForLocation()
-      this.expandedDatasets = [ ...Array(this.datasets.length).keys() ]
+      // Added +1 to ensure that this also opens when length = 0
+      this.expandedDatasets = [ ...Array(this.datasets.length+1).keys() ]
     },
     methods: {
       ...mapActions([ 'storeActiveDatasetIds', 'loadPointDataForLocation' ]),

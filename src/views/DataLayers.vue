@@ -4,6 +4,8 @@
     <mapbox-map
       slot="map"
       :access-token="accessToken"
+      :center="[5.2913, 48.1326]"
+      :zoom="4"
       mapbox-style="mapbox://styles/global-data-viewer/cjtslsula05as1fppvrh7n4rv"
       @load="initializeMap"
     >
@@ -52,7 +54,8 @@
           'circle-stroke-opacity': 0.8
         }
       },
-      map: {}
+      map: {},
+      mapLoaded: true,
     }),
     components: {
       DataLayersCard,
