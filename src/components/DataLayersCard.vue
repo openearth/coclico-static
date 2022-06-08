@@ -154,7 +154,42 @@
       ...mapMutations([ 'removeMapboxLayer' ]),
       toggleLocationDataset(dataset) {
 
-        // Removed code to add multiple params in route, as this did not work anymore
+        // Comment out code to add multiple params in route, as this did not work anymore
+
+        /*           const { id } = dataset
+        let oldParams = _.get(this.$route, 'params.datasetIds')
+        const params = this.$route.params
+        let newParams 
+
+        if (!oldParams) {
+          //if oldPrams is undefined, set newParams by id
+          newParams = id
+        }else {
+          // Else check if new id should be removed or added to new route
+          oldParams = oldParams.split(',')
+          if (oldParams.includes(id)) {
+            // if oldparams already includes id, remove from route
+            newParams = oldParams.filter(param => param !== id)
+            if (newParams.length === 0) {
+              newParams = undefined
+            } else {
+              newParams = newParams.join(',')
+            }
+          } else {
+            // else add id to route and zoomtobbox
+            newParams = `${oldParams},${id}`
+          }
+        }
+        params.datasetIds = newParams
+        let path = `/data/${params.datasetIds}`
+        if (_.has(params, 'locationId')) {
+          path = `/data/${params.datasetIds}/${params.locationId}`
+        }
+        if (newParams) {
+          this.$router.push({ path, params })
+        } else {
+          this.$router.push('/data')
+        }         */
         const { id } = dataset
         const params = this.$route.params
         params.datasetIds = id
