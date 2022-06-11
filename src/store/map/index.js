@@ -8,6 +8,7 @@ import themes, { state } from './themes.js'
 import { openArray } from 'zarr'
 import router from '@/router'
 import Vue from 'vue'
+import moment from 'moment'
 
 export default {
   modules: {
@@ -18,6 +19,9 @@ export default {
     activeMapboxLayers: [],
     selectedPointData: {},
     activeDatasetIds: [],
+    activeRasterData: {},
+    activeRasterLayerId: '',
+    loadingRasterLayers: false,
   }),
 
   getters: {
@@ -35,11 +39,22 @@ export default {
     selectedPointData(state) {
       return state.selectedPointData
     },
+    getActiveRasterLayer (state) {
+      return state.activeRasterLayerId
+    },
     activeDatasetIds(state) {
       return state.activeDatasetIds
-    }
+    },
+    activeRasterData (state) {
+      return state.activeRasterData
+    },
   },
   mutations: {
+    resetMap (state) {
+      state.activeMapboxLayers = []
+      state.activeDatasetIds = []
+      state.loadingRasterLayers = false
+    },
     addMapboxLayer(state, mapboxLayer) {
       const layerExists = state.activeMapboxLayers.some(storedLayer => storedLayer.id === mapboxLayer.id);
       if (!layerExists) {
@@ -62,8 +77,23 @@ export default {
     setActiveDatasetIds (state, ids) {
       state.activeDatasetIds = ids
     },
+    setActiveRasterLayerId (state, id) {
+      state.activeRasterLayerId = id
+    },
+    setRasterData (state, { data }) {
+      state.activeRasterData = data
+    },
+    setRasterProperty (state, { prop, data }) {
+      state.activeRasterData.layer.properties[prop] = data
+    },
     clearActiveDatasetIds (state) {
       state.activeDatasetIds = []
+    },
+    setLoadingRasterLayers (state, loading) {
+      state.loadingRasterLayers = loading
+    },
+    addActiveRasterLayer (state, { data }) {
+      Vue.set(state.activeRasterData, 'layer', data)
     },
   },
   actions: {
@@ -239,7 +269,87 @@ export default {
     loadLocationDataset({dispatch}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
       dispatch('loadMapboxLayer',layer)
-    }
+    },
+    loadActiveRasterData ({ state, commit, dispatch }, dataset) {
+      // Store active raster data, if null leave empty, otherwise retrieve
+      // new data from link
+      
+      const id = dataset.id  
+      if (!id) {
+        commit('setRasterData', {})
+        return
+      }
+      if (_.get(dataset, 'properties.deltares:mapService') === "GEE") {
+        // implementation below is copied from BlueEarth Data, to read map layers from GEE
+        console.log('Loading GEE maps')
+        const links = _.get(state.datasets[id], 'links')
+        const collectionUrl = links.find(child => child.title === `${id}-gee`).href
+        getCatalog(collectionUrl)
+          .then(dataset => {
+            let links = _.get(dataset, 'links', [])
+            links = links.filter(link => link.rel === 'item')
+            const rasterLayer = links[links.length - 1]
+            const result = links.map(serie => {
+              serie.date = moment(serie.date, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm')
+              return serie
+          })
+          dataset.links = result
+          commit('setRasterData', { id: id, data: dataset })
+          dispatch('loadActiveRasterLayer', rasterLayer)
+        })
+      } else if (_.get(dataset, 'properties.deltares:mapService') === "WMS") {
+        // find layer selected with drop-down box
+        console.log('Loading WMS maps')
+        const layer = matchLayerIdToProperties(dataset)
+
+        const collectionUrl = layer.href
+
+        let links = _.get(dataset, 'links', [])
+        // select link based on selection from summaries
+        links = links.filter(link => link.href === collectionUrl)
+        const rasterLayer = links[0]
+        commit('setRasterData', { id: id, data: dataset })
+        dispatch('loadActiveRasterLayer', rasterLayer)
+
+      }
+    },
+
+    loadActiveRasterLayer ({ state, getters, commit }, rasterLayer) {
+      // Load the active item (depending on activeTimestamp), this function is also
+      // used to update the raster layer when the min and max has changed (using the
+      // properties of the activeRasterData)
+      if (!rasterLayer) {
+        rasterLayer = state.activeRasterData.links.find(item => {
+          return getters.activeTimestamp === item.date
+        })
+      }
+
+      // If no matching timestamp found by child, use collection of invalid date
+      if (!rasterLayer) {
+        rasterLayer = state.activeRasterData.links.find(item => item.rel === 'item')
+      }
+
+      const properties = _.get(state.activeRasterData, 'layer.properties', {})
+      // Seems properties stays empty?
+      const url = new URL(rasterLayer.href)
+
+      if (_.get(properties, 'deltares:band')) {
+        url.searchParams.set('band', _.get(properties, 'deltares:band'))
+      }
+
+      if (_.get(properties, 'deltares:min')) {
+        url.searchParams.set('min', _.get(properties, 'deltares:min'))
+      }
+      if (_.get(properties, 'deltares:max')) {
+        url.searchParams.set('max', _.get(properties, 'deltares:max'))
+      }
+      getCatalog(url.href)
+        .then(dataset => {
+          // dataset loaded here is the one containing the visual assets, so url.href should point to file with this info
+          commit('addActiveRasterLayer', { data: dataset })
+          commit('setLoadingRasterLayers', false)
+        })
+    },
 
   },
 }

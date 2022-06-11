@@ -64,7 +64,7 @@
                     dense
                     class="ma-auto radio"
                     :value="dataset.id"
-                    @click="setRasterLayer(dataset.id)"
+                    @click="setRasterLayer(dataset)"
                     color="formActive"
                   />
                   <v-progress-circular
@@ -107,7 +107,7 @@
                     :label="summary.id"
                     flat
                     dense
-                    @change="toggleLocationDataset(dataset)"
+                    @change="toggleDataset(dataset)"
                   />          
                 </v-col>
               </v-row>
@@ -142,16 +142,19 @@
       LayerLegend
     },
     computed: { 
-      ...mapGetters([ 'activeMapboxLayers' ])
+      ...mapGetters([ 'activeMapboxLayers', 'getActiveRasterLayer', 'activeRasterData', 'loadingRasterLayers' ])
     },
     data () {
       return {
         panel: [],
       }
     },
+    mounted () {
+      this.activeRasterLayer = this.getActiveRasterLayer
+    },
     methods: {
-      ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
-      ...mapMutations([ 'removeMapboxLayer' ]),
+      ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds', 'loadActiveRasterData', 'loadActiveRasterLayer' ]),
+      ...mapMutations([ 'removeMapboxLayer', 'setRasterData', 'setRasterProperty', 'setLoadingRasterLayers', 'setActiveRasterLayerId' ]),
       toggleLocationDataset(dataset) {
 
         // Comment out code to add multiple params in route, as this did not work anymore
@@ -207,6 +210,25 @@
           return
         }
         this.loadLocationDataset(dataset)
+      },
+
+      toggleDataset(dataset) {
+
+        // Change layer whenever summary option is changed, for both vector and raster data
+        if(this.getActiveRasterLayer !== ""){
+          // if raster layer is active, toggle when summary is changed
+          this.setRasterLayer(dataset)
+        }
+        this.toggleLocationDataset(dataset)
+
+      },
+
+      setRasterLayer (dataset) {
+        this.setRasterData({})
+        this.setLoadingRasterLayers(true)
+        this.setActiveRasterLayerId(dataset.id)
+        this.loadActiveRasterData(dataset)
+        this.activeRasterLayer = this.getActiveRasterLayer
       },
 
       data () {

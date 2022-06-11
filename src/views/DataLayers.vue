@@ -20,6 +20,7 @@
         :options="selectedPointLayer"
         key="selectedPointLayer.id"
       />
+      <v-mapbox-raster-layer v-if="mapLoaded" :options="rasterLayer" />
     </mapbox-map>
     <router-view />
   </div>
@@ -28,8 +29,10 @@
 <script>
   import { MapboxMap } from '@deltares/vue-components'
   import DataLayersCard from '@/components/DataLayersCard.vue'
-  import { mapGetters, mapActions, mapMutations } from 'vuex'
+  import { mapGetters, mapActions, mapMutations, mapState } from 'vuex'
   import _ from 'lodash'
+  import VMapboxRasterLayer from '@/components/v-mapbox-components/v-mapbox-raster-layer'
+  import getRasterLayer from '@/lib/mapbox/get-raster-layer'
 
   import getColors from '@/lib/styling/colors'
   const color = getColors('coclico')
@@ -59,13 +62,22 @@
     }),
     components: {
       DataLayersCard,
-      MapboxMap
+      MapboxMap,
+      VMapboxRasterLayer
     },
     computed: {
-      ...mapGetters([ 'availableDatasets', 'activeMapboxLayers', 'selectedPointData' ]),
+      ...mapState(['loadingRasterLayers']),
+      ...mapGetters([ 'availableDatasets', 'activeMapboxLayers', 'selectedPointData', 'activeRasterData', 'getActiveRasterLayer' ]),
+      rasterLayer () {
+        const rasterLayer = getRasterLayer()
+        console.log('RASTERLAYER DEBUG activeRasterLayer', this.activeRasterData)
+        rasterLayer.source.tiles = [_.get(this.activeRasterData, 'layer.assets.visual.href')]
+        console.log('rasterlayer source tiles', rasterLayer.source.tiles)
+        return rasterLayer
+      }
     },
     methods: {
-      ...mapMutations([ 'setSelectedPointData' ]),
+      ...mapMutations([ 'setSelectedPointData', 'setActiveRasterLayerId' ]),
       ...mapActions([ 'loadDatasets', 'loadPointDataForLocation' ]),
       initializeMap (evt) {
         this.map = evt.target
@@ -91,6 +103,9 @@
       },
       selectLocation(e) {
         this.showTimeseries(e)
+        console.log('E', e)
+        console.log('E2', this.selectedPointLayer.source.data)
+        this.geometry = this.selectedPointLayer.source.data
         const {properties} = e.features[0]
         const {locationId} = properties
         if (locationId) {
@@ -122,6 +137,10 @@
       updateSelectedPoint(geometry) {
         const selectedPoint = this.map.getSource('selected_point')
         selectedPoint.setData(geometry)
+      },
+      toggleRasterLayer (event) {
+        this.setActiveRasterLayerId(event)
+        this.loadActiveRasterItem()
       }
     }
   }
