@@ -16,7 +16,7 @@ export default {
   },
   state: () => ({
     activeLocationLayer: null,
-    selectedPointData: {},
+    selectedVectorData: {},
     activeDatasetIds: [],
     activeRasterLayer: null,
     activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
@@ -28,15 +28,15 @@ export default {
     },
     selectedDatasets(state) {
       return state.activeDatasetIds.map(datasetId => {
-        return _.get(state.selectedPointData, `data.${datasetId}`)
+        return _.get(state.selectedVectorData, `data.${datasetId}`)
       })
     },
     //active location layer on map
     activeLocationLayer(state) {
     return state.activeLocationLayer
     },
-    selectedPointData(state) {
-      return state.selectedPointData
+    selectedVectorData(state) {
+      return state.selectedvectorData
     },
     activeDatasetIds(state) {
       return state.activeDatasetIds
@@ -52,15 +52,15 @@ export default {
     resetActiveLocationLayer(state) {
       state.activeLocationLayer = null
     },
-    setSelectedPointData(state, pointData) {
-      state.selectedPointData = pointData
+    setSelectedVectorData(state, vectorData) {
+      state.selectedVectorData = vectorData
     },
-    addDatasetPointData(state, pointData) {
-      Vue.set(state.selectedPointData, `data.${pointData.id}`, pointData)
+    addDatasetPointData(state, vectorData) {
+      Vue.set(state.selectedVectorData, `data.${vectorData.id}`, vectorData)
     },
     setActiveDatasetIds (state, ids) {
       //at this moment only one location dataset is allowed to be displayed.
-      //in the future more than one id will be stored in this state. 
+      //in the future more than one id will be stored in this state.
       state.activeDatasetIds = ids
     },
     clearActiveDatasetIds (state) {
@@ -116,7 +116,7 @@ export default {
     },
 
     reclassifyMapboxLayer({state, commit}, dataset) {
-      /* 
+      /*
       This implementation is only checked with paint that has the below format
        "circle-color": [
                 "interpolate",
@@ -137,22 +137,22 @@ export default {
       */
       const newMin = _.get(dataset, 'properties.deltares:min', '')
       const newMax =  _.get(dataset, 'properties.deltares:max', '')
-      
+
       const mapboxLayer = state.activeLocationLayer
       const mapboxLayerId = _.get(mapboxLayer, 'id')
       const circleColors = _.get(mapboxLayer, 'paint.circle-color')
       //remove mapboxlayer in order and update paint
-      // 
+      //
       commit('resetActiveLocationLayer')
-      //create new colors 
-    
+      //create new colors
+
       const newCircleColors = circleColors.map((item, index) => {
-        //index is based on the format of 
+        //index is based on the format of
         if (index === 3) {
           return parseFloat(newMin)
         }
         if (index === 5) {
-          return  ((parseFloat(newMin)+parseFloat(newMax))/2.0) 
+          return  ((parseFloat(newMin)+parseFloat(newMax))/2.0)
         }
         if (index === 7) {
           return parseFloat(newMax)
@@ -165,7 +165,7 @@ export default {
       commit('setActiveLocationLayer', mapboxLayer)
 
     },
- 
+
     loadPointDataForLocation({ state, commit }) {
       // Retrieve per point data from a zarr file corresponding to the href in the
       // data attributes and it's dimensions and variables
@@ -184,7 +184,7 @@ export default {
         // TODO: make sure that the stations always correspond to the mapbox layers and that the
         // other layers are the temporal layers used in the graphs..
         if (dim[1] === 'stations') {
-          return _.get(state.selectedPointData, 'properties.locationId', 0)
+          return _.get(state.selectedVectorData, 'properties.locationId', 0)
         } else {
           return null
         }
