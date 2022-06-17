@@ -6,7 +6,7 @@ export const coclico = {
   black100: '#000000',
   error: '#de071c',
   grey05: '#f3f3f3',
-  grey100: '#4c4c4c',
+  grey100: '#202020',
   grey20: '#d2d2d2',
   grey40: '#a5a5a5',
   grey60: '#787878',
@@ -52,7 +52,7 @@ const context = {
     coclico: 'transparent',
   },
   quietHover: {
-    coclico: coclico.white100,
+    coclico: coclico.green,
   },
   quietFocus: {
     coclico: coclico.white100,
@@ -73,10 +73,13 @@ const context = {
     coclico: coclico.white100,
   },
   textInverted: {
-    coclico: coclico.white100,
+    coclico: coclico.black100,
   },
   formBase: {
     coclico: coclico.green,
+  },
+  formBackground: {
+    coclico: coclico.white100
   },
   formActive: {
     coclico: coclico.orange,
