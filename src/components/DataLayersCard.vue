@@ -8,7 +8,7 @@
     <v-card-title class="h3">
       All datasets
     </v-card-title>
-    <v-card-text class="scrollbar data-layers-card__text px-0 pb-0"> 
+    <v-card-text class="scrollbar data-layers-card__text px-0 pb-0">
       <v-expansion-panels
         v-model="panel"
         multiple
@@ -25,7 +25,7 @@
               hide-actions
               color="white100"
               dark
-            > 
+            >
               <v-row>
                 <v-col
                   cols="1"
@@ -34,13 +34,13 @@
                   <custom-icon
                     name="cc"
                     icon-folder="datasets"
-                  />  
+                  />
                 </v-col>
                 <v-col
                   cols="7"
                   class="ma-auto pa-0"
                 >
-                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.id }}</span> 
+                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.id }}</span>
                 </v-col>
                 <v-col
                   cols="2"
@@ -108,10 +108,10 @@
                     flat
                     dense
                     @change="toggleLocationDataset(dataset)"
-                  />          
+                  />
                 </v-col>
               </v-row>
-              <v-row v-if="dataset.visible"> 
+              <v-row v-if="dataset.visible">
                 <v-col>
                   <layer-legend :dataset="dataset" />
                 </v-col>
@@ -141,7 +141,7 @@
       CustomIcon,
       LayerLegend
     },
-    computed: { 
+    computed: {
       ...mapGetters([ 'activeMapboxLayers' ])
     },
     data () {
@@ -153,43 +153,6 @@
       ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
       ...mapMutations([ 'removeMapboxLayer' ]),
       toggleLocationDataset(dataset) {
-
-        // Comment out code to add multiple params in route, as this did not work anymore
-
-        /*           const { id } = dataset
-        let oldParams = _.get(this.$route, 'params.datasetIds')
-        const params = this.$route.params
-        let newParams 
-
-        if (!oldParams) {
-          //if oldPrams is undefined, set newParams by id
-          newParams = id
-        }else {
-          // Else check if new id should be removed or added to new route
-          oldParams = oldParams.split(',')
-          if (oldParams.includes(id)) {
-            // if oldparams already includes id, remove from route
-            newParams = oldParams.filter(param => param !== id)
-            if (newParams.length === 0) {
-              newParams = undefined
-            } else {
-              newParams = newParams.join(',')
-            }
-          } else {
-            // else add id to route and zoomtobbox
-            newParams = `${oldParams},${id}`
-          }
-        }
-        params.datasetIds = newParams
-        let path = `/data/${params.datasetIds}`
-        if (_.has(params, 'locationId')) {
-          path = `/data/${params.datasetIds}/${params.locationId}`
-        }
-        if (newParams) {
-          this.$router.push({ path, params })
-        } else {
-          this.$router.push('/data')
-        }         */
         const { id } = dataset
         const params = this.$route.params
         params.datasetIds = id
@@ -201,9 +164,11 @@
         if (!dataset.visible) {
           this.clearActiveDatasetIds()
           //TODO: check if there is a better way. I need the layerId to check if the layer is in the activeMapboxLayers
-          //right now checking if one of the layerIds has the dataset id in its string. 
+          //right now checking if one of the layerIds has the dataset id in its string.
           const mapboxLayer = this.activeMapboxLayers.find(({id}) => id.includes(dataset.id))
-          this.removeMapboxLayer(mapboxLayer.id)
+          if (mapboxLayer) {
+            this.removeMapboxLayer(mapboxLayer.id)
+          }
           return
         }
         this.loadLocationDataset(dataset)

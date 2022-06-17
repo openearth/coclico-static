@@ -236,7 +236,7 @@
     },
     computed: {
       ...mapGetters([ 'selectedPointData', 'selectedDatasets' ]),
-      datasets (selectedPointData) {
+      datasets () {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
           // does not seem a very neat way to do this. Is there a better way?
