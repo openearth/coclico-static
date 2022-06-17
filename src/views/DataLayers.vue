@@ -10,9 +10,9 @@
       @load="initializeMap"
     >
       <v-mapbox-layer
-        v-for="layer in activeMapboxLayers"
-        :key="layer.id"
-        :options="layer"
+        v-if="activeLocationLayer"
+        :key="activeLocationLayer.id"
+        :options="activeLocationLayer"
         clickable
         @click="selectLocation"
       />
@@ -62,7 +62,7 @@
       MapboxMap
     },
     computed: {
-      ...mapGetters([ 'availableDatasets', 'activeMapboxLayers', 'selectedPointData' ]),
+      ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'selectedPointData' ]),
     },
     methods: {
       ...mapMutations([ 'setSelectedPointData' ]),
@@ -94,6 +94,7 @@
         const {properties} = e.features[0]
         const {locationId} = properties
         if (locationId) {
+       
           const params = this.$route.params
           params.locationId = locationId
           this.$router.push({ path: `/data/${params.datasetIds}/${params.locationId}`, params })

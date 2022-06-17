@@ -15,9 +15,11 @@ export default {
     themes
   },
   state: () => ({
-    activeMapboxLayers: [],
+    activeLocationLayer: null,
     selectedPointData: {},
     activeDatasetIds: [],
+    activeRasterLayer: null,
+    activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
   }),
 
   getters: {
@@ -29,29 +31,26 @@ export default {
         return _.get(state.selectedPointData, `data.${datasetId}`)
       })
     },
-    activeMapboxLayers(state) {
-    return state.activeMapboxLayers
+    //active location layer on map
+    activeLocationLayer(state) {
+    return state.activeLocationLayer
     },
     selectedPointData(state) {
       return state.selectedPointData
     },
     activeDatasetIds(state) {
       return state.activeDatasetIds
+    },
+    activeDatasetId(state) {
+      return state.activeDatasetId
     }
   },
   mutations: {
-    addMapboxLayer(state, mapboxLayer) {
-      const layerExists = state.activeMapboxLayers.some(storedLayer => storedLayer.id === mapboxLayer.id);
-      if (!layerExists) {
-        state.activeMapboxLayers  =  state.activeMapboxLayers = [
-          ...state.activeMapboxLayers, {
-            ...mapboxLayer
-          }
-        ];
-      }
+    setActiveLocationLayer(state, layer) {
+      state.activeLocationLayer = layer
     },
-    removeMapboxLayer(state, mapboxLayerId) {
-      state.activeMapboxLayers = state.activeMapboxLayers.filter(({id}) => id !== mapboxLayerId)
+    resetActiveLocationLayer(state) {
+      state.activeLocationLayer = null
     },
     setSelectedPointData(state, pointData) {
       state.selectedPointData = pointData
@@ -60,10 +59,15 @@ export default {
       Vue.set(state.selectedPointData, `data.${pointData.id}`, pointData)
     },
     setActiveDatasetIds (state, ids) {
+      //at this moment only one location dataset is allowed to be displayed.
+      //in the future more than one id will be stored in this state. 
       state.activeDatasetIds = ids
     },
     clearActiveDatasetIds (state) {
       state.activeDatasetIds = []
+    },
+    setActiveDatasetId(state, id) {
+      state.activeDatasetId = id
     },
   },
   actions: {
@@ -93,7 +97,7 @@ export default {
               commit('addDataset', dataset)
               //if we start a subroute with active dataset ids, directly load the layer
               if (state.activeDatasetIds.includes(dataset.id)) {
-                _.set(state.datasets, `${dataset.id}.visible`, true)
+                dispatch('setActiveDatasetId', dataset.id)
                 dispatch('loadLocationDataset', dataset)
                 dispatch('loadPointDataForLocation')
               }
@@ -102,11 +106,12 @@ export default {
 
       })
     },
+    //load mapbox layer format from stac
     loadMapboxLayer({ commit }, layer) {
       //get info of the layer from stac catalog
       getCatalog(layer.href)
         .then(layerInfo => {
-          commit('addMapboxLayer', buildGeojsonLayer(layerInfo))
+          commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
         })
     },
 
@@ -132,15 +137,13 @@ export default {
       */
       const newMin = _.get(dataset, 'properties.deltares:min', '')
       const newMax =  _.get(dataset, 'properties.deltares:max', '')
-      const datasetId = _.get(dataset, 'id')
       
-      
-      const mapboxLayer = state.activeMapboxLayers.find(({id}) => id.includes(datasetId))
+      const mapboxLayer = state.activeLocationLayer
       const mapboxLayerId = _.get(mapboxLayer, 'id')
       const circleColors = _.get(mapboxLayer, 'paint.circle-color')
       //remove mapboxlayer in order and update paint
       // 
-      commit('removeMapboxLayer',mapboxLayerId)
+      commit('resetActiveLocationLayer')
       //create new colors 
     
       const newCircleColors = circleColors.map((item, index) => {
@@ -159,7 +162,7 @@ export default {
 
       _.set(mapboxLayer, 'paint.circle-color', newCircleColors)
       //add layer again in the activeMapboxLayers array
-      commit('addMapboxLayer', mapboxLayer)
+      commit('setActiveLocationLayer', mapboxLayer)
 
     },
  
@@ -228,7 +231,7 @@ export default {
           })
       })
     },
-    storeActiveDatasetIds ({ commit }, _ids) {
+    storeactiveDatasetIds ({ commit }, _ids) {
       // First set of the activeDatasetIds
       const ids = isArray(_ids) ? _ids : _ids.split(',')
       commit('setActiveDatasetIds', ids)
@@ -239,8 +242,13 @@ export default {
     loadLocationDataset({dispatch}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
       dispatch('loadMapboxLayer',layer)
+    },
+    resetActiveLocationLayer({commit}) {
+      commit('resetActiveLocationLayer')
+    },
+    setActiveDatasetId({commit}, id) {
+      commit('setActiveDatasetId', id)
     }
-
   },
 }
 

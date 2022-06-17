@@ -1,4 +1,4 @@
-## CoClico (beta) User Aggreement
+## CoClico (beta) User Agreement
 
 This legal agreement (hereinafter “User Agreement”) governs the conditions of use of this Open Data website and the data products (hereinafter “Data Products”) to be found, accessed and downloaded through our website.
 
@@ -16,11 +16,11 @@ By marking the “I agree”-checkbox:
 
 You are not allowed to use this website and its Data Products without an agreement with the FORCOAST consortium. If you do not agree to the terms of this User Agreement, you must promptly stop using the Website and the Data Products. Any further actions with respect to the Website and/or Data Products without an agreement are in violation of copyright law.
 
-Article 1: General purpose and allowed use	
+Article 1: General purpose and allowed use
 
-- 1.1 By presenting this Website and providing Data Products that can be accessed online as well as directly downloaded, The Consortium intends to provide users with the opportunity to evaluate and study integrated water-related information.	
-- 1.2 All data provided through our Website and Data Products are purely indicative data that are only validated to a very limited extent, and User hereby agrees not to use the Website and the Data Products for any decision-making, operational purposes, navigation or any other purpose involving safety at sea.	
-- 1.3 The Data Products are generally grouped into specific Service Modules. The specific purpose and allowed use of each type of Service Module are further specified below at Article 2.	
+- 1.1 By presenting this Website and providing Data Products that can be accessed online as well as directly downloaded, The Consortium intends to provide users with the opportunity to evaluate and study integrated water-related information.
+- 1.2 All data provided through our Website and Data Products are purely indicative data that are only validated to a very limited extent, and User hereby agrees not to use the Website and the Data Products for any decision-making, operational purposes, navigation or any other purpose involving safety at sea.
+- 1.3 The Data Products are generally grouped into specific Service Modules. The specific purpose and allowed use of each type of Service Module are further specified below at Article 2.
 
 Article 2: Specific purpose and allowed use per Service Module
 
