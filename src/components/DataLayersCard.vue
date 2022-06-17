@@ -9,10 +9,10 @@
       All datasets
     </v-card-title>
     <v-card-text
-      class="scrollbar data-layers-card__text  
+      class="scrollbar data-layers-card__text
       px-0
       pb-0"
-    > 
+    >
       <v-expansion-panels
         accordion
         flat
@@ -31,7 +31,7 @@
               hide-actions
               color="white100"
               dark
-            > 
+            >
               <v-row>
                 <v-col
                   cols="1"
@@ -40,13 +40,13 @@
                   <custom-icon
                     name="cc"
                     icon-folder="datasets"
-                  />  
+                  />
                 </v-col>
                 <v-col
                   cols="7"
                   class="ma-auto pa-0"
                 >
-                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span> 
+                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span>
                 </v-col>
                 <v-col
                   cols="2"
@@ -115,7 +115,7 @@
                   />
                 </div>
               </v-row>
-             
+
               <v-row>
                 <v-col
                   cols="6"
@@ -131,10 +131,10 @@
                     flat
                     dense
                     @change="toggleLocationDataset(dataset)"
-                  />          
+                  />
                 </v-col>
               </v-row>
-              <v-row v-if="dataset.id === activeLocationDatasetId"> 
+              <v-row v-if="dataset.id === activeLocationDatasetId">
                 <v-col>
                   <layer-legend :dataset="dataset" />
                 </v-col>
@@ -172,7 +172,7 @@
     },
     computed: {
       ...mapGetters([ 'activeDatasetId' ]),
-      activeLocationDatasetId: { 
+      activeLocationDatasetId: {
         get() {
           return this.activeDatasetId
         },
@@ -204,12 +204,9 @@
           this.resetActiveLocationLayer()
           return
         }
-     
         const params = this.$route.params
-        
         params.datasetIds = id
         let path = `/data/${params.datasetIds}`
-        
         this.$router.push({ path, params })
         this.loadLocationDataset(dataset)
       },

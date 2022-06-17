@@ -18,7 +18,9 @@
       />
       <v-mapbox-layer
         :options="selectedPointLayer"
-        key="selectedPointLayer.id"
+      />
+      <v-mapbox-layer
+        :options="selectedPolygonLayer"
       />
     </mapbox-map>
     <router-view />
@@ -38,8 +40,8 @@
     data: () => ({
       accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
       selectedPointLayer: {
-        id: 'selected_point',
         type: 'circle',
+        id: 'selected_point',
         source: {
           type: 'geojson',
           data: {
@@ -54,6 +56,22 @@
           'circle-stroke-opacity': 0.8
         }
       },
+      selectedPolygonLayer: {
+        type: 'line',
+        id: 'selected_polygon',
+        source: {
+          type: 'geojson',
+          data: {
+            type: 'Point',
+            coordinates: []
+          }
+        },
+        paint: {
+          'line-width': 8,
+          'line-color': color.metallic100,
+          'line-opacity': 0.8
+        }
+      },
       map: {},
       mapLoaded: true,
     }),
@@ -61,11 +79,21 @@
       DataLayersCard,
       MapboxMap
     },
+    watch: {
+      '$route.params.datasetIds': {
+        handler (newValue, oldValue) {
+          if (newValue !== oldValue) {
+            this.clearSelection()
+          }
+        },
+        deep: true
+      }
+    },
     computed: {
-      ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'selectedPointData' ]),
+      ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'selectedVectorData' ]),
     },
     methods: {
-      ...mapMutations([ 'setSelectedPointData' ]),
+      ...mapMutations([ 'setSelectedVectorData' ]),
       ...mapActions([ 'loadDatasets', 'loadPointDataForLocation' ]),
       initializeMap (evt) {
         this.map = evt.target
@@ -79,10 +107,16 @@
           if (!feature) {
             return
           }
-          this.updateSelectedPoint(feature.geometry)
+          let lng = feature.geometry.coordinates[0]
+          let lat = feature.geometry.coordinates[1]
+          if (feature.geometry.type !== 'Point') {
+            lng = feature.geometry.coordinates[0][0][0]
+            lat = feature.geometry.coordinates[0][0][1]
+          }
+          this.updateSelectedVector(feature.geometry)
           this.map.panTo({
-            lng: feature.geometry.coordinates[0],
-            lat: feature.geometry.coordinates[1]
+            lng,
+            lat
           })
         }, 500)
       },
@@ -92,9 +126,11 @@
       selectLocation(e) {
         this.showTimeseries(e)
         const {properties} = e.features[0]
-        const {locationId} = properties
+        // TODO: all mapbox files should have a locationId
+        let {locationId, id} = properties
+        locationId = locationId || id
         if (locationId) {
-       
+
           const params = this.$route.params
           params.locationId = locationId
           this.$router.push({ path: `/data/${params.datasetIds}/${params.locationId}`, params })
@@ -116,13 +152,26 @@
         this.mapPanTo(event, 500)
 
         const features = this.map.queryRenderedFeatures(event.point)
-        this.setSelectedPointData(features[0])
-        this.updateSelectedPoint(features[0].geometry)
+        this.setSelectedVectorData(features[0])
+        this.clearSelection()
+        this.updateSelectedVector(features[0].geometry)
         this.loadPointDataForLocation()
       },
-      updateSelectedPoint(geometry) {
-        const selectedPoint = this.map.getSource('selected_point')
-        selectedPoint.setData(geometry)
+      clearSelection() {
+        const emptyGeometry = {
+          type: 'Point',
+          coordinates: []
+        }
+        this.map.getSource('selected_point').setData(emptyGeometry)
+        this.map.getSource('selected_polygon').setData(emptyGeometry)
+      },
+      updateSelectedVector(geometry) {
+        if (geometry.type === 'Point') {
+          this.map.getSource('selected_point').setData(geometry)
+        }
+        if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
+          this.map.getSource('selected_polygon').setData(geometry)
+        }
       }
     }
   }
