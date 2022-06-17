@@ -147,79 +147,6 @@
     }
   })
 
-  const baseOptions = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      },
-      backgroundColor: 'rgba(50,50,50,0.7)',
-      textStyle: {
-        color: '#fff'
-      }
-    },
-    //toolbox: {
-    //  show: true,
-    //  feature: {
-    //    dataZoom: {
-    //      yAxisIndex: 'none'
-    //    },
-    //    dataView: { readOnly: false },
-    //    magicType: { type: ['line', 'bar'] },
-    //    restore: {},
-    //    saveAsImage: {}
-    //  }
-    //},
-    legend: {
-      top: 'horizontal'
-    },
-    grid: {
-      show: true,
-      top: 30,
-      bottom: 50,
-      right: 20,
-      left: 50
-    },
-    dataZoom: [
-      {
-        type: 'inside',
-        realtime: true
-      }
-    ],
-    textStyle: {
-      fontFamily: 'Helvetica'
-    },
-    xAxis: {
-      splitLine: {
-        show: true,
-      },
-      axisLabel: {
-        fontSize: 14
-      },
-      nameLocation: 'center',
-      nameGap: 20,
-      name: "-",
-      nameTextStyle: {
-        color: 'white',
-        fontSize: 14,
-        fontFamily: 'Helvetica'
-      }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        fontSize: 14
-      },
-      nameLocation: 'center',
-      name: '-',
-      nameGap: 30,
-      nameTextStyle: {
-        color: 'white',
-        fontSize: 14,
-        fontFamily: 'Helvetica'
-      }
-    }
-  }
 
   export default {
     name:'LocationIds',
@@ -240,9 +167,9 @@
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
           // does not seem a very neat way to do this. Is there a better way?
-          baseOptions.xAxis.name = set.xAxis.title
-          baseOptions.yAxis.name = set.yAxis.title
-          return _.merge(set, baseOptions, theme)
+          this.baseOptions.xAxis.name = set.xAxis.title
+          this.baseOptions.yAxis.name = set.yAxis.title
+          return _.merge(set, this.baseOptions, theme)
         })
       }
     },
@@ -255,6 +182,7 @@
       this.loadPointDataForLocation()
       // Added +1 to ensure that this also opens when length = 0
       this.expandedDatasets = [ ...Array(this.datasets.length+1).keys() ]
+      this.getBaseOption(this.$route.params.datasetIds)
     },
     methods: {
       ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
@@ -264,6 +192,14 @@
           path: `/data/${this.$route.params.datasetIds}`,
           params: { datasetIds: this.$route.params.datasetIds }
         })
+      },
+      getBaseOption (datasetId) {
+        try {
+          this.baseOptions = require(`@/assets/echart-templates/${datasetId}.json`)
+        } catch {
+          this.baseOptions = require('@/assets/echart-templates/ssl.json')
+        }
+
       }
     }
   }
