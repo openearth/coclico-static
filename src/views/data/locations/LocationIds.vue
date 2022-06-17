@@ -229,7 +229,7 @@
     watch: {
       '$route.params.datasetIds': {
         handler () {
-          this.storeActiveDatasetIds(this.$route.params.datasetIds)
+          this.storeactiveDatasetIds(this.$route.params.datasetIds)
         },
         deep: true
       }
@@ -257,7 +257,7 @@
       this.expandedDatasets = [ ...Array(this.datasets.length+1).keys() ]
     },
     methods: {
-      ...mapActions([ 'storeActiveDatasetIds', 'loadPointDataForLocation' ]),
+      ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
       ...mapMutations([ 'setActiveDatasetIds' ]),
       close () {
         this.$router.push({

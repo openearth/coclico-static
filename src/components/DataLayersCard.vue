@@ -8,12 +8,18 @@
     <v-card-title class="h3">
       All datasets
     </v-card-title>
-    <v-card-text class="scrollbar data-layers-card__text px-0 pb-0">
+    <v-card-text
+      class="scrollbar data-layers-card__text
+      px-0
+      pb-0"
+    >
       <v-expansion-panels
-        v-model="panel"
-        multiple
         accordion
         flat
+        tile
+        :value="activePanels"
+        multiple
+        readonly
         color="background"
       >
         <v-radio-group class="data-layers-card__group ma-0">
@@ -40,7 +46,7 @@
                   cols="7"
                   class="ma-auto pa-0"
                 >
-                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.id }}</span>
+                  <span class="ml-2 d-sm-none d-md-flex">{{ dataset.title }}</span>
                 </v-col>
                 <v-col
                   cols="2"
@@ -48,9 +54,11 @@
                 >
                   <v-switch
                     class="my-auto switch"
+                    v-if="checkLayerType(dataset) === 'vector'"
                     dense
                     flat
-                    v-model="dataset.visible"
+                    v-model="activeLocationDatasetId"
+                    :value="dataset.id"
                     color="formActive"
                     @change="toggleLocationDataset(dataset)"
                   />
@@ -61,6 +69,7 @@
                 >
                   <!-- TODO: to be added functionality to radio button -->
                   <v-radio
+                    v-if="checkLayerType(dataset) === 'raster'"
                     dense
                     class="ma-auto radio"
                     :value="dataset.id"
@@ -94,6 +103,20 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-row>
+                <div
+                  v-if="dataset.description && hoverId === dataset.id"
+                  class="data-layers-card__tooltip"
+                >
+                  <div
+                    v-html="markedTooltip(dataset.description)"
+                    class="data-layers-card__tooltip-text markdown pa-2"
+                    :anchor-attributes="{ target: '_blank' }"
+                    :watches="['source']"
+                  />
+                </div>
+              </v-row>
+
+              <v-row>
                 <v-col
                   cols="6"
                   class="ma-auto pa-0"
@@ -111,7 +134,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="dataset.visible">
+              <v-row v-if="dataset.id === activeLocationDatasetId">
                 <v-col>
                   <layer-legend :dataset="dataset" />
                 </v-col>
@@ -127,8 +150,14 @@
   import CustomIcon from "./CustomIcon.vue"
   import LayerLegend from "./LayerLegend.vue"
 
-  import { mapGetters, mapMutations, mapActions } from "vuex"
+  import { mapGetters, mapActions } from "vuex"
   import _ from 'lodash'
+  import { marked } from 'marked'
+
+  const renderer = new marked.Renderer()
+  renderer.link = function (href, title, text) {
+    return `<a target="_blank" href="${href}" title="${title}">${text}</a>`
+  }
 
   export default {
     props: {
@@ -142,43 +171,56 @@
       LayerLegend
     },
     computed: {
-      ...mapGetters([ 'activeMapboxLayers' ])
+      ...mapGetters([ 'activeDatasetId' ]),
+      activeLocationDatasetId: {
+        get() {
+          return this.activeDatasetId
+        },
+        set(val) {
+          this.setActiveDatasetId(val)
+        }
+      },
+      activePanels () {
+        // map which panel is showing the legend layer or the information layer)
+        const active = _.values(this.datasets).flatMap((dataset, index) => {
+          const activeDataset = this.hoverId === dataset.id || this.activeLocationDatasetId === dataset.id
+          return activeDataset ? index : []
+        })
+        return active
+      },
     },
     data () {
       return {
-        panel: [],
+        hoverId: null
       }
     },
     methods: {
-      ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds' ]),
-      ...mapMutations([ 'removeMapboxLayer' ]),
+      ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'setActiveDatasetId' ]),
       toggleLocationDataset(dataset) {
         const { id } = dataset
+        if (id !== this.activeLocationDatasetId ) {
+          this.clearActiveDatasetIds()
+          this.$router.push('/data')
+          this.resetActiveLocationLayer()
+          return
+        }
         const params = this.$route.params
         params.datasetIds = id
         let path = `/data/${params.datasetIds}`
-        if (_.has(params, 'locationId')) {
-          path = `/data/${params.datasetIds}/${params.locationId}`
-        }
-        //find the layer of the dataset to load on the map based on the chosen values only if the dataset is visible
-        if (!dataset.visible) {
-          this.clearActiveDatasetIds()
-          //TODO: check if there is a better way. I need the layerId to check if the layer is in the activeMapboxLayers
-          //right now checking if one of the layerIds has the dataset id in its string.
-          const mapboxLayer = this.activeMapboxLayers.find(({id}) => id.includes(dataset.id))
-          if (mapboxLayer) {
-            this.removeMapboxLayer(mapboxLayer.id)
-          }
-          return
-        }
+        this.$router.push({ path, params })
         this.loadLocationDataset(dataset)
       },
-
-      data () {
-        return {
-          panel: [],
-        }
+      markedTooltip (text) {
+        return marked(text, { renderer: renderer })
       },
+      onTooltipClick(id) {
+        this.hoverId ? (this.hoverId = null) : (this.hoverId = id)
+      },
+      checkLayerType(dataset) {
+        //Assumption: if layer has cube:dimensions then it is a vector
+        //TODO: add in the stacCatalogue structure a format parameter somehow
+        return _.has(dataset, 'cube:dimensions') ? 'vector' : 'raster'
+      }
     }
   }
 </script>
@@ -193,6 +235,7 @@
   width: 30vw;
   max-width: 400px;
   min-width: 250px;
+  background-color: var(--v-textColor-base);
 }
 .data-layers-card__text {
   height: 90%;
@@ -222,7 +265,7 @@
   border-radius: 5px;
   background-color: var(--v-quietHover-base);
   box-shadow: 4px 6px 20px -4px rgba(0, 0, 0, 0.5);
-  color: var(--v-textColor-base);
+  color: var(--v-textInverted-base);
 }
 .switch {
   top: 8px;
@@ -234,4 +277,6 @@
 .v-input--selection-controls__input .v-icon {
   color: var(--v-primary-darken2);
 }
+
+
 </style>

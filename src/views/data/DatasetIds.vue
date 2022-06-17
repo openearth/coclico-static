@@ -11,16 +11,16 @@
     watch: {
       '$route.params.datasetIds': {
         handler () {
-          this.storeActiveDatasetIds(this.$route.params.datasetIds)
+          this.storeactiveDatasetIds(this.$route.params.datasetIds)
         },
         deep: true
       }
     },
     mounted () {
-      this.storeActiveDatasetIds(this.$route.params.datasetIds)
+      this.storeactiveDatasetIds(this.$route.params.datasetIds)
     },
     methods: {
-      ...mapActions([ 'storeActiveDatasetIds' ])
+      ...mapActions([ 'storeactiveDatasetIds' ])
     }
   }
 </script>
