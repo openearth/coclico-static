@@ -79,6 +79,16 @@
       DataLayersCard,
       MapboxMap
     },
+    watch: {
+      '$route.params.datasetIds': {
+        handler (newValue, oldValue) {
+          if (newValue !== oldValue) {
+            this.clearSelection()
+          }
+        },
+        deep: true
+      }
+    },
     computed: {
       ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'selectedVectorData' ]),
     },
@@ -97,11 +107,16 @@
           if (!feature) {
             return
           }
-          console.log(feature.geometry)
+          let lng = feature.geometry.coordinates[0]
+          let lat = feature.geometry.coordinates[1]
+          if (feature.geometry.type !== 'Point') {
+            lng = feature.geometry.coordinates[0][0][0]
+            lat = feature.geometry.coordinates[0][0][1]
+          }
           this.updateSelectedVector(feature.geometry)
           this.map.panTo({
-            lng: feature.geometry.coordinates[0] || feature.geometry.coordinates[0][0],
-            lat: feature.geometry.coordinates[1] || feature.geometry.coordinates[0][1]
+            lng,
+            lat
           })
         }, 500)
       },
