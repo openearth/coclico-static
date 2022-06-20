@@ -204,6 +204,12 @@
           this.resetActiveLocationLayer()
           return
         }
+        
+        if (this.$route.path.includes(id)) {
+          this.loadLocationDataset(dataset)
+          return
+        }
+        
         const params = this.$route.params
         params.datasetIds = id
         let path = `/data/${params.datasetIds}`
