@@ -32,6 +32,7 @@
             :step="stepper.step"
             class="stepper-icon py-0"
             :key="stepper.name"
+            @click="stepperAction(stepper.name)"
           >
             {{ stepper.name }}
           </v-stepper-step>
@@ -50,6 +51,15 @@
   export default { 
     computed: {
       ...mapGetters([ 'steppers' ])
+    },
+    methods: {
+      stepperAction (name) {
+        // For workbench in stepper, open workbench page in seperate panel
+        if(name === 'Workbench')
+        {
+          window.open("https://github.com/openearth/coclico-workbench", "_blank");
+        }
+      }
     }
   }
 </script>
