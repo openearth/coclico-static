@@ -22,7 +22,10 @@
         readonly
         color="background"
       >
-        <v-radio-group class="data-layers-card__group ma-0">
+        <v-radio-group
+          v-model="activeRasterDatasetId"
+          class="data-layers-card__group ma-0"
+        >
           <v-expansion-panel
             v-for="(dataset, index) in datasets"
             :key="index"
@@ -69,11 +72,11 @@
                 >
                   <!-- TODO: to be added functionality to radio button -->
                   <v-radio
-                    v-if="checkLayerType(dataset) === 'raster'"
+                    v-show="checkLayerType(dataset) === 'raster'"
                     dense
                     class="ma-auto radio"
                     :value="dataset.id"
-                    @click="setRasterLayer(dataset.id)"
+                    @click="toggleRasterDataset(dataset)"
                     color="formActive"
                   />
                   <v-progress-circular
@@ -116,7 +119,7 @@
                 </div>
               </v-row>
 
-              <v-row>
+              <v-row v-if="checkLayerType(dataset) === 'vector'">
                 <v-col
                   cols="6"
                   class="ma-auto pa-0"
@@ -134,7 +137,30 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="dataset.id === activeLocationDatasetId">
+              <v-row v-if="checkLayerType(dataset) === 'vector' && dataset.id === activeLocationDatasetId">
+                <v-col>
+                  <layer-legend :dataset="dataset" />
+                </v-col>
+              </v-row>
+              <v-row v-if="checkLayerType(dataset) === 'raster'">
+                <v-col
+                  cols="6"
+                  class="ma-auto pa-0"
+                  v-for="summary in dataset.summaries"
+                  :key="summary.id"
+                >
+                  <v-select
+                    class="pa-2"
+                    v-model="summary.chosenValue"
+                    :items="summary.allowedValues"
+                    :label="summary.id"
+                    flat
+                    dense
+                    @change="toggleRasterDataset(dataset)"
+                  />
+                </v-col>
+              </v-row>
+              <v-row v-if="checkLayerType(dataset) === 'raster' && dataset.id === activeRasterDatasetId">
                 <v-col>
                   <layer-legend :dataset="dataset" />
                 </v-col>
@@ -171,7 +197,7 @@
       LayerLegend
     },
     computed: {
-      ...mapGetters([ 'activeDatasetId' ]),
+      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer' ]),
       activeLocationDatasetId: {
         get() {
           return this.activeDatasetId
@@ -183,7 +209,7 @@
       activePanels () {
         // map which panel is showing the legend layer or the information layer)
         const active = _.values(this.datasets).flatMap((dataset, index) => {
-          const activeDataset = this.hoverId === dataset.id || this.activeLocationDatasetId === dataset.id
+          const activeDataset = this.hoverId === dataset.id || this.activeLocationDatasetId === dataset.id || this.activeRasterDatasetId === dataset.id
           return activeDataset ? index : []
         })
         return active
@@ -191,11 +217,12 @@
     },
     data () {
       return {
-        hoverId: null
+        hoverId: null,
+        activeRasterDatasetId: null
       }
     },
     methods: {
-      ...mapActions ([ 'loadLocationDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'setActiveDatasetId' ]),
+      ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ]),
       toggleLocationDataset(dataset) {
         const { id } = dataset
         if (id !== this.activeLocationDatasetId ) {
@@ -216,6 +243,20 @@
         this.$router.push({ path, params })
         this.loadLocationDataset(dataset)
       },
+      toggleRasterDataset(dataset) {
+       
+        //if (dataset.id === this.activeRasterDatasetId) {
+          
+        //this.resetActiveRasterLayer() 
+        //console.log('in if', this.activeRasterDatasetId, dataset.id)
+        //this.activeRasterDatasetId = null
+        //return
+        //}
+        this.loadRasterDataset(dataset)
+        this.activeRasterDatasetId = dataset.id
+        console.log('activeRasterDatasetId after if', this.activeRasterDatasetId)
+      },
+
       markedTooltip (text) {
         return marked(text, { renderer: renderer })
       },
@@ -224,7 +265,7 @@
       },
       checkLayerType(dataset) {
         //Assumption: if layer has cube:dimensions then it is a vector
-        //TODO: add in the stacCatalogue structure a format parameter somehow
+        //TODO: add in the stacCatalogue structure a file format parameter somehow better so
         return _.has(dataset, 'cube:dimensions') ? 'vector' : 'raster'
       }
     }
