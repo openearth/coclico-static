@@ -134,7 +134,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="dataset.id === activeLocationDatasetId">
+              <v-row v-if="dataset.id === activeLocationDatasetId && activeLegend(dataset)">
                 <v-col>
                   <layer-legend :dataset="dataset" />
                 </v-col>
@@ -226,6 +226,10 @@
         //Assumption: if layer has cube:dimensions then it is a vector
         //TODO: add in the stacCatalogue structure a format parameter somehow
         return _.has(dataset, 'cube:dimensions') ? 'vector' : 'raster'
+      },
+      activeLegend (dataset) {
+        // Check if linearGradient is defined. If so, assume that legend has to be shown
+        return _.has(dataset, 'properties.deltares:linearGradient')
       }
     }
   }
