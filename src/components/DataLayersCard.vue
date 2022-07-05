@@ -229,7 +229,7 @@
       },
       activeLegend (dataset) {
         // Check if linearGradient is defined. If so, assume that legend has to be shown
-        return _.has(dataset, 'properties.deltares:linearGradient') ? true : false
+        return _.has(dataset, 'properties.deltares:linearGradient')
       }
     }
   }
