@@ -134,7 +134,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="dataset.id === activeLocationDatasetId && activeLegend(dataset) === true">
+              <v-row v-if="dataset.id === activeLocationDatasetId && activeLegend(dataset)">
                 <v-col>
                   <layer-legend :dataset="dataset" />
                 </v-col>
