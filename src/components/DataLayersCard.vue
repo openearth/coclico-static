@@ -160,7 +160,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="checkLayerType(dataset) === 'raster' && dataset.id === activeRasterDatasetId">
+              <v-row v-if="checkLayerType(dataset) === 'raster' && dataset.id === activeRasterDatasetId && activeLegend(dataset)">
                 <v-col>
                   <layer-legend :dataset="dataset" />
                 </v-col>
