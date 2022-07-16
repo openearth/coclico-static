@@ -155,15 +155,15 @@
     mounted () {
       
       this.datasetId = _.get(this.dataset, 'id')
-      this.unit = _.get(this.dataset, 'properties.deltares:units')
+      this.unit = _.get(this.dataset, 'deltares:units')
       this.updateMinMax()
-      this.linearGradient =  _.get(this.dataset, 'properties.deltares:linearGradient')
+      this.linearGradient =  _.get(this.dataset, 'deltares:linearGradient')
     },
     methods: {
       ...mapActions([ 'reclassifyMapboxLayer' ]),
       updateMinMax () {
-        const min = _.get(this.dataset, 'properties.deltares:min', '')
-        const max =  _.get(this.dataset, 'properties.deltares:max', '')
+        const min = _.get(this.dataset, 'deltares:min', '')
+        const max =  _.get(this.dataset, 'deltares:max', '')
         this.minValue = min.toString()
         this.maxValue = max.toString()
         this.defaultMinValue = min.toString()
@@ -179,8 +179,8 @@
       },
       saveRange () {
         this.editingRange = false
-        _.set(this.dataset, 'properties.deltares:min', this.minValue)
-        _.set(this.dataset, 'properties.deltares:max', this.maxValue)
+        _.set(this.dataset, 'deltares:min', this.minValue)
+        _.set(this.dataset, 'deltares:max', this.maxValue)
         this.reclassifyMapboxLayer(this.dataset)
       },
       resetRange () {
