@@ -17,6 +17,11 @@
         @click="selectLocation"
       />
       <v-mapbox-layer
+        v-if="activeRasterLayer"
+        :key="activeRasterLayer.id"
+        :options="activeRasterLayer"
+      />
+      <v-mapbox-layer
         :options="selectedPointLayer"
       />
       <v-mapbox-layer
@@ -90,7 +95,7 @@
       }
     },
     computed: {
-      ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'selectedVectorData' ]),
+      ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'activeRasterLayer', 'selectedVectorData' ]),
     },
     methods: {
       ...mapMutations([ 'setSelectedVectorData' ]),

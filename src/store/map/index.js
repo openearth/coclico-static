@@ -1,6 +1,7 @@
 import getCatalog from '@/lib/request/get-catalog'
 import datasets from './datasets.js'
 import buildGeojsonLayer from '@/lib/mapbox/build-geojson-layer'
+import buildRasterLayer from '@/lib/mapbox/build-raster-layer'
 import matchLayerIdToProperties from '@/lib/match-layer-id-to-properties.js'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
@@ -35,6 +36,9 @@ export default {
     activeLocationLayer(state) {
     return state.activeLocationLayer
     },
+    activeRasterLayer(state) {
+      return state.activeRasterLayer
+    },
     selectedVectorData(state) {
       return state.selectedvectorData
     },
@@ -51,6 +55,12 @@ export default {
     },
     resetActiveLocationLayer(state) {
       state.activeLocationLayer = null
+    },
+    setActiveRasterLayer(state, layer) {
+      state.activeRasterLayer = layer
+    },
+    resetActiveRasterLayer(state, layer) {
+      state.activeRasterLayer = null
     },
     setSelectedVectorData(state, vectorData) {
       state.selectedVectorData = vectorData
@@ -105,14 +115,6 @@ export default {
         })
 
       })
-    },
-    //load mapbox layer format from stac
-    loadMapboxLayer({ commit }, layer) {
-      //get info of the layer from stac catalog
-      getCatalog(layer.href)
-        .then(layerInfo => {
-          commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
-        })
     },
 
     reclassifyMapboxLayer({state, commit}, dataset) {
@@ -239,12 +241,26 @@ export default {
     clearActiveDatasetIds({commit}) {
       commit('clearActiveDatasetIds')
     },
-    loadLocationDataset({dispatch}, dataset) {
+    loadLocationDataset({commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
-      dispatch('loadMapboxLayer',layer)
+       //get info of the layer from stac catalog
+      getCatalog(layer.href)
+        .then(layerInfo => {
+          commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
+        })   
+    },
+    loadRasterDataset({commit}, dataset) {
+      const layer = matchLayerIdToProperties(dataset)
+      getCatalog(layer.href)
+        .then(layerInfo => {
+          commit('setActiveRasterLayer', buildRasterLayer(layerInfo))
+        })   
     },
     resetActiveLocationLayer({commit}) {
       commit('resetActiveLocationLayer')
+    },
+    resetActiveRasterLayer({commit}) {
+      commit('resetActiveRasterLayer')
     },
     setActiveDatasetId({commit}, id) {
       commit('setActiveDatasetId', id)
