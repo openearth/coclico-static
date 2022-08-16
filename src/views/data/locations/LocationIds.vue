@@ -162,13 +162,13 @@
       }
     },
     computed: {
-      ...mapGetters([ 'selectedPointData', 'selectedDatasets' ]),
+      ...mapGetters([ 'selectedVectorData', 'selectedDatasets' ]),
       datasets () {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
           // does not seem a very neat way to do this. Is there a better way?
-          this.baseOptions.xAxis.name = set.xAxis.title
-          this.baseOptions.yAxis.name = set.yAxis.title
+          _.set(this.baseOptions, 'xAxis.name', _.get(set, 'xAxis.title'))
+          _.set(this.baseOptions, 'yAxis.name', _.get(set, 'yAxis.title'))
           return _.merge(set, this.baseOptions, theme)
         })
       }
