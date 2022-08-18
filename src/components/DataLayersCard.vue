@@ -118,7 +118,17 @@
                   />
                 </div>
               </v-row>
-
+              <v-row v-if="hasVariables(dataset)">
+                <v-select
+                  class="pa-2"
+                  v-model="selectedVariable"
+                  :items="dataset.variables"
+                  :label="`Select variable`"
+                  flat
+                  dense
+                  @change="updateVariable()"
+                />
+              </v-row>
               <v-row v-if="checkLayerType(dataset) === 'vector'">
                 <v-col
                   cols="6"
@@ -197,7 +207,7 @@
       LayerLegend
     },
     computed: {
-      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer' ]),
+      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId' ]),
       activeLocationDatasetId: {
         get() {
           return this.activeDatasetId
@@ -214,6 +224,14 @@
         })
         return active
       },
+      selectedVariable: {
+        get () {
+          return this.activeVariableId
+        },
+        set (val) {
+          this.setActiveVariableId(val)
+        }
+      }
     },
     data () {
       return {
@@ -222,11 +240,12 @@
       }
     },
     methods: {
-      ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ]),
+      ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId']),
       toggleLocationDataset(dataset) {
         const { id } = dataset
         if (id !== this.activeLocationDatasetId ) {
           this.clearActiveDatasetIds()
+          this.clearActiveVariableId()
           this.$router.push('/data')
           this.resetActiveLocationLayer()
           return
@@ -242,6 +261,7 @@
         let path = `/data/${params.datasetIds}`
         this.$router.push({ path, params })
         this.loadLocationDataset(dataset)
+        this.setActiveVariableId(dataset.variables[0])
       },
       toggleRasterDataset(dataset) {
        
@@ -256,7 +276,9 @@
         this.activeRasterDatasetId = dataset.id
         console.log('activeRasterDatasetId after if', this.activeRasterDatasetId)
       },
-
+      updateVariable() {
+        console.log('Stuff to do when variable is updated')        
+      },
       markedTooltip (text) {
         return marked(text, { renderer: renderer })
       },
@@ -271,7 +293,15 @@
       activeLegend (dataset) {
         // Check if linearGradient is defined. If so, assume that legend has to be shown
         return _.has(dataset, 'properties.deltares:linearGradient')
-      }
+      },
+      hasVariables (dataset) {
+        // Check if there is more than one Variable
+        // - If only one variable, no selection box
+        // - If multiple variables, add selection box
+        if (typeof dataset.variables !== 'undefined') { 
+          return _.gt(dataset.variables.length, 1)
+        }
+      },
     }
   }
 </script>

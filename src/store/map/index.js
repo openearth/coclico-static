@@ -47,7 +47,10 @@ export default {
     },
     activeDatasetId(state) {
       return state.activeDatasetId
-    }
+    },
+    activeVariableId(state) {
+      return state.activeVariableId
+    },
   },
   mutations: {
     setActiveLocationLayer(state, layer) {
@@ -79,6 +82,12 @@ export default {
     setActiveDatasetId(state, id) {
       state.activeDatasetId = id
     },
+    clearActiveVariableId (state) {
+      state.activeVariableId = null
+    },
+    setActiveVariableId(state, variable) {
+      state.activeVariableId = variable
+    },
   },
   actions: {
     loadDatasets ({state, commit, dispatch}) {
@@ -104,12 +113,31 @@ export default {
               })
               _.set(dataset, 'summaries', mappedSummaries)
 
+              // Store available data variables
+              const variables = _.get(dataset, 'cube:variables')
+              var mappedVariables = Object.keys(variables).map(id => {
+                const variable = _.get(variables, id)
+                if (variable.type === 'data') {
+                  return {
+                    id: id
+                  }
+                }
+              })
+
+              mappedVariables = _.compact(mappedVariables)
+
+              const mappedVariablesArray = mappedVariables.map(a => a.id)
+              if (mappedVariablesArray.length !== 0) {
+                _.set(dataset, 'variables', mappedVariablesArray)
+              }
+
               commit('addDataset', dataset)
               //if we start a subroute with active dataset ids, directly load the layer
               if (state.activeDatasetIds.includes(dataset.id)) {
                 dispatch('setActiveDatasetId', dataset.id)
                 dispatch('loadLocationDataset', dataset)
                 dispatch('loadPointDataForLocation')
+                dispatch('setActiveVariableId', dataset.variables[0])
               }
             })
         })
@@ -241,6 +269,9 @@ export default {
     clearActiveDatasetIds({commit}) {
       commit('clearActiveDatasetIds')
     },
+    clearActiveVariableId({commit}) {
+      commit('clearActiveVariableId')
+    },
     loadLocationDataset({commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
        //get info of the layer from stac catalog
@@ -264,6 +295,9 @@ export default {
     },
     setActiveDatasetId({commit}, id) {
       commit('setActiveDatasetId', id)
+    },
+    setActiveVariableId({commit}, variable) {
+      commit('setActiveVariableId', variable)
     }
   },
 }
