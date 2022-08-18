@@ -126,7 +126,7 @@
                   :label="`Select variable`"
                   flat
                   dense
-                  @change="updateVariable()"
+                  @change="updateVariable(dataset)"
                 />
               </v-row>
               <v-row v-if="checkLayerType(dataset) === 'vector'">
@@ -276,7 +276,8 @@
         this.activeRasterDatasetId = dataset.id
         console.log('activeRasterDatasetId after if', this.activeRasterDatasetId)
       },
-      updateVariable() {
+      updateVariable(dataset) {
+        this.loadLocationDataset(dataset)
         console.log('Stuff to do when variable is updated')        
       },
       markedTooltip (text) {

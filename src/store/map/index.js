@@ -219,6 +219,9 @@ export default {
           return null
         }
       })
+      console.log('url', url)
+      console.log('path', path)
+      console.log('slice', slice)
 
       openArray({
         store: url,
@@ -233,6 +236,7 @@ export default {
                 data: Array.from(serie)
               }
             })
+            console.log('series', series)
             // TODO: Which axis belongs to which dimension????
             let cubeDimensions = _.get(dataset, 'cube:dimensions')
             // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
@@ -272,9 +276,13 @@ export default {
     clearActiveVariableId({commit}) {
       commit('clearActiveVariableId')
     },
-    loadLocationDataset({commit}, dataset) {
+    loadLocationDataset({state, commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
-       //get info of the layer from stac catalog
+      //get info of the layer from stac catalog
+      const activeVariableId = state.activeVariableId
+      if (typeof activeVariableId !== 'undefined' && activeVariableId !== null) {
+        layer.href = layer.href.replaceAll([ dataset.variables[0] + '-mapbox' ], [ activeVariableId + '-mapbox' ])
+      }
       getCatalog(layer.href)
         .then(layerInfo => {
           commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
