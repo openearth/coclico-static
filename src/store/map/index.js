@@ -165,8 +165,8 @@ export default {
                 "hsl(110, 90%, 80%)"
             ],
       */
-      const newMin = _.get(dataset, 'properties.deltares:min', '')
-      const newMax =  _.get(dataset, 'properties.deltares:max', '')
+      const newMin = _.get(dataset, 'deltares:min', '')
+      const newMax =  _.get(dataset, 'deltares:max', '')
 
       const mapboxLayer = state.activeLocationLayer
       const mapboxLayerId = _.get(mapboxLayer, 'id')
@@ -207,7 +207,19 @@ export default {
       const url = _.get(dataset, 'assets.data.href')
       // const datasetName = "replace"
       const datasetName = _.get(dataset, 'name')
-      const path = Object.keys(_.get(dataset, 'cube:variables'))[0]
+
+      // check which variable is of "data" type, and set path to this
+      const variables = Object.entries(_.get(dataset, 'cube:variables'))
+      let path = variables.map(dim => {
+        if (dim[1].type === 'data') {
+          return dim[0]
+        } else {
+          return null
+        }
+      })
+      // filter out null dimensions in path (should be better way to do this?)
+      path = path.filter(x=>x)[0]
+
       const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
       const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
       let slice = dimensions.map(dim => {
@@ -242,8 +254,8 @@ export default {
             // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
             const xAxis = Object.keys(cubeDimensions)[2]
             const yAxis = variableUnit[0][1]
-            // Name based on properties.deltares:plotSeries from STAC
-            const plotSeries = _.get(dataset, 'properties.deltares:plotSeries')
+            // Name based on deltares:plotSeries from STAC
+            const plotSeries = _.get(dataset, 'deltares:plotSeries')
             const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
 
             for (var i = 0; i < dimensionNames.length; i++) {
