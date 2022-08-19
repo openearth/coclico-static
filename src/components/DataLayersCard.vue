@@ -41,7 +41,7 @@
                   class="ma-auto pa-0"
                 >
                   <custom-icon
-                    name="cc"
+                    :name="dataset.id"
                     icon-folder="datasets"
                   />
                 </v-col>
@@ -186,7 +186,7 @@
   import CustomIcon from "./CustomIcon.vue"
   import LayerLegend from "./LayerLegend.vue"
 
-  import { mapGetters, mapActions } from "vuex"
+  import { mapGetters, mapActions, mapMutations } from "vuex"
   import _ from 'lodash'
   import { marked } from 'marked'
 
@@ -240,9 +240,11 @@
       }
     },
     methods: {
+      ...mapMutations(['setActiveSummary']),
       ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId']),
       toggleLocationDataset(dataset) {
         const { id } = dataset
+        this.setActiveSummary(dataset.summaries)
         if (id !== this.activeLocationDatasetId ) {
           this.clearActiveDatasetIds()
           this.clearActiveVariableId()
@@ -259,6 +261,7 @@
         const params = this.$route.params
         params.datasetIds = id
         let path = `/data/${params.datasetIds}`
+        // plot is updated because of change in route
         this.$router.push({ path, params })
         this.loadLocationDataset(dataset)
         this.setActiveVariableId(dataset.variables[0])
@@ -274,11 +277,9 @@
         //}
         this.loadRasterDataset(dataset)
         this.activeRasterDatasetId = dataset.id
-        console.log('activeRasterDatasetId after if', this.activeRasterDatasetId)
       },
       updateVariable(dataset) {
-        this.loadLocationDataset(dataset)
-        console.log('Stuff to do when variable is updated')        
+        this.loadLocationDataset(dataset)  
       },
       markedTooltip (text) {
         return marked(text, { renderer: renderer })
@@ -293,7 +294,7 @@
       },
       activeLegend (dataset) {
         // Check if linearGradient is defined. If so, assume that legend has to be shown
-        return _.has(dataset, 'properties.deltares:linearGradient')
+        return _.has(dataset, 'deltares:linearGradient')
       },
       hasVariables (dataset) {
         // Check if there is more than one Variable
