@@ -21,7 +21,7 @@ export default {
     activeDatasetIds: [],
     activeRasterLayer: null,
     activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
-    lockedDatasets: []
+    lockedDatasets: [],
     activeSummary: [],
     activeVariableId: null
   }),
