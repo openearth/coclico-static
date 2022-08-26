@@ -61,9 +61,10 @@ export default {
       state.activeLocationLayer = null
     },
     setActiveRasterLayer(state, layer) {
+      console.log('hallo')
       state.activeRasterLayer = layer
     },
-    resetActiveRasterLayer(state, layer) {
+    resetActiveRasterLayer(state) {
       state.activeRasterLayer = null
     },
     setSelectedVectorData(state, vectorData) {
@@ -264,7 +265,8 @@ export default {
       const layer = matchLayerIdToProperties(dataset)
       getCatalog(layer.href)
         .then(layerInfo => {
-          commit('setActiveRasterLayer', buildRasterLayer(layerInfo))
+          const rasterLayer = _.merge({layerId: dataset.id}, buildRasterLayer(layerInfo))
+          commit('setActiveRasterLayer', rasterLayer)
         })
     },
     resetActiveLocationLayer({commit}) {
