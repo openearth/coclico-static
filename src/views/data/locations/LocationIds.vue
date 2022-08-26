@@ -21,7 +21,6 @@
         <v-expansion-panels
           v-if="selectedDatasets[0]"
           flat
-          accordion
           multiple
           v-model="expandedDatasets"
           color="background"
@@ -36,10 +35,14 @@
               color="background"
               dark
             >
-              <h3 class="h3">
-                Location id: {{ $route.params.locationId }}
-              </h3>
-              Data set: {{ data.id }}
+              <div>
+                <span style="margin-left: 50px;"></span><b>Data set:</b> {{ data.id }}
+                <h3 class="h4">
+                  <span style="margin-left: 50px;"></span><b>Location id:</b> {{ $route.params.locationId }}
+                </h3>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end">
               <v-tooltip
                 bottom
                 v-if="openToLock"
@@ -70,6 +73,7 @@
                 </template>
                 <span>This dataset is already locked in the list below.</span>
               </v-tooltip>
+              </div>
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -86,9 +90,6 @@
               </v-container>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <h2 class="h2">
-            Locked datasets
-          </h2>
           <v-expansion-panel
             v-for="data in lockedDatasets"
             :key="data.id"
@@ -99,10 +100,14 @@
               color="background"
               dark
             >
-              <h3 class="h3">
-                Location id: {{ data.location }}
-              </h3>
-              Data set: {{ data.dataset }}
+              <div>
+                <span style="margin-left: 50px;"></span><b>Data set:</b> {{ data.dataset }}
+                <h3 class="h4">
+                  <span style="margin-left: 50px;"></span><b>Location id:</b> {{ data.location }}
+                </h3>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end">
               <v-tooltip bottom>
                 <template #activator="{ on, attrs }">
                   <v-btn
@@ -116,6 +121,7 @@
                 </template>
                 <span>Remove dataset from locked dataset list.</span>
               </v-tooltip>
+              </div>
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -318,7 +324,7 @@
 
 .graph-line {
   position: relative;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 .graph-line__chart {
@@ -326,7 +332,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 85%;
+  height: 100%;
 }
 
 .disclaimer {
