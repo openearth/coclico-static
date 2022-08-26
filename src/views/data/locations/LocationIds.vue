@@ -236,6 +236,17 @@
           this.storeactiveDatasetIds(this.$route.params.datasetIds)
         },
         deep: true
+      },
+      // Update figure when different summary is selected
+      '$store.state.map.activeSummary': {
+        handler () {
+          this.updateTimeseries()
+        },
+        deep: true
+      },
+      // Update figure when different variable is selected
+      '$store.state.map.activeVariableId': function() {
+        this.updateTimeseries()
       }
     },
     computed: {
@@ -282,7 +293,10 @@
       randomId () {
         const dateId = Date.now()
         return dateId.toString()
-      }
+      },
+      updateTimeseries () {
+        this.loadPointDataForLocation()
+      },
     }
   }
 </script>
