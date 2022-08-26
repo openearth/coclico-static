@@ -61,7 +61,6 @@ export default {
       state.activeLocationLayer = null
     },
     setActiveRasterLayer(state, layer) {
-      console.log('hallo')
       state.activeRasterLayer = layer
     },
     resetActiveRasterLayer(state) {
