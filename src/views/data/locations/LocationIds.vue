@@ -41,11 +41,13 @@
               </h3>
               Data set: {{ data.id }}
               <v-btn
+                v-if="openToLock"
                 icon
-                @click.stop="lockDataset({location: $route.params.locationId, dataset: data.id, option: data, id: Date.now().toString()})"
+                @click.stop="lockDataset({location: $route.params.locationId, dataset: data.id, option: data, id: Date.now().toString()}); openToLock = false"
               >
                 <v-icon>mdi-lock-open</v-icon>
               </v-btn>
+              <v-icon v-else>mdi-lock</v-icon>
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -218,7 +220,8 @@
     },
     data () {
       return {
-        expandedDatasets: []
+        expandedDatasets: [],
+        openToLock: true
       }
     },
     mounted () {
