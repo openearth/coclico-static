@@ -245,7 +245,6 @@
       },
       toggleRasterDataset(dataset) {
         const layerId = _.get(this.activeRasterLayer, 'layerId')
-        console.log(layerId)
         if (dataset.id === layerId && layerId) {
           this.resetActiveRasterLayer()
           this.activeRasterDatasetId = null
