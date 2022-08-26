@@ -40,14 +40,36 @@
                 Location id: {{ $route.params.locationId }}
               </h3>
               Data set: {{ data.id }}
-              <v-btn
+              <v-tooltip
+                bottom
                 v-if="openToLock"
-                icon
-                @click.stop="lockDataset({location: $route.params.locationId, dataset: data.id, option: data, id: Date.now().toString()}); openToLock = false"
               >
-                <v-icon>mdi-lock-open</v-icon>
-              </v-btn>
-              <v-icon v-else>mdi-lock</v-icon>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    @click.stop="lockDataset({location: $route.params.locationId, dataset: data.id, option: data, id: Date.now().toString()}); openToLock = false"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon>mdi-lock-open</v-icon>
+                  </v-btn>
+                </template>
+                <span>Lock this dataset and make it visible in the locked dataset list below.</span>
+              </v-tooltip>
+              <v-tooltip
+                bottom
+                v-else
+              >
+                <template #activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    mdi-lock
+                  </v-icon>
+                </template>
+                <span>This dataset is already locked in the list below.</span>
+              </v-tooltip>
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -64,6 +86,9 @@
               </v-container>
             </v-expansion-panel-content>
           </v-expansion-panel>
+          <h2 class="h2">
+            Locked datasets
+          </h2>
           <v-expansion-panel
             v-for="data in lockedDatasets"
             :key="data.id"
@@ -78,12 +103,19 @@
                 Location id: {{ data.location }}
               </h3>
               Data set: {{ data.dataset }}
-              <v-btn
-                icon
-                @click.stop="removeLockedDataset(data.id)"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
+              <v-tooltip bottom>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    @click.stop="removeLockedDataset(data.id)"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </template>
+                <span>Remove dataset from locked dataset list.</span>
+              </v-tooltip>
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
