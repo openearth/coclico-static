@@ -76,7 +76,7 @@
                     dense
                     class="ma-auto radio"
                     :value="dataset.id"
-                    @click="toggleRasterDataset(dataset)"
+                    @click.stop="toggleRasterDataset(dataset)"
                     color="formActive"
                   />
                   <v-progress-circular
@@ -252,12 +252,12 @@
           this.resetActiveLocationLayer()
           return
         }
-        
+
         if (this.$route.path.includes(id)) {
           this.loadLocationDataset(dataset)
           return
         }
-        
+
         const params = this.$route.params
         params.datasetIds = id
         let path = `/data/${params.datasetIds}`
@@ -267,16 +267,14 @@
         this.setActiveVariableId(dataset.variables[0])
       },
       toggleRasterDataset(dataset) {
-       
-        //if (dataset.id === this.activeRasterDatasetId) {
-          
-        //this.resetActiveRasterLayer() 
-        //console.log('in if', this.activeRasterDatasetId, dataset.id)
-        //this.activeRasterDatasetId = null
-        //return
-        //}
-        this.loadRasterDataset(dataset)
-        this.activeRasterDatasetId = dataset.id
+        const layerId = _.get(this.activeRasterLayer, 'layerId')
+        if (dataset.id === layerId && layerId) {
+          this.resetActiveRasterLayer()
+          this.activeRasterDatasetId = null
+        } else {
+          this.activeRasterDatasetId = dataset.id
+          this.loadRasterDataset(dataset)
+        }
       },
       updateVariable(dataset) {
         this.loadLocationDataset(dataset)  

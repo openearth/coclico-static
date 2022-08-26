@@ -7,9 +7,6 @@
     color="background"
   >
     <v-container class="graph-menu d-flex flex-column">
-      <h2 class="h2">
-        Location id: {{ $route.params.locationId }}
-      </h2>
       <v-btn
         icon
         class="close-button"
@@ -32,13 +29,47 @@
           <v-expansion-panel
             v-for="data in datasets"
             :key="data.id"
+            :value="true"
           >
             <v-expansion-panel-header
               class="h4"
               color="background"
               dark
             >
-              {{ $store.state.map.activeVariableId }}
+              <h3 class="h3">
+                Location id: {{ $route.params.locationId }}
+              </h3>
+              Data set: {{ data.id }}
+              <v-tooltip
+                bottom
+                v-if="openToLock"
+              >
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    @click.stop="lockDataset({location: $route.params.locationId, dataset: data.id, option: data, id: Date.now().toString()}); openToLock = false"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon>mdi-lock-open</v-icon>
+                  </v-btn>
+                </template>
+                <span>Lock this dataset and make it visible in the locked dataset list below.</span>
+              </v-tooltip>
+              <v-tooltip
+                bottom
+                v-else
+              >
+                <template #activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    mdi-lock
+                  </v-icon>
+                </template>
+                <span>This dataset is already locked in the list below.</span>
+              </v-tooltip>
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -48,6 +79,52 @@
                 >
                   <v-chart
                     :option="data"
+                    :autoresize="true"
+                    class="graph-line__chart"
+                  />
+                </v-col>
+              </v-container>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <h2 class="h2">
+            Locked datasets
+          </h2>
+          <v-expansion-panel
+            v-for="data in lockedDatasets"
+            :key="data.id"
+            :value="true"
+          >
+            <v-expansion-panel-header
+              class="h4"
+              color="background"
+              dark
+            >
+              <h3 class="h3">
+                Location id: {{ data.location }}
+              </h3>
+              Data set: {{ data.dataset }}
+              <v-tooltip bottom>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    @click.stop="removeLockedDataset(data.id)"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </template>
+                <span>Remove dataset from locked dataset list.</span>
+              </v-tooltip>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content color="background">
+              <v-container class="pa-0">
+                <v-col
+                  cols="12"
+                  class="graph-line pa-0"
+                >
+                  <v-chart
+                    :option="data.option"
                     :autoresize="true"
                     class="graph-line__chart"
                   />
@@ -147,79 +224,6 @@
     }
   })
 
-  const baseOptions = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      },
-      backgroundColor: 'rgba(50,50,50,0.7)',
-      textStyle: {
-        color: '#fff'
-      }
-    },
-    //toolbox: {
-    //  show: true,
-    //  feature: {
-    //    dataZoom: {
-    //      yAxisIndex: 'none'
-    //    },
-    //    dataView: { readOnly: false },
-    //    magicType: { type: ['line', 'bar'] },
-    //    restore: {},
-    //    saveAsImage: {}
-    //  }
-    //},
-    legend: {
-      top: 'horizontal'
-    },
-    grid: {
-      show: true,
-      top: 30,
-      bottom: 50,
-      right: 20,
-      left: 50
-    },
-    dataZoom: [
-      {
-        type: 'inside',
-        realtime: true
-      }
-    ],
-    textStyle: {
-      fontFamily: 'Helvetica'
-    },
-    xAxis: {
-      splitLine: {
-        show: true,
-      },
-      axisLabel: {
-        fontSize: 14
-      },
-      nameLocation: 'center',
-      nameGap: 20,
-      name: "-",
-      nameTextStyle: {
-        color: 'white',
-        fontSize: 14,
-        fontFamily: 'Helvetica'
-      }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        fontSize: 14
-      },
-      nameLocation: 'center',
-      name: '-',
-      nameGap: 30,
-      nameTextStyle: {
-        color: 'white',
-        fontSize: 14,
-        fontFamily: 'Helvetica'
-      }
-    }
-  }
 
   export default {
     name:'LocationIds',
@@ -246,35 +250,49 @@
       }
     },
     computed: {
-      ...mapGetters([ 'selectedPointData', 'selectedDatasets' ]),
+      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets']),
       datasets () {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
-          // does not seem a very neat way to do this. Is there a better way?
-          baseOptions.xAxis.name = set.xAxis.title
-          baseOptions.yAxis.name = set.yAxis.title
-          return _.merge(set, baseOptions, theme)
+          // // does not seem a very neat way to do this. Is there a better way?
+          // _.set(this.baseOptions, 'xAxis.name', _.get(set, 'xAxis.title'))
+          // _.set(this.baseOptions, 'yAxis.name', _.get(set, 'yAxis.title'))
+          return _.merge(set, this.baseOptions, theme)
         })
       }
     },
     data () {
       return {
-        expandedDatasets: []
+        expandedDatasets: [],
+        openToLock: true
       }
     },
     mounted () {
       this.loadPointDataForLocation()
       // Added +1 to ensure that this also opens when length = 0
       this.expandedDatasets = [ ...Array(this.datasets.length+1).keys() ]
+      this.getBaseOption(this.$route.params.datasetIds)
     },
     methods: {
       ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
-      ...mapMutations([ 'setActiveDatasetIds' ]),
+      ...mapMutations([ 'setActiveDatasetIds', 'lockDataset', 'removeLockedDataset']),
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,
           params: { datasetIds: this.$route.params.datasetIds }
         })
+      },
+      getBaseOption (datasetId) {
+        try {
+          this.baseOptions = require(`@/assets/echart-templates/${datasetId}.js`).default
+          console.log(this.baseOptions)
+        } catch {
+          this.baseOptions = require('@/assets/echart-templates/default.js').default
+        }
+      },
+      randomId () {
+        const dateId = Date.now()
+        return dateId.toString()
       },
       updateTimeseries () {
         this.loadPointDataForLocation()

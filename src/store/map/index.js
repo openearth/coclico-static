@@ -20,7 +20,8 @@ export default {
     selectedVectorData: {},
     activeDatasetIds: [],
     activeRasterLayer: null,
-    activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids,
+    activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
+    lockedDatasets: [],
     activeSummary: [],
     activeVariableId: null
   }),
@@ -50,6 +51,9 @@ export default {
     activeDatasetId(state) {
       return state.activeDatasetId
     },
+    lockedDatasets(state) {
+      return state.lockedDatasets
+    },
     activeVariableId(state) {
       return state.activeVariableId
     },
@@ -67,7 +71,7 @@ export default {
     setActiveRasterLayer(state, layer) {
       state.activeRasterLayer = layer
     },
-    resetActiveRasterLayer(state, layer) {
+    resetActiveRasterLayer(state) {
       state.activeRasterLayer = null
     },
     setSelectedVectorData(state, vectorData) {
@@ -87,6 +91,12 @@ export default {
     setActiveDatasetId(state, id) {
       state.activeDatasetId = id
     },
+    lockDataset(state, dataset) {
+      state.lockedDatasets.push(dataset)
+    },
+    removeLockedDataset(state, id) {
+      state.lockedDatasets = state.lockedDatasets.filter(data => data.id !== id)
+    },
     clearActiveVariableId (state) {
       state.activeVariableId = null
     },
@@ -99,12 +109,12 @@ export default {
   },
   actions: {
     loadDatasets ({state, commit, dispatch}) {
-			//Get STAC collection
+      //Get STAC collection
     getCatalog(process.env.VUE_APP_CATALOG_URL)
       .then(datasets => {
-				const themes = _.get(datasets, 'summaries.keywords')
+        const themes = _.get(datasets, 'summaries.keywords')
         themes.forEach(theme => commit('addTheme', theme))
-				const children = datasets.links.filter(ds => ds.rel === 'child')
+        const children = datasets.links.filter(ds => ds.rel === 'child')
 
         return children.forEach(child => {
           return getCatalog(child.href)
@@ -361,14 +371,15 @@ export default {
       getCatalog(layer.href)
         .then(layerInfo => {
           commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
-        })   
+        })
     },
     loadRasterDataset({commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
       getCatalog(layer.href)
         .then(layerInfo => {
-          commit('setActiveRasterLayer', buildRasterLayer(layerInfo))
-        })   
+          const rasterLayer = _.merge({layerId: dataset.id}, buildRasterLayer(layerInfo))
+          commit('setActiveRasterLayer', rasterLayer)
+        })
     },
     resetActiveLocationLayer({commit}) {
       commit('resetActiveLocationLayer')
