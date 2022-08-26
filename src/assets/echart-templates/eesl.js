@@ -8,7 +8,7 @@ export default {
      "textStyle":{
         "color":"#fff"
      },
-     "valueFormatter": (value) => `${value.toFixed(2)} MW/m`
+     "valueFormatter": (value) => `${value.toFixed(2)} m`
   },
   "legend":{
      "top":"horizontal"
@@ -29,57 +29,36 @@ export default {
   "textStyle":{
      "fontFamily":"Helvetica"
   },
-  "series": [ {
-    "markArea": {
-      "itemStyle": {
-        "color": 'rgba(255, 173, 177, 0.4)'
-      },
-      "data": [
-        [
-          {
-            "name": 'Selected category',
-            "xAxis": "1995"
-          },
-          {
-            "xAxis": "2010"
-          }
-        ],
-      ]
-    }
-  } ],
   "xAxis":{
      "splitLine":{
         "show":true
      },
      "axisLabel":{
-        "fontSize":14
+        "fontSize": 14
      },
      "nameLocation":"center",
      "nameGap":30,
-     "name":"Time [years]",
      "nameTextStyle":{
         "color":"white",
         "fontSize":14,
         "fontFamily":"Helvetica"
-     }
+     },
+     "name":"Time [years]",
   },
   "yAxis":{
      "type":"value",
      "min":0,
-     "max":1500000,
+     "max":8,
      "axisLabel":{
-        "fontSize":14,
-        "formatter": function (value, index) {
-            return value / 1000;
-        }
+        "fontSize":14
      },
-     "nameLocation":"center",
-     "name":"Wave energy flux [x1000 MW/m]",
+     "nameLocation":"middle",
      "nameGap":45,
      "nameTextStyle":{
         "color":"white",
         "fontSize":14,
         "fontFamily":"Helvetica"
-     }
+     },
+     "name": "Extreme surge level [m]"
   }
 }

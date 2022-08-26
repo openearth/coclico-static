@@ -252,6 +252,7 @@
       // Update figure when different variable is selected
       '$store.state.map.activeVariableId': function() {
         this.updateTimeseries()
+        this.getBaseOption(this.$route.params.datasetIds)
       }
     },
     computed: {
@@ -281,6 +282,7 @@
     methods: {
       ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
       ...mapMutations([ 'setActiveDatasetIds', 'lockDataset', 'removeLockedDataset' ]),
+      ...mapGetters([ 'activeVariableId' ]),
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,
@@ -289,8 +291,12 @@
       },
       getBaseOption (datasetId) {
         try {
-          this.baseOptions = require(`@/assets/echart-templates/${datasetId}.js`).default
-          console.log(this.baseOptions)
+          // if dataset === variable, template name = dataset.json. if dataset !== variable, template name = dataset-variable.json
+          if (datasetId === this.$store.getters.activeVariableId) {
+            this.baseOptions = require(`@/assets/echart-templates/${datasetId}.js`).default
+          } else if (datasetId !== this.$store.getters.activeVariableId) {
+            this.baseOptions = require(`@/assets/echart-templates/${datasetId}_${this.$store.getters.activeVariableId}.js`).default
+          }
         } catch {
           this.baseOptions = require('@/assets/echart-templates/default.js').default
         }

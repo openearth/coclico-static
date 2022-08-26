@@ -7,7 +7,8 @@ export default {
      "backgroundColor":"rgba(50,50,50,0.7)",
      "textStyle":{
         "color":"#fff"
-     }
+     },
+     "valueFormatter": (value) => `${value.toFixed(2)} m`
   },
   "legend":{
      "top":"horizontal"
@@ -36,7 +37,7 @@ export default {
         "fontSize": 14
      },
      "nameLocation":"center",
-     "nameGap":20,
+     "nameGap":30,
      "nameTextStyle":{
         "color":"white",
         "fontSize":14,
@@ -46,11 +47,13 @@ export default {
   },
   "yAxis":{
      "type":"value",
+     "min":0,
+     "max":5,
      "axisLabel":{
         "fontSize":14
      },
      "nameLocation":"middle",
-     "nameGap":40,
+     "nameGap":45,
      "nameTextStyle":{
         "color":"white",
         "fontSize":14,

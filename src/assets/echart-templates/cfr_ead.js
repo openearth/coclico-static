@@ -8,7 +8,7 @@ export default {
      "textStyle":{
         "color":"#fff"
      },
-     "valueFormatter": (value) => `${value.toFixed(2)} MW/m`
+     "valueFormatter": (value) => `${value.toFixed(2)} e12 euro`
   },
   "legend":{
      "top":"horizontal"
@@ -66,15 +66,15 @@ export default {
   "yAxis":{
      "type":"value",
      "min":0,
-     "max":1500000,
+     "max":60,
      "axisLabel":{
         "fontSize":14,
         "formatter": function (value, index) {
-            return value / 1000;
+            return value / 1;
         }
      },
      "nameLocation":"center",
-     "name":"Wave energy flux [x1000 MW/m]",
+     "name":"Annual damage [1e12 euro]",
      "nameGap":45,
      "nameTextStyle":{
         "color":"white",
