@@ -5,7 +5,7 @@ import buildRasterLayer from '@/lib/mapbox/build-raster-layer'
 import matchLayerIdToProperties from '@/lib/match-layer-id-to-properties.js'
 import isArray from 'lodash/isArray'
 import _ from 'lodash'
-import themes, { state } from './themes.js'
+import themes from './themes.js'
 import { openArray } from 'zarr'
 import router from '@/router'
 import Vue from 'vue'
@@ -121,6 +121,7 @@ export default {
             .then(dataset => {
               // Exclude template folder from selection (check with backend whether this should stay in STAC catalog)
               if (dataset.id !== 'template') {
+         
                 //All the below functionality will be added in a function at the end
                 const summaries = _.get(dataset, 'summaries')
                 const mappedSummaries = Object.keys(summaries).map(id => {
@@ -132,23 +133,23 @@ export default {
                   }
                 })
                 _.set(dataset, 'summaries', mappedSummaries)
-
                 // Store available data variables
                 const variables = _.get(dataset, 'cube:variables')
-                var mappedVariables = Object.keys(variables).map(id => {
-                  const variable = _.get(variables, id)
-                  if (variable.type === 'data') {
-                    return {
-                      id: id
+                if (typeof variables !== 'undefined') {
+                  var mappedVariables = Object.keys(variables).map(id => {
+                    const variable = _.get(variables, id)
+                    if (variable.type === 'data') {
+                      return {
+                        id: id
+                      }
                     }
+                  })
+                  mappedVariables = _.compact(mappedVariables)
+
+                  const mappedVariablesArray = mappedVariables.map(a => a.id)
+                  if (mappedVariablesArray.length !== 0) {
+                    _.set(dataset, 'variables', mappedVariablesArray)
                   }
-                })
-
-                mappedVariables = _.compact(mappedVariables)
-
-                const mappedVariablesArray = mappedVariables.map(a => a.id)
-                if (mappedVariablesArray.length !== 0) {
-                  _.set(dataset, 'variables', mappedVariablesArray)
                 }
 
                 commit('addDataset', dataset)
@@ -190,7 +191,6 @@ export default {
       const newMax =  _.get(dataset, 'deltares:max', '')
 
       const mapboxLayer = state.activeLocationLayer
-      const mapboxLayerId = _.get(mapboxLayer, 'id')
       const circleColors = _.get(mapboxLayer, 'paint.circle-color')
       //remove mapboxlayer in order and update paint
       //
@@ -275,11 +275,11 @@ export default {
             if (data.data.length > data.data[0].length || datasetName === 'sc') {
               data.data = _.unzip(data.data)
             }
-            var series = [{
+            var series = [ {
                 data: [],
                 type: 'line',
                 name: ''
-              }];
+              } ];
             if (typeof data.data[0].length === 'undefined') {
               // In case there is just 1 series, data.data.map(serie => does not seem to work. Resolved like this.
               series[0].data = Array.from(data.data)
@@ -295,7 +295,6 @@ export default {
             }
             let cubeDimensions = _.get(dataset, 'cube:dimensions')
             const xAxis = _.get(dataset, 'deltares:plotxAxis')
-            const yAxis = variableUnit[0][1]
             // Name based on deltares:plotSeries from STAC
             const plotSeries = _.get(dataset, 'deltares:plotSeries')
             

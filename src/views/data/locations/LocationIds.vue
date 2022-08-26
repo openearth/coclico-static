@@ -148,7 +148,6 @@
 <script>
   import VChart from 'vue-echarts'
   import { mapGetters, mapActions, mapMutations } from 'vuex'
-  import moment from 'moment'
   import _ from 'lodash'
   import getColors from '@/lib/styling/colors'
 
@@ -250,7 +249,7 @@
       }
     },
     computed: {
-      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets']),
+      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets' ]),
       datasets () {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
@@ -275,7 +274,7 @@
     },
     methods: {
       ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
-      ...mapMutations([ 'setActiveDatasetIds', 'lockDataset', 'removeLockedDataset']),
+      ...mapMutations([ 'setActiveDatasetIds', 'lockDataset', 'removeLockedDataset' ]),
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,

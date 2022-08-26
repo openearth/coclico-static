@@ -240,8 +240,8 @@
       }
     },
     methods: {
-      ...mapMutations(['setActiveSummary']),
-      ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId']),
+      ...mapMutations([ 'setActiveSummary' ]),
+      ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId' ]),
       toggleLocationDataset(dataset) {
         const { id } = dataset
         this.setActiveSummary(dataset.summaries)
