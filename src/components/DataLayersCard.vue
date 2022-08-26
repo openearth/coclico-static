@@ -41,7 +41,7 @@
                   class="ma-auto pa-0"
                 >
                   <custom-icon
-                    name="cc"
+                    :name="dataset.id"
                     icon-folder="datasets"
                   />
                 </v-col>
@@ -118,7 +118,17 @@
                   />
                 </div>
               </v-row>
-
+              <v-row v-if="hasVariables(dataset)">
+                <v-select
+                  class="pa-2"
+                  v-model="selectedVariable"
+                  :items="dataset.variables"
+                  :label="`Select variable`"
+                  flat
+                  dense
+                  @change="updateVariable(dataset)"
+                />
+              </v-row>
               <v-row v-if="checkLayerType(dataset) === 'vector'">
                 <v-col
                   cols="6"
@@ -176,7 +186,7 @@
   import CustomIcon from "./CustomIcon.vue"
   import LayerLegend from "./LayerLegend.vue"
 
-  import { mapGetters, mapActions } from "vuex"
+  import { mapGetters, mapActions, mapMutations } from "vuex"
   import _ from 'lodash'
   import { marked } from 'marked'
 
@@ -197,7 +207,7 @@
       LayerLegend
     },
     computed: {
-      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer' ]),
+      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId' ]),
       activeLocationDatasetId: {
         get() {
           return this.activeDatasetId
@@ -214,6 +224,14 @@
         })
         return active
       },
+      selectedVariable: {
+        get () {
+          return this.activeVariableId
+        },
+        set (val) {
+          this.setActiveVariableId(val)
+        }
+      }
     },
     data () {
       return {
@@ -222,11 +240,14 @@
       }
     },
     methods: {
-      ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ]),
+      ...mapMutations(['setActiveSummary']),
+      ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId']),
       toggleLocationDataset(dataset) {
         const { id } = dataset
+        this.setActiveSummary(dataset.summaries)
         if (id !== this.activeLocationDatasetId ) {
           this.clearActiveDatasetIds()
+          this.clearActiveVariableId()
           this.$router.push('/data')
           this.resetActiveLocationLayer()
           return
@@ -240,8 +261,10 @@
         const params = this.$route.params
         params.datasetIds = id
         let path = `/data/${params.datasetIds}`
+        // plot is updated because of change in route
         this.$router.push({ path, params })
         this.loadLocationDataset(dataset)
+        this.setActiveVariableId(dataset.variables[0])
       },
       toggleRasterDataset(dataset) {
        
@@ -254,9 +277,10 @@
         //}
         this.loadRasterDataset(dataset)
         this.activeRasterDatasetId = dataset.id
-        console.log('activeRasterDatasetId after if', this.activeRasterDatasetId)
       },
-
+      updateVariable(dataset) {
+        this.loadLocationDataset(dataset)  
+      },
       markedTooltip (text) {
         return marked(text, { renderer: renderer })
       },
@@ -270,8 +294,16 @@
       },
       activeLegend (dataset) {
         // Check if linearGradient is defined. If so, assume that legend has to be shown
-        return _.has(dataset, 'properties.deltares:linearGradient')
-      }
+        return _.has(dataset, 'deltares:linearGradient')
+      },
+      hasVariables (dataset) {
+        // Check if there is more than one Variable
+        // - If only one variable, no selection box
+        // - If multiple variables, add selection box
+        if (typeof dataset.variables !== 'undefined') { 
+          return _.gt(dataset.variables.length, 1)
+        }
+      },
     }
   }
 </script>

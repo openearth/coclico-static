@@ -20,7 +20,9 @@ export default {
     selectedVectorData: {},
     activeDatasetIds: [],
     activeRasterLayer: null,
-    activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
+    activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids,
+    activeSummary: [],
+    activeVariableId: null
   }),
 
   getters: {
@@ -47,7 +49,13 @@ export default {
     },
     activeDatasetId(state) {
       return state.activeDatasetId
-    }
+    },
+    activeVariableId(state) {
+      return state.activeVariableId
+    },
+    activeSummary (state) {
+      return state.activeSummary
+    },
   },
   mutations: {
     setActiveLocationLayer(state, layer) {
@@ -79,6 +87,15 @@ export default {
     setActiveDatasetId(state, id) {
       state.activeDatasetId = id
     },
+    clearActiveVariableId (state) {
+      state.activeVariableId = null
+    },
+    setActiveVariableId(state, variable) {
+      state.activeVariableId = variable
+    },
+    setActiveSummary (state, summary) {
+      Vue.set(state, 'activeSummary', summary)
+    },
   },
   actions: {
     loadDatasets ({state, commit, dispatch}) {
@@ -92,24 +109,46 @@ export default {
         return children.forEach(child => {
           return getCatalog(child.href)
             .then(dataset => {
-              //All the below functionality will be added in a function at the end
-              const summaries = _.get(dataset, 'summaries')
-              const mappedSummaries = Object.keys(summaries).map(id => {
-                const summary = _.get(summaries, id)
-                return {
-                  id: id,
-                  allowedValues: summary,
-                  chosenValue: summary[0]
-                }
-              })
-              _.set(dataset, 'summaries', mappedSummaries)
+              // Exclude template folder from selection (check with backend whether this should stay in STAC catalog)
+              if (dataset.id !== 'template') {
+                //All the below functionality will be added in a function at the end
+                const summaries = _.get(dataset, 'summaries')
+                const mappedSummaries = Object.keys(summaries).map(id => {
+                  const summary = _.get(summaries, id)
+                  return {
+                    id: id,
+                    allowedValues: summary,
+                    chosenValue: summary[0]
+                  }
+                })
+                _.set(dataset, 'summaries', mappedSummaries)
 
-              commit('addDataset', dataset)
-              //if we start a subroute with active dataset ids, directly load the layer
-              if (state.activeDatasetIds.includes(dataset.id)) {
-                dispatch('setActiveDatasetId', dataset.id)
-                dispatch('loadLocationDataset', dataset)
-                dispatch('loadPointDataForLocation')
+                // Store available data variables
+                const variables = _.get(dataset, 'cube:variables')
+                var mappedVariables = Object.keys(variables).map(id => {
+                  const variable = _.get(variables, id)
+                  if (variable.type === 'data') {
+                    return {
+                      id: id
+                    }
+                  }
+                })
+
+                mappedVariables = _.compact(mappedVariables)
+
+                const mappedVariablesArray = mappedVariables.map(a => a.id)
+                if (mappedVariablesArray.length !== 0) {
+                  _.set(dataset, 'variables', mappedVariablesArray)
+                }
+
+                commit('addDataset', dataset)
+                //if we start a subroute with active dataset ids, directly load the layer
+                if (state.activeDatasetIds.includes(dataset.id)) {
+                  dispatch('setActiveDatasetId', dataset.id)
+                  dispatch('loadLocationDataset', dataset)
+                  dispatch('loadPointDataForLocation')
+                  dispatch('setActiveVariableId', dataset.variables[0])
+                }
               }
             })
         })
@@ -137,8 +176,8 @@ export default {
                 "hsl(110, 90%, 80%)"
             ],
       */
-      const newMin = _.get(dataset, 'properties.deltares:min', '')
-      const newMax =  _.get(dataset, 'properties.deltares:max', '')
+      const newMin = _.get(dataset, 'deltares:min', '')
+      const newMax =  _.get(dataset, 'deltares:max', '')
 
       const mapboxLayer = state.activeLocationLayer
       const mapboxLayerId = _.get(mapboxLayer, 'id')
@@ -177,18 +216,40 @@ export default {
         return
       }
       const url = _.get(dataset, 'assets.data.href')
-      // const datasetName = "replace"
-      const datasetName = _.get(dataset, 'name')
-      const path = Object.keys(_.get(dataset, 'cube:variables'))[0]
+      const datasetName = _.get(dataset, 'id')
+
+      // check which variable is of "data" type, and set path to this
+      const variables = Object.entries(_.get(dataset, 'cube:variables'))
+      let path = variables.map(dim => {
+        if (dim[1].type === 'data') {
+          // Look for dimension which corresponds to selected variable
+          if (dim[0] === state.activeVariableId) {
+            return dim[0]
+          }
+        } else {
+          return null
+        }
+      })
+      // filter out null dimensions in path (should be better way to do this?)
+      path = path.filter(x=>x)[0]
+
+      const summaryList = _.get(state, 'activeSummary')
+
       const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
       const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
       let slice = dimensions.map(dim => {
-        // TODO: make sure that the stations always correspond to the mapbox layers and that the
-        // other layers are the temporal layers used in the graphs..
         if (dim[1] === 'stations') {
           return _.get(state.selectedVectorData, 'properties.locationId', 0)
+        } else if (dim[1] === 'nscenarios' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
+          return summaryList[summaryList.findIndex(object => object.id === 'scenarios')].allowedValues.findIndex(object => {
+            return object === summaryList[summaryList.findIndex(object => object.id === 'scenarios')].chosenValue
+          })
+        } else if (dim[1] === 'rp' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
+          return summaryList[summaryList.findIndex(object => object.id === 'rp')].allowedValues.findIndex(object => {
+            return object === summaryList[summaryList.findIndex(object => object.id === 'rp')].chosenValue
+          })
         } else {
-          return null
+        return null
         }
       })
 
@@ -199,23 +260,69 @@ export default {
       })
         .then(res => {
           res.get(slice).then(data => {
-            const series = data.data.map(serie => {
-              return {
+            // in some cases, transpose data array to order data properly
+            // hardcoded sc dataset (stupid hack, implementation to be improved at some time)
+            if (data.data.length > data.data[0].length || datasetName === 'sc') {
+              data.data = _.unzip(data.data)
+            }
+            var series = [{
+                data: [],
                 type: 'line',
-                data: Array.from(serie)
-              }
-            })
-            // TODO: Which axis belongs to which dimension????
+                name: ''
+              }];
+            if (typeof data.data[0].length === 'undefined') {
+              // In case there is just 1 series, data.data.map(serie => does not seem to work. Resolved like this.
+              series[0].data = Array.from(data.data)
+              series[0].type = 'line'
+              series[0].name = 'default'
+            } else {
+              series = data.data.map(serie => {
+                return {
+                  type: 'line',
+                  data: Array.from(serie)
+                }
+              })
+            }
             let cubeDimensions = _.get(dataset, 'cube:dimensions')
-            // cubeDimensions = cubeDimensions.filter(dim => dim.type === 'temporal')
-            const xAxis = Object.keys(cubeDimensions)[2]
+            const xAxis = _.get(dataset, 'deltares:plotxAxis')
             const yAxis = variableUnit[0][1]
-            // Name based on properties.deltares:plotSeries from STAC
-            const plotSeries = _.get(dataset, 'properties.deltares:plotSeries')
+            // Name based on deltares:plotSeries from STAC
+            const plotSeries = _.get(dataset, 'deltares:plotSeries')
+            
             const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
 
-            for (var i = 0; i < dimensionNames.length; i++) {
-              series[i].name = dimensionNames[i][1]
+            // Add function to resolve decadal window, if required by dataset
+            if (cubeDimensions[xAxis].description === "decade window") {
+
+              const startDateYear = new Date(cubeDimensions[xAxis].extent[0]);
+              const endDateYear = new Date(cubeDimensions[xAxis].extent[1]);
+
+              var decadeWindowSeries = [];
+
+              for (let y = startDateYear.getFullYear(); y <= endDateYear.getFullYear();  y += 10) {
+                decadeWindowSeries.push(y);
+              }
+              // replace values array with decade window series
+              cubeDimensions[xAxis].values = decadeWindowSeries
+            } else if (cubeDimensions[xAxis].description === "time") {
+              cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent
+            }
+            for (var i = 0; i < series.length; i++) {
+              if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
+                var dimensionName = String(dimensionNames[i][1]) 
+                series[i].name = dimensionName
+              } else if (typeof dimensionNames[i][1] === 'string' && dimensionNames.length === series.length) {
+                series[i].name = dimensionNames[i][1]
+              } else if (dimensionNames.length !== series.length) {
+                // update name based on selection from summary
+                var serieName = summaryList.map(summary => {
+                  if (summary.id === plotSeries) {
+                    serieName = summary.id + ' ' + String(summary.chosenValue)
+                    return serieName
+                  }
+                })
+                series[i].name = serieName[i]
+              }
             }
             commit('addDatasetPointData', {
               id: datasetId,
@@ -241,9 +348,16 @@ export default {
     clearActiveDatasetIds({commit}) {
       commit('clearActiveDatasetIds')
     },
-    loadLocationDataset({commit}, dataset) {
+    clearActiveVariableId({commit}) {
+      commit('clearActiveVariableId')
+    },
+    loadLocationDataset({state, commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
-       //get info of the layer from stac catalog
+      //get info of the layer from stac catalog
+      const activeVariableId = state.activeVariableId
+      if (typeof activeVariableId !== 'undefined' && activeVariableId !== null) {
+        layer.href = layer.href.replaceAll([ dataset.variables[0] + '-mapbox' ], [ activeVariableId + '-mapbox' ])
+      }
       getCatalog(layer.href)
         .then(layerInfo => {
           commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
@@ -264,6 +378,9 @@ export default {
     },
     setActiveDatasetId({commit}, id) {
       commit('setActiveDatasetId', id)
+    },
+    setActiveVariableId({commit}, variable) {
+      commit('setActiveVariableId', variable)
     }
   },
 }

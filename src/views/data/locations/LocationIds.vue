@@ -38,7 +38,7 @@
               color="background"
               dark
             >
-              {{ data.id }}
+              {{ $store.state.map.activeVariableId }}
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -232,6 +232,17 @@
           this.storeactiveDatasetIds(this.$route.params.datasetIds)
         },
         deep: true
+      },
+      // Update figure when different summary is selected
+      '$store.state.map.activeSummary': {
+        handler () {
+          this.updateTimeseries()
+        },
+        deep: true
+      },
+      // Update figure when different variable is selected
+      '$store.state.map.activeVariableId': function() {
+        this.updateTimeseries()
       }
     },
     computed: {
@@ -264,7 +275,10 @@
           path: `/data/${this.$route.params.datasetIds}`,
           params: { datasetIds: this.$route.params.datasetIds }
         })
-      }
+      },
+      updateTimeseries () {
+        this.loadPointDataForLocation()
+      },
     }
   }
 </script>
