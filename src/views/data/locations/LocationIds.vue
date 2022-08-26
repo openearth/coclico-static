@@ -7,9 +7,6 @@
     color="background"
   >
     <v-container class="graph-menu d-flex flex-column">
-      <h2 class="h2">
-        Location id: {{ $route.params.locationId }}
-      </h2>
       <v-btn
         icon
         class="close-button"
@@ -32,13 +29,23 @@
           <v-expansion-panel
             v-for="data in datasets"
             :key="data.id"
+            :value="true"
           >
             <v-expansion-panel-header
               class="h4"
               color="background"
               dark
             >
-              {{ data.id }}
+              <h3 class="h3">
+                Location id: {{ $route.params.locationId }}
+              </h3>
+              Data set: {{ data.id }}
+              <v-btn
+                icon
+                @click.stop="lockDataset({location: $route.params.locationId, dataset: data.id, option: data, id: Date.now().toString()})"
+              >
+                <v-icon>mdi-lock-open</v-icon>
+              </v-btn>
             </v-expansion-panel-header>
             <v-expansion-panel-content color="background">
               <v-container class="pa-0">
@@ -48,6 +55,42 @@
                 >
                   <v-chart
                     :option="data"
+                    :autoresize="true"
+                    class="graph-line__chart"
+                  />
+                </v-col>
+              </v-container>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel
+            v-for="data in lockedDatasets"
+            :key="data.id"
+            :value="true"
+          >
+            <v-expansion-panel-header
+              class="h4"
+              color="background"
+              dark
+            >
+              <h3 class="h3">
+                Location id: {{ data.location }}
+              </h3>
+              Data set: {{ data.dataset }}
+              <v-btn
+                icon
+                @click.stop="removeLockedDataset(data.id)"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content color="background">
+              <v-container class="pa-0">
+                <v-col
+                  cols="12"
+                  class="graph-line pa-0"
+                >
+                  <v-chart
+                    :option="data.option"
                     :autoresize="true"
                     class="graph-line__chart"
                   />
@@ -162,13 +205,13 @@
       }
     },
     computed: {
-      ...mapGetters([ 'selectedVectorData', 'selectedDatasets' ]),
+      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets']),
       datasets () {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
-          // does not seem a very neat way to do this. Is there a better way?
-          _.set(this.baseOptions, 'xAxis.name', _.get(set, 'xAxis.title'))
-          _.set(this.baseOptions, 'yAxis.name', _.get(set, 'yAxis.title'))
+          // // does not seem a very neat way to do this. Is there a better way?
+          // _.set(this.baseOptions, 'xAxis.name', _.get(set, 'xAxis.title'))
+          // _.set(this.baseOptions, 'yAxis.name', _.get(set, 'yAxis.title'))
           return _.merge(set, this.baseOptions, theme)
         })
       }
@@ -186,7 +229,7 @@
     },
     methods: {
       ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
-      ...mapMutations([ 'setActiveDatasetIds' ]),
+      ...mapMutations([ 'setActiveDatasetIds', 'lockDataset', 'removeLockedDataset']),
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,
@@ -195,11 +238,15 @@
       },
       getBaseOption (datasetId) {
         try {
-          this.baseOptions = require(`@/assets/echart-templates/${datasetId}.json`)
+          this.baseOptions = require(`@/assets/echart-templates/${datasetId}.js`).default
+          console.log(this.baseOptions)
         } catch {
-          this.baseOptions = require('@/assets/echart-templates/ssl.json')
+          this.baseOptions = require('@/assets/echart-templates/default.js').default
         }
-
+      },
+      randomId () {
+        const dateId = Date.now()
+        return dateId.toString()
       }
     }
   }

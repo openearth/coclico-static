@@ -21,6 +21,7 @@ export default {
     activeDatasetIds: [],
     activeRasterLayer: null,
     activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
+    lockedDatasets: []
   }),
 
   getters: {
@@ -47,6 +48,9 @@ export default {
     },
     activeDatasetId(state) {
       return state.activeDatasetId
+    },
+    lockedDatasets(state) {
+      return state.lockedDatasets
     }
   },
   mutations: {
@@ -79,6 +83,12 @@ export default {
     setActiveDatasetId(state, id) {
       state.activeDatasetId = id
     },
+    lockDataset(state, dataset) {
+      state.lockedDatasets.push(dataset)
+    },
+    removeLockedDataset(state, id) {
+      state.lockedDatasets = state.lockedDatasets.filter(data => data.id !== id)
+    }
   },
   actions: {
     loadDatasets ({state, commit, dispatch}) {
@@ -199,6 +209,7 @@ export default {
       })
         .then(res => {
           res.get(slice).then(data => {
+            // TODO: type should be defined in the properties or in the templates!
             const series = data.data.map(serie => {
               return {
                 type: 'line',
@@ -247,14 +258,14 @@ export default {
       getCatalog(layer.href)
         .then(layerInfo => {
           commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
-        })   
+        })
     },
     loadRasterDataset({commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
       getCatalog(layer.href)
         .then(layerInfo => {
           commit('setActiveRasterLayer', buildRasterLayer(layerInfo))
-        })   
+        })
     },
     resetActiveLocationLayer({commit}) {
       commit('resetActiveLocationLayer')
