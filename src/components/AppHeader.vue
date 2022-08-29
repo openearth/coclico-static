@@ -55,9 +55,14 @@
     methods: {
       stepperAction (name) {
         // For workbench in stepper, open workbench page in seperate panel
-        if(name === 'Workbench')
-        {
+        if (name === 'Workbench') {
           window.open("https://github.com/openearth/coclico-workbench", "_blank");
+        } else if (name === 'Stories') {
+          this.$router.push({ name: 'stories' })
+        } else if (name === 'Platform') {
+          this.$router.push({ name: 'data' })
+        } else if (name === 'Landing page') {
+          window.open("https://coclicoservices.eu", "_blank");
         }
       }
     }

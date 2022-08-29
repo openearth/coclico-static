@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import DataLayers from '../views/DataLayers.vue'
 import LandPage from '../views/LandPage.vue'
-import StoriesPage from '../views/StoriesPage.vue'
+import Stories from '../views/Stories.vue'
 import WorkbenchPage from '../views/WorkbenchPage.vue'
 import DatasetIds from '../views/data/DatasetIds.vue'
 import LocationIds from '../views/data/locations/LocationIds.vue'
@@ -42,7 +42,7 @@ const routes = [
   {
     name: 'stories',
     path: '/stories',
-    component: StoriesPage
+    component: Stories
   }
 ]
 
