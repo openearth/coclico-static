@@ -366,6 +366,7 @@ export default {
         })
       } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
         let series = path.map(p => {
+          // TODO: for a single dataset, read values for all variables and store, to be visualized as bar plot
           // map (werkt niet met asynchrone zaken) --> foreach
           // in this.series stoppen
           // "promise.all"
