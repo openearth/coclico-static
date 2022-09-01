@@ -151,6 +151,7 @@ export default {
                     _.set(dataset, 'variables', mappedVariablesArray)
                   }
                 }
+                console.log('logging dataset 2', dataset)
 
                 commit('addDataset', dataset)
                 //if we start a subroute with active dataset ids, directly load the layer
@@ -233,7 +234,12 @@ export default {
       let path = variables.map(dim => {
         if (dim[1].type === 'data') {
           // Look for dimension which corresponds to selected variable
-          if (dim[0] === state.activeVariableId) {
+          // for bar plots, all variables should be read. For line and area plot, only one variable should be read
+          if (_.get(dataset, 'deltares:plotType') !== 'bar') {
+            if (dim[0] === state.activeVariableId) {
+              return dim[0]
+            }
+          } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
             return dim[0]
           }
         } else {
@@ -241,12 +247,17 @@ export default {
         }
       })
       // filter out null dimensions in path (should be better way to do this?)
-      path = path.filter(x=>x)[0]
+      // for bar plots, all variables should be read. For line and area plot, only one variable should be read
+      var dimensions = []
+      if (_.get(dataset, 'deltares:plotType') !== 'bar') {
+        path = path.filter(x=>x)[0]
+        dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
+      } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
+        dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path[0]}.dimensions`))
+      }
 
       const summaryList = _.get(state, 'activeSummary')
-
-      const dimensions = Object.entries(_.get(dataset, `["cube:variables"].${path}.dimensions`))
-      const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
+     
       let slice = dimensions.map(dim => {
         if (dim[1] === 'stations') {
           return _.get(state.selectedVectorData, 'properties.locationId', 0)
@@ -262,92 +273,127 @@ export default {
         return null
         }
       })
-
-      openArray({
-        store: url,
-        path: path,
-        mode: 'r'
-      })
-        .then(res => {
-          res.get(slice).then(data => {
-            // in some cases, transpose data array to order data properly
-            // hardcoded sc dataset (stupid hack, implementation to be improved at some time)
-            if (data.data.length > data.data[0].length || datasetName === 'sc') {
-              data.data = _.unzip(data.data)
-            }
-            var series = [ {
-                data: [],
-                type: 'line',
-                name: ''
-              } ];
-            if (typeof data.data[0].length === 'undefined') {
-              // In case there is just 1 series, data.data.map(serie => does not seem to work. Resolved like this.
-              series[0].data = Array.from(data.data)
-              series[0].type = 'line'
-              series[0].name = 'default'
-            } else {
-              series = data.data.map(serie => {
-                return {
-                  type: 'line',
-                  data: Array.from(serie)
-                }
-              })
-            }
-            let cubeDimensions = _.get(dataset, 'cube:dimensions')
-            const xAxis = _.get(dataset, 'deltares:plotxAxis')
-            // Name based on deltares:plotSeries from STAC
-            const plotSeries = _.get(dataset, 'deltares:plotSeries')
-            
-            const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
-
-            // Add function to resolve decadal window, if required by dataset
-            if (cubeDimensions[xAxis].description === "decade window") {
-
-              const startDateYear = new Date(cubeDimensions[xAxis].extent[0]);
-              const endDateYear = new Date(cubeDimensions[xAxis].extent[1]);
-
-              var decadeWindowSeries = [];
-
-              for (let y = startDateYear.getFullYear(); y <= endDateYear.getFullYear();  y += 10) {
-                decadeWindowSeries.push(y);
+      console.log('slice', slice)
+ 
+      if (_.get(dataset, 'deltares:plotType') !== 'bar') {
+        openArray({
+          store: url,
+          path: path,
+          mode: 'r'
+        })
+          .then(res => {
+            res.get(slice).then(data => {
+              // in some cases, transpose data array to order data properly
+              // hardcoded sc dataset (stupid hack, implementation to be improved at some time)
+              console.log('data', data)
+              if (data.data.length > data.data[0].length || datasetName === 'sc') {
+                data.data = _.unzip(data.data)
               }
-              // replace values array with decade window series
-              cubeDimensions[xAxis].values = decadeWindowSeries
-            } else if (cubeDimensions[xAxis].description === "time") {
-              cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent
-            }
-            for (var i = 0; i < series.length; i++) {
-              if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
-                var dimensionName = String(dimensionNames[i][1]) 
-                series[i].name = dimensionName
-              } else if (typeof dimensionNames[i][1] === 'string' && dimensionNames.length === series.length) {
-                series[i].name = dimensionNames[i][1]
-              } else if (dimensionNames.length !== series.length) {
-                // update name based on selection from summary
-                var serieName = summaryList.map(summary => {
-                  if (summary.id === plotSeries) {
-                    serieName = summary.id + ' ' + String(summary.chosenValue)
-                    return serieName
+              var series = [ {
+                  data: [],
+                  type: _.get(dataset, 'deltares:plotType'),
+                  name: ''
+                } ];
+              if (typeof data.data[0].length === 'undefined') {
+                // In case there is just 1 series, data.data.map(serie => does not seem to work. Resolved like this.
+                series[0].data = Array.from(data.data)
+                series[0].type = _.get(dataset, 'deltares:plotType')
+                series[0].name = 'default'
+              } else {
+                series = data.data.map(serie => {
+                  return {
+                    type: 'line',
+                    data: Array.from(serie)
                   }
                 })
-                series[i].name = serieName[i]
               }
-            }
-            commit('addDatasetPointData', {
-              id: datasetId,
-              name: datasetName,
-              series,
-              xAxis: {
-                type: 'category',
-                data: cubeDimensions[xAxis].values,
-                title: `${xAxis}`
-              },
-              yAxis: {
-                title: `${variableUnit[0][1]}`,
+              const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
+
+              let cubeDimensions = _.get(dataset, 'cube:dimensions')
+              const xAxis = _.get(dataset, 'deltares:plotxAxis')
+              // Name based on deltares:plotSeries from STAC
+              const plotSeries = _.get(dataset, 'deltares:plotSeries')
+              
+              const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
+
+              // Add function to resolve decadal window, if required by dataset
+              if (cubeDimensions[xAxis].description === "decade window") {
+
+                const startDateYear = new Date(cubeDimensions[xAxis].extent[0]);
+                const endDateYear = new Date(cubeDimensions[xAxis].extent[1]);
+
+                var decadeWindowSeries = [];
+
+                for (let y = startDateYear.getFullYear(); y <= endDateYear.getFullYear();  y += 10) {
+                  decadeWindowSeries.push(y);
+                }
+                // replace values array with decade window series
+                cubeDimensions[xAxis].values = decadeWindowSeries
+              } else if (cubeDimensions[xAxis].description === "time") {
+                cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent
               }
+              for (var i = 0; i < series.length; i++) {
+                if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
+                  var dimensionName = String(dimensionNames[i][1]) 
+                  series[i].name = dimensionName
+                } else if (typeof dimensionNames[i][1] === 'string' && dimensionNames.length === series.length) {
+                  series[i].name = dimensionNames[i][1]
+                } else if (dimensionNames.length !== series.length) {
+                  // update name based on selection from summary
+                  var serieName = summaryList.map(summary => {
+                    if (summary.id === plotSeries) {
+                      serieName = summary.id + ' ' + String(summary.chosenValue)
+                      return serieName
+                    }
+                  })
+                  series[i].name = serieName[i]
+                }
+              }
+              commit('addDatasetPointData', {
+                id: datasetId,
+                name: datasetName,
+                series,
+                xAxis: {
+                  type: 'category',
+                  data: cubeDimensions[xAxis].values,
+                  title: `${xAxis}`
+                },
+                yAxis: {
+                  title: `${variableUnit[0][1]}`,
+                }
+              })
             })
-          })
-      })
+        })
+      } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
+        let series = path.map(p => {
+          // map (werkt niet met asynchrone zaken) --> foreach
+          // in this.series stoppen
+          // "promise.all"
+          console.log('p', p)
+
+          let zarrValue = openArray({
+            store: url,
+            path: p,
+            mode: 'r'
+            })
+            .then(res => {
+              res.get(slice).then(zarrData => {
+                // in some cases, transpose data array to order data properly
+                // hardcoded sc dataset (stupid hack, implementation to be improved at some time)
+                console.log('data', zarrData)
+                return {
+                  zarrData
+                }
+              })
+            })
+          return {
+            type: 'bar',
+            data: zarrValue
+          }
+        })
+        console.log('series bar', series)
+
+      }
     },
     storeactiveDatasetIds ({ commit }, _ids) {
       // First set of the activeDatasetIds
