@@ -1,22 +1,34 @@
 <template>
   <v-flex class="stories pl-15">
     <v-row>
-      <v-col cols="8" class="pa-4">
+      <v-col
+        cols="8"
+        class="pa-4"
+      >
         <v-container>
           <h2 class="h2">
             Stories
           </h2>
-          <div v-for="theme in stories" :key="theme.id">
-             <stories-layout :theme="theme.theme" :stories="theme.stories"/>
+          <div
+            v-for="theme in stories"
+            :key="theme.id"
+          >
+            <stories-layout
+              :theme="theme.theme"
+              :stories="theme.stories"
+            />
           </div>
         </v-container>
       </v-col>
-      <v-col cols="4" class="pa-4">
-         <v-container>
+      <v-col
+        cols="4"
+        class="pa-4"
+      >
+        <v-container>
           <h2 class="h2">
             News
           </h2>
-          <news-layout :feeds="news"/>
+          <news-layout :feeds="news" />
         </v-container>
       </v-col>
     </v-row>
@@ -45,13 +57,13 @@
       this.loadStories()
     },
     computed: {
-      ...mapGetters(['stories', 'news']),
+      ...mapGetters([ 'stories', 'news' ]),
       icon () {
         return require('../assets/icons/icon-coclico.svg')
       }
     },
     methods: {
-      ...mapActions(['loadNews', 'loadStories'])
+      ...mapActions([ 'loadNews', 'loadStories' ])
     }
   }
   </script>
