@@ -36,7 +36,7 @@
       max-width="200px"
       contain
       class="background-logo"
-      src="icon"
+      src="../assets/images/CoCliCo_logo2.png"
     />
   </v-flex>
 </template>
@@ -71,9 +71,10 @@
   <style scoped>
   .stories {
     width: 100%;
-    height: 100%;
+    height: 105%;
+    background-image: url("../assets/images/CoCliCo_background3.png");
     background-size: cover;
-    background-color: rgb(240,240,240);
+    background-color: black;
   }
 
   .background-logo {
