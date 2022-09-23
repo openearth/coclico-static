@@ -6,7 +6,7 @@
         class="pa-4"
       >
         <v-container>
-          <h2 class="h2">
+          <h2 class="stories-head">
             Stories
           </h2>
           <div
@@ -25,7 +25,7 @@
         class="pa-4"
       >
         <v-container>
-          <h2 class="h2">
+          <h2 class="news-head">
             News
           </h2>
           <news-layout :feeds="news" />

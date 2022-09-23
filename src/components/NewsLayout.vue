@@ -13,7 +13,10 @@
         :key="feed.ID"
       >
         <v-list-item-content>
-          <v-list-item-title v-text="feed.title" />
+          <v-list-item-title
+            class="news-text"
+            v-text="feed.title"
+          />
           <v-list-item-subtitle
             class="text-subtitle-1"
             v-text="feed.source"
