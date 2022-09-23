@@ -119,7 +119,7 @@
             return
           }
           const features = this.map.queryRenderedFeatures()
-          const feature = features.find(feat => { feat.properties.locationId.toString() === location.toString() })
+          const feature = features.find(feat => { _.get(feat, 'properties.locationId', '').toString() === location.toString() })
           if (!feature) {
             return
           }
