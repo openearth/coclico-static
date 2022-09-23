@@ -1,13 +1,12 @@
 <template>
   <div class="data-layers">
     <data-layers-card :datasets="availableDatasets" />
-    <mapbox-map
-      slot="map"
+    <v-mapbox
+      id="map"
+      ref="map"
       :access-token="accessToken"
-      :center="[5.2913, 48.1326]"
-      :zoom="4"
-      mapbox-style="mapbox://styles/global-data-viewer/cjtslsula05as1fppvrh7n4rv"
-      @load="initializeMap"
+      :preserve-drawing-buffer="true"
+      map-style="mapbox://styles/global-data-viewer/cjtslsula05as1fppvrh7n4rv"
     >
       <v-mapbox-layer
         v-if="activeLocationLayer"
@@ -27,13 +26,12 @@
       <v-mapbox-layer
         :options="selectedPolygonLayer"
       />
-    </mapbox-map>
+    </v-mapbox>
     <router-view />
   </div>
 </template>
 
 <script>
-  import { MapboxMap } from '@deltares/vue-components'
   import DataLayersCard from '@/components/DataLayersCard.vue'
   import { mapGetters, mapActions, mapMutations } from 'vuex'
   import _ from 'lodash'
@@ -81,8 +79,7 @@
       mapLoaded: true,
     }),
     components: {
-      DataLayersCard,
-      MapboxMap
+      DataLayersCard
     },
     watch: {
       '$route.params.datasetIds': {
@@ -97,18 +94,32 @@
     computed: {
       ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'activeRasterLayer', 'selectedVectorData' ]),
     },
+    mounted () {
+      this.map = this.$refs.map.map
+      this.map.on('load', () => {
+        console.log('loaded')
+        if (!this.$route.params.locationId) {
+          this.map.flyTo({
+            center: [5.2913, 48.1326],
+            zoom: 4
+          })
+        }
+        this.initializeMap()
+      })
+      console.log('loaded', this.map)
+    },
     methods: {
       ...mapMutations([ 'setSelectedVectorData' ]),
       ...mapActions([ 'loadDatasets', 'loadPointDataForLocation' ]),
-      initializeMap (evt) {
-        this.map = evt.target
+      initializeMap () {
         setTimeout(() => {
           const location = this.$route.params.locationId
+          console.log(location)
           if (!location) {
             return
           }
           const features = this.map.queryRenderedFeatures()
-          const feature = features.find(feat => toString(feat.properties.locationId) === toString(location))
+          const feature = features.find(feat => { feat.properties.locationId.toString() === location.toString() })
           if (!feature) {
             return
           }
@@ -119,6 +130,7 @@
             lat = feature.geometry.coordinates[0][0][1]
           }
           this.updateSelectedVector(feature.geometry)
+          console.log(location, lng, lat, feature)
           this.map.panTo({
             lng,
             lat
@@ -184,6 +196,11 @@
 
 <style scoped>
 .data-layers {
+  width: 100%;
+  height: 100%;
+}
+
+#map {
   width: 100%;
   height: 100%;
 }
