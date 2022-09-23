@@ -121,7 +121,7 @@ export default {
             .then(dataset => {
               // Exclude template folder from selection (check with backend whether this should stay in STAC catalog)
               if (dataset.id !== 'template') {
-         
+
                 //All the below functionality will be added in a function at the end
                 const summaries = _.get(dataset, 'summaries')
                 const mappedSummaries = Object.keys(summaries).map(id => {
@@ -151,8 +151,6 @@ export default {
                     _.set(dataset, 'variables', mappedVariablesArray)
                   }
                 }
-                console.log('logging dataset 2', dataset)
-
                 commit('addDataset', dataset)
                 //if we start a subroute with active dataset ids, directly load the layer
                 if (state.activeDatasetIds.includes(dataset.id)) {
@@ -257,24 +255,25 @@ export default {
       }
 
       const summaryList = _.get(state, 'activeSummary')
-     
+      console.log(summaryList)
+
       let slice = dimensions.map(dim => {
         if (dim[1] === 'stations') {
           return _.get(state.selectedVectorData, 'properties.locationId', 0)
         } else if (dim[1] === 'nscenarios' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
-          return summaryList[summaryList.findIndex(object => object.id === 'scenarios')].allowedValues.findIndex(object => {
-            return object === summaryList[summaryList.findIndex(object => object.id === 'scenarios')].chosenValue
+          const scenarioIndex = summaryList.find(object => object.id === 'scenarios')
+          return scenarioIndex.allowedValues.findIndex(object => {
+            return object === summaryList.find(object => object.id === 'scenarios').chosenValue
           })
         } else if (dim[1] === 'rp' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
-          return summaryList[summaryList.findIndex(object => object.id === 'rp')].allowedValues.findIndex(object => {
+          return summaryList.find(object => object.id === 'rp').allowedValues.findIndex(object => {
             return object === summaryList[summaryList.findIndex(object => object.id === 'rp')].chosenValue
           })
         } else {
         return null
         }
       })
-      console.log('slice', slice)
- 
+
       if (_.get(dataset, 'deltares:plotType') !== 'bar') {
         openArray({
           store: url,
@@ -313,7 +312,7 @@ export default {
               const xAxis = _.get(dataset, 'deltares:plotxAxis')
               // Name based on deltares:plotSeries from STAC
               const plotSeries = _.get(dataset, 'deltares:plotSeries')
-              
+
               const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
 
               // Add function to resolve decadal window, if required by dataset
@@ -334,7 +333,7 @@ export default {
               }
               for (var i = 0; i < series.length; i++) {
                 if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
-                  var dimensionName = String(dimensionNames[i][1]) 
+                  var dimensionName = String(dimensionNames[i][1])
                   series[i].name = dimensionName
                 } else if (typeof dimensionNames[i][1] === 'string' && dimensionNames.length === series.length) {
                   series[i].name = dimensionNames[i][1]
@@ -387,13 +386,24 @@ export default {
                 }
               })
             })
-          return {
-            type: 'bar',
-            data: zarrValue
-          }
-        })
-        console.log('series bar', series)
+          const xAxis = _.get(dataset, 'deltares:plotxAxis')
+          const cubeDimensions = _.get(dataset, 'cube:dimensions')
+          const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
 
+          commit('addDatasetPointData', {
+            id: datasetId,
+            name: datasetName,
+            series,
+            xAxis: {
+              type: 'category',
+              data: cubeDimensions[xAxis].values,
+              title: `${xAxis}`
+            },
+            yAxis: {
+              title: `${variableUnit[0][1]}`,
+            }
+          })
+        })
       }
     },
     storeactiveDatasetIds ({ commit }, _ids) {
