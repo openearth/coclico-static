@@ -253,11 +253,6 @@
           return
         }
 
-        if (this.$route.path.includes(id)) {
-          this.loadLocationDataset(dataset)
-          return
-        }
-
         const params = this.$route.params
         params.datasetIds = id
         let path = `/data/${params.datasetIds}`
@@ -277,7 +272,7 @@
         }
       },
       updateVariable(dataset) {
-        this.loadLocationDataset(dataset)  
+        this.loadLocationDataset(dataset)
       },
       markedTooltip (text) {
         return marked(text, { renderer: renderer })
@@ -298,7 +293,7 @@
         // Check if there is more than one Variable
         // - If only one variable, no selection box
         // - If multiple variables, add selection box
-        if (typeof dataset.variables !== 'undefined') { 
+        if (typeof dataset.variables !== 'undefined') {
           return _.gt(dataset.variables.length, 1)
         }
       },

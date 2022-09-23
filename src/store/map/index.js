@@ -121,7 +121,7 @@ export default {
             .then(dataset => {
               // Exclude template folder from selection (check with backend whether this should stay in STAC catalog)
               if (dataset.id !== 'template') {
-         
+
                 //All the below functionality will be added in a function at the end
                 const summaries = _.get(dataset, 'summaries')
                 const mappedSummaries = Object.keys(summaries).map(id => {
@@ -297,7 +297,7 @@ export default {
             const xAxis = _.get(dataset, 'deltares:plotxAxis')
             // Name based on deltares:plotSeries from STAC
             const plotSeries = _.get(dataset, 'deltares:plotSeries')
-            
+
             const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
 
             // Add function to resolve decadal window, if required by dataset
@@ -318,7 +318,7 @@ export default {
             }
             for (var i = 0; i < series.length; i++) {
               if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
-                var dimensionName = String(dimensionNames[i][1]) 
+                var dimensionName = String(dimensionNames[i][1])
                 series[i].name = dimensionName
               } else if (typeof dimensionNames[i][1] === 'string' && dimensionNames.length === series.length) {
                 series[i].name = dimensionNames[i][1]
@@ -362,6 +362,7 @@ export default {
     },
     loadLocationDataset({state, commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
+      state.activeVariableId = dataset.id
       //get info of the layer from stac catalog
       const activeVariableId = state.activeVariableId
       if (typeof activeVariableId !== 'undefined' && activeVariableId !== null) {
