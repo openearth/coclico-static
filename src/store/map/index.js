@@ -9,6 +9,7 @@ import themes from './themes.js'
 import { openArray } from 'zarr'
 import router from '@/router'
 import Vue from 'vue'
+import { path } from 'lodash/fp.js'
 
 export default {
   modules: {
@@ -43,7 +44,7 @@ export default {
       return state.activeRasterLayer
     },
     selectedVectorData(state) {
-      return state.selectedvectorData
+      return state.selectedVectorData
     },
     activeDatasetIds(state) {
       return state.activeDatasetIds
@@ -229,21 +230,21 @@ export default {
 
       // check which variable is of "data" type, and set path to this
       const variables = Object.entries(_.get(dataset, 'cube:variables'))
-      let path = variables.map(dim => {
+      let path = []
+      variables.forEach(dim => {
         if (dim[1].type === 'data') {
           // Look for dimension which corresponds to selected variable
           // for bar plots, all variables should be read. For line and area plot, only one variable should be read
           if (_.get(dataset, 'deltares:plotType') !== 'bar') {
             if (dim[0] === state.activeVariableId) {
-              return dim[0]
+              path.push(dim[0])
             }
           } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
-            return dim[0]
+            path.push(dim[0])
           }
-        } else {
-          return null
         }
       })
+
       // filter out null dimensions in path (should be better way to do this?)
       // for bar plots, all variables should be read. For line and area plot, only one variable should be read
       var dimensions = []
@@ -255,7 +256,6 @@ export default {
       }
 
       const summaryList = _.get(state, 'activeSummary')
-      console.log(summaryList)
 
       let slice = dimensions.map(dim => {
         if (dim[1] === 'stations') {
@@ -284,7 +284,6 @@ export default {
             res.get(slice).then(data => {
               // in some cases, transpose data array to order data properly
               // hardcoded sc dataset (stupid hack, implementation to be improved at some time)
-              console.log('data', data)
               if (data.data.length > data.data[0].length || datasetName === 'sc') {
                 data.data = _.unzip(data.data)
               }
@@ -364,14 +363,10 @@ export default {
             })
         })
       } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
-        let series = path.map(p => {
-          // TODO: for a single dataset, read values for all variables and store, to be visualized as bar plot
-          // map (werkt niet met asynchrone zaken) --> foreach
-          // in this.series stoppen
-          // "promise.all"
-          console.log('p', p)
-
-          let zarrValue = openArray({
+        const xAxisdata = []
+        const series = []
+        path.forEach(p => {
+          return openArray({
             store: url,
             path: p,
             mode: 'r'
@@ -380,31 +375,22 @@ export default {
               res.get(slice).then(zarrData => {
                 // in some cases, transpose data array to order data properly
                 // hardcoded sc dataset (stupid hack, implementation to be improved at some time)
-                console.log('data', zarrData)
-                return {
-                  zarrData
-                }
+                series.push(zarrData)
+                xAxisdata.push(p)
+
+                commit('addDatasetPointData', {
+                  id: datasetId,
+                  name: datasetName,
+                  series: [{ type: 'bar', data: series }],
+                  xAxis: {
+                    type: 'category',
+                    data: xAxisdata,
+                  }
+                })
               })
             })
-          const xAxis = _.get(dataset, 'deltares:plotxAxis')
-          const cubeDimensions = _.get(dataset, 'cube:dimensions')
-          const variableUnit = Object.entries(_.get(dataset, `["cube:variables"].${path}.unit`))
-
-          commit('addDatasetPointData', {
-            id: datasetId,
-            name: datasetName,
-            series,
-            xAxis: {
-              type: 'category',
-              data: cubeDimensions[xAxis].values,
-              title: `${xAxis}`
-            },
-            yAxis: {
-              title: `${variableUnit[0][1]}`,
-            }
           })
-        })
-      }
+        }
     },
     storeactiveDatasetIds ({ commit }, _ids) {
       // First set of the activeDatasetIds
