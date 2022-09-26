@@ -77,3 +77,23 @@ body {
   font-size: 0.5rem;
   line-height: 1rem;
 }
+
+.news-text {
+  color: white;
+}
+
+.stories-text {
+  color: white;
+}
+
+.news-head {
+  font-size: 2rem;
+  line-height: 3rem;
+  color: white;
+}
+
+.stories-head {
+  font-size: 2rem;
+  line-height: 3rem;
+  color: white;
+}
