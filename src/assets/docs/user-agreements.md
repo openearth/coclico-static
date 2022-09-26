@@ -4,9 +4,9 @@ This legal agreement (hereinafter “User Agreement”) governs the conditions o
 
 Please read this User Agreement carefully.
 
-This is a legal agreement between you – either as individual or acting on behalf of a legal entity - and the FORCOAST Consortium (hereinafter "the Consortium"). This agreement is effective upon your submission of consent, by checking and clicking on the “I-Agree” button below.
+This is a legal agreement between you – either as individual or acting on behalf of a legal entity - and the CoCliCo Consortium (hereinafter "the Consortium"). This agreement is effective upon your submission of consent, by checking and clicking on the “I-Agree” button below.
 
-The use of this FORCOAST Platform website (hereinafter “Website”), and the Data Products resulting from the use of therefrom, is subject to the conditions of this User Agreement as set out below.
+The use of this CoCliCo Platform website (hereinafter “Website”), and the Data Products resulting from the use of therefrom, is subject to the conditions of this User Agreement as set out below.
 
 By marking the “I agree”-checkbox:
 
@@ -14,7 +14,7 @@ By marking the “I agree”-checkbox:
 2. User expressly accepts this User Agreement and accepts to be legally bound by the terms and conditions contained therein.
    If you are not authorized to act on behalf of User to agree upon this User Agreement, please do not mark the “I-agree” checkbox and exit this website page. Furthermore, do not mark the “I accept” checkbox and end the visit to this website page if User does not agree with the User Agreement.
 
-You are not allowed to use this website and its Data Products without an agreement with the FORCOAST consortium. If you do not agree to the terms of this User Agreement, you must promptly stop using the Website and the Data Products. Any further actions with respect to the Website and/or Data Products without an agreement are in violation of copyright law.
+You are not allowed to use this website and its Data Products without an agreement with the CoCliCo consortium. If you do not agree to the terms of this User Agreement, you must promptly stop using the Website and the Data Products. Any further actions with respect to the Website and/or Data Products without an agreement are in violation of copyright law.
 
 Article 1: General purpose and allowed use
 

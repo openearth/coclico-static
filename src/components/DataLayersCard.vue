@@ -239,11 +239,26 @@
         activeRasterDatasetId: null
       }
     },
+    mounted () {
+      const dataset = this.datasets[this.$route.params.datasetIds]
+      if (dataset) {
+        this.toggleLocationDataset(dataset)
+      }
+    },
     methods: {
       ...mapMutations([ 'setActiveSummary' ]),
       ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId' ]),
       toggleLocationDataset(dataset) {
         const { id } = dataset
+        const summ = _.get(dataset, 'summaries[0]', [])
+        if (!_.get(summ, 'chosenValue')) {
+          summ.chosenValue = _.get(summ, 'allowedValues[0]')
+        }
+
+        if (!this.selectedVariable) {
+          this.selectedVariable = dataset.variables[0]
+          this.setActiveVariableId(dataset.variables[0])
+        }
         this.setActiveSummary(dataset.summaries)
         if (id !== this.activeLocationDatasetId ) {
           this.clearActiveDatasetIds()
