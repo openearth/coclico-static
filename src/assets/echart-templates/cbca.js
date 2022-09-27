@@ -28,5 +28,37 @@ export default {
   ],
   "textStyle":{
      "fontFamily":"Helvetica"
-  }
+  },
+  "xAxis":{
+   "splitLine":{
+      "show":true
+   },
+   "axisLabel":{
+      "fontSize": 14
+   },
+   "nameLocation":"center",
+   "nameGap":30,
+   "nameTextStyle":{
+      "color":"white",
+      "fontSize":14,
+      "fontFamily":"Helvetica"
+   },
+   "name": "Variable [-]"
+   },
+   "yAxis":{
+      "type":"value",
+      "min":0,
+      "max":5,
+      "axisLabel":{
+         "fontSize":14
+      },
+      "nameLocation":"middle",
+      "nameGap":45,
+      "nameTextStyle":{
+         "color":"white",
+         "fontSize":14,
+         "fontFamily":"Helvetica"
+      },
+      "name": "Count [-]"
+   }
 }
