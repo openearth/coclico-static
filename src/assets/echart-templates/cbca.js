@@ -8,7 +8,7 @@ export default {
      "textStyle":{
         "color":"#fff"
      },
-     "valueFormatter": (value) => `${value.toFixed(2)} MW/m`
+     "valueFormatter": (value) => `${value.toFixed(2)} `
   },
   "legend":{
      "top":"horizontal"
@@ -48,7 +48,7 @@ export default {
    "yAxis":{
       "type":"value",
       "min":0,
-      "max":5,
+      "max":500,
       "axisLabel":{
          "fontSize":14
       },
