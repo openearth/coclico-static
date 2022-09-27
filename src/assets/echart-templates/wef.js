@@ -66,7 +66,7 @@ export default {
   "yAxis":{
      "type":"value",
      "min":0,
-     "max":1500,
+     "max":1500000,
      "axisLabel":{
         "fontSize":14,
         "formatter": function (value, index) {
