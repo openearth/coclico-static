@@ -28,5 +28,8 @@ export default {
   ],
   "textStyle":{
      "fontFamily":"Helvetica"
+  },
+  "xAxis": {
+    "name": "xAxis"
   }
 }

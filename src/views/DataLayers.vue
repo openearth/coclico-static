@@ -6,7 +6,7 @@
       ref="map"
       :access-token="accessToken"
       :preserve-drawing-buffer="true"
-      map-style="mapbox://styles/global-data-viewer/cjtslsula05as1fppvrh7n4rv"
+      map-style="mapbox://styles/mapbox/light-v10"
     >
       <v-mapbox-layer
         v-if="activeLocationLayer"
