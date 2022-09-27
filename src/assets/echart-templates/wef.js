@@ -69,6 +69,9 @@ export default {
      "max":1500,
      "axisLabel":{
         "fontSize":14,
+        "formatter": function (value, index) {
+            return value / 1000;
+        }
      },
      "nameLocation":"center",
      "name":"Wave energy flux [MW/m]",
