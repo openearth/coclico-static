@@ -52,7 +52,7 @@ export default {
       "axisLabel":{
          "fontSize":14
       },
-      "nameLocation":"middle",
+      "nameLocation":"center",
       "nameGap":45,
       "nameTextStyle":{
          "color":"white",
