@@ -140,7 +140,7 @@
           </v-expansion-panel>
         </v-expansion-panels>
         <template v-else>
-          <p>No data available.</p>
+          <p>Loading data...</p>
         </template>
       </div>
       <div class="flex-shrink-1 bodytext-xs disclaimer">
