@@ -9,7 +9,7 @@ export default {
     name: 'Landing page',
     step: 1,
     icon: 'mdi-information-outline',
-    color: color.secondary  
+    color: color.quiet  
     },
     {
     name: 'Stories',
@@ -27,7 +27,7 @@ export default {
     name: 'Workbench',
     step: 4,
     icon: 'mdi-hammer',
-    color: color.secondary 
+    color: color.quiet
     } ]
 }),
   getters: { 
