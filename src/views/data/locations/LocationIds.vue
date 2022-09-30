@@ -15,8 +15,9 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <div
-        class="flex-grow-1 py-3 scrollbar"
+        class="flex-grow-1 py-3"
         align-space-between
+        scrollbar
       >
         <v-expansion-panels
           v-if="selectedDatasets[0]"
@@ -339,5 +340,9 @@
 
 .disclaimer {
   text-align: center;
+}
+
+.close-button {
+  z-index: 100;
 }
 </style>

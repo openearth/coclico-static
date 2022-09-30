@@ -266,7 +266,6 @@ export default {
         return null
         }
       })
-      console.log('slice', slice, dimensions)
 
       if (_.get(dataset, 'deltares:plotType') !== 'bar') {
         openArray({
@@ -286,7 +285,6 @@ export default {
                   type: _.get(dataset, 'deltares:plotType'),
                   name: ''
                 } ]
-              console.log(data, series)
               if (typeof data.data[0].length === 'undefined') {
                 // In case there is just 1 series, data.data.map(serie => does not seem to work. Resolved like this.
                 series[0].data = Array.from(data.data)
@@ -325,7 +323,6 @@ export default {
               } else if (cubeDimensions[xAxis].description === "time") {
                 cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent
               }
-              console.log(series)
               for (var i = 0; i < series.length; i++) {
                 if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
                   var dimensionName = String(dimensionNames[i][1])
