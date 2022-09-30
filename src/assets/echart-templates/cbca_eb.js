@@ -43,7 +43,7 @@ export default {
       "fontSize":14,
       "fontFamily":"Helvetica"
    },
-   "name": "Variable [-]"
+   "name": "Scenario [-]"
    },
    "yAxis":{
       "type":"value",
@@ -59,6 +59,6 @@ export default {
          "fontSize":14,
          "fontFamily":"Helvetica"
       },
-      "name": "Count [-]"
+      "name": "Protection height increase [m]"
    }
 }
