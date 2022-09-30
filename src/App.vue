@@ -1,9 +1,13 @@
 <template>
   <v-app>
     <app-header />
-    <app-sidebar />
+    <app-sidebar @toggle-about="togglePanel('about')" />
     <v-main>
       <router-view />
+      <about-panel
+        v-if="panel === 'about'"
+        @close-about="panel = false"
+      />
       <legal-dialog />
     </v-main>
   </v-app>
@@ -11,6 +15,7 @@
 
 <script>
   import AppHeader from './components/AppHeader'
+  import AboutPanel from '@/components/AboutPanel.vue'
   import AppSidebar from './components/AppSidebar'
   import LegalDialog from './components/LegalDialog'
   import { mapActions } from 'vuex'
@@ -19,6 +24,7 @@
   
     components: {
       AppHeader,
+      AboutPanel,
       AppSidebar,
       LegalDialog
     },
