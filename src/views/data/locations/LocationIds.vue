@@ -36,7 +36,7 @@
               dark
             >
               <div>
-                <span style="margin-left: 50px;" /><b>Data set:</b> {{ data.id }}
+                <span style="margin-left: 50px;" /><b>Dataset:</b> {{ data.title }}
                 <h3 class="h4">
                   <span style="margin-left: 50px;" /><b>Location id:</b> {{ $route.params.locationId }}
                 </h3>
@@ -101,7 +101,7 @@
               dark
             >
               <div>
-                <span style="margin-left: 50px;" /><b>Data set:</b> {{ data.dataset }}
+                <span style="margin-left: 50px;" /><b>Dataset:</b> {{ data.dataset }}
                 <h3 class="h4">
                   <span style="margin-left: 50px;" /><b>Location id:</b> {{ data.location }}
                 </h3>
