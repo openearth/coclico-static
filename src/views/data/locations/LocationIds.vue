@@ -250,13 +250,13 @@
         deep: true
       },
       // Update figure when different variable is selected
-      '$store.state.map.activeVariableId': function() {
+      activeVariableId () {
         this.updateTimeseries()
         this.getBaseOption(this.$route.params.datasetIds)
       }
     },
     computed: {
-      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets' ]),
+      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets', 'activeVariableId' ]),
       datasets () {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
@@ -279,7 +279,6 @@
     methods: {
       ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
       ...mapMutations([ 'setActiveDatasetIds', 'lockDataset', 'removeLockedDataset' ]),
-      ...mapGetters([ 'activeVariableId' ]),
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,

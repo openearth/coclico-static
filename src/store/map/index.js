@@ -24,7 +24,7 @@ export default {
     activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
     lockedDatasets: [],
     activeSummary: [],
-    activeVariableId: null
+    activeVariableId: ""
   }),
 
   getters: {
@@ -234,15 +234,7 @@ export default {
       let path = []
       variables.forEach(dim => {
         if (dim[1].type === 'data') {
-          // Look for dimension which corresponds to selected variable
-          // for bar plots, all variables should be read. For line and area plot, only one variable should be read
-          if (_.get(dataset, 'deltares:plotType') !== 'bar') {
-            if (dim[0] === state.activeVariableId) {
-              path.push(dim[0])
-            }
-          } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
-            path.push(dim[0])
-          }
+          path.push(dim[0])
         }
       })
 
