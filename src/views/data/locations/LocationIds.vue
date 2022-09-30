@@ -36,7 +36,7 @@
               dark
             >
               <div>
-                <span style="margin-left: 50px;" /><b>Dataset:</b> {{ data.title }}
+                <span style="margin-left: 50px;" /><b>Dataset:</b> {{ data.id }}
                 <h3 class="h4">
                   <span style="margin-left: 50px;" /><b>Location id:</b> {{ $route.params.locationId }}
                 </h3>
