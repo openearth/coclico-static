@@ -28,8 +28,19 @@
       AppSidebar,
       LegalDialog
     },
+    data: () => ({
+      panel: false,
+      page: 2
+    }),
     methods: { 
       ...mapActions({ loadDatasets: 'loadDatasets' }),
+      togglePanel (name) {
+        if (this.panel === name) {
+          this.panel = false
+        } else {
+          this.panel = name
+        }
+      }
     },
     mounted() { 
       this.loadDatasets()
