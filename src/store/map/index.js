@@ -400,12 +400,12 @@ export default {
     },
     loadLocationDataset({state, commit}, dataset) {
       const layer = matchLayerIdToProperties(dataset)
-      state.activeVariableId = dataset.id
       //get info of the layer from stac catalog
       const activeVariableId = state.activeVariableId
-      //if (typeof activeVariableId !== 'undefined' && activeVariableId !== null) {
-      //  layer.href = layer.href.replaceAll([ dataset.variables[0] + '-mapbox' ], [ activeVariableId + '-mapbox' ])
-      //}
+      console.log(activeVariableId, dataset.variables[0])
+      if (typeof activeVariableId !== undefined && activeVariableId !== null && activeVariableId !== '') {
+        layer.href = layer.href.replaceAll(`${dataset.variables[0]}-mapbox`, `${activeVariableId}-mapbox`)
+      }
       getCatalog(layer.href)
         .then(layerInfo => {
           commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
