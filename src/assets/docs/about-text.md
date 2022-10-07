@@ -1,13 +1,9 @@
-This is a beta release of the Blue Earth Data platform. The Blue Earth Data platform has been developed by Deltares as a free, web-based application to support the study and sharing of integrated water and subsoil-related data. The platform provides indicative data, which is primarily intended for professional specialists and researchers.
+This is the Fast-Track release of the Coastal Climate Core (CoCliCo) Services platform. The CoCliCo platform has been developed by Deltares in cooperation with the CoCliCo partners. It will be an open-source web platform informing users on present-day and future coastal risks by  providing indicative data, which is intended for layman as well as professional specialists and researchers.
 
-Users are presented with global water and subsoil-related data through use of our multi-data viewer. The datasets included are subdivided over different themes and areas of interest, which can be selected on the left side of the screen. The global data is grouped under the Flooding, Coastal Management and Offshore themes. These themes incorporate datasets for amongst others global shoreline changes, global bathymetry, global river discharge and storm surge forecasts and global metocean conditions. Additionally, some regional datasets are added for the North Sea. Further information with each dataset is provided through the data selection menu.
+Users are presented with global data on coastal hazards through use of our multi-data viewer. The datasets included will eventually be subdivided over different themes, which can be selected on the left-hand side of the screen. For now, all datasets are present under the 'CoCliCo' theme. Further information on each dataset is provided by clicking the 'i' in the data selection menu.
 
-Datasets can be selected by using the selection menu on the right side of the screen. By activating the radial button, spatial maps can be enabled for each dataset. By activating the toggle button, time series can be enabled for each dataset at selected locations. If available at a location, time series for multiple datasets can be shown simultaneously. Furthermore, after registration the platform allows users to download selected data to the users device.
+Datasets can be visualized by using the the same selection menu on the right side of the screen. By activating the radial button, raster data can be shown. By activating the toggle button, vector datasets are enabled. By clicking on a vector location in the map, a dashboard will pop up on the left-hand side of the screen. Here, dedicated graphs (for instance time-series) will provide more detailed information. One can compare between different locations and datasets by 'locking' the graph and subsequently selecting another location on the map.
 
-If you want to find out more about this initiative, please visit the WiKi.
+If you want to find out more about this initiative, please visit https://coclicoservices.eu/ or click the 'landing page' button at the top of the screen. 
 
-Your feedback will help us to further improve Blue Earth Data. To provide your feedback, please use the following form.
-
-For further questions regarding the platform or the datasets included, please contact us at dataservices@deltares.nl.
-
-Deltares values your privacy. Our general Privacy Statement can be found here.
+Your feedback will help us to further improve CoCliCo. To provide your feedback, please send an email to etienne.kras@deltares.nl
