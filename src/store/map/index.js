@@ -114,6 +114,8 @@ export default {
     getCatalog(process.env.VUE_APP_CATALOG_URL)
       .then(datasets => {
         const themes = _.get(datasets, 'summaries.keywords')
+        console.log('logging dataset', datasets)
+        console.log('logging themes', themes)
         themes.forEach(theme => commit('addTheme', theme))
         const children = datasets.links.filter(ds => ds.rel === 'child')
 
@@ -122,7 +124,7 @@ export default {
             .then(dataset => {
               // Exclude template folder from selection (check with backend whether this should stay in STAC catalog)
               if (dataset.id !== 'template') {
-
+                console.log('logging dataset', dataset)
                 //All the below functionality will be added in a function at the end
                 const summaries = _.get(dataset, 'summaries')
                 const mappedSummaries = Object.keys(summaries).map(id => {
@@ -401,9 +403,9 @@ export default {
       state.activeVariableId = dataset.id
       //get info of the layer from stac catalog
       const activeVariableId = state.activeVariableId
-      if (typeof activeVariableId !== 'undefined' && activeVariableId !== null) {
-        layer.href = layer.href.replaceAll([ dataset.variables[0] + '-mapbox' ], [ activeVariableId + '-mapbox' ])
-      }
+      //if (typeof activeVariableId !== 'undefined' && activeVariableId !== null) {
+      //  layer.href = layer.href.replaceAll([ dataset.variables[0] + '-mapbox' ], [ activeVariableId + '-mapbox' ])
+      //}
       getCatalog(layer.href)
         .then(layerInfo => {
           commit('setActiveLocationLayer', buildGeojsonLayer(layerInfo))
