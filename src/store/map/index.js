@@ -307,8 +307,8 @@ export default {
               // Name based on deltares:plotSeries from STAC
               const plotSeries = _.get(dataset, 'deltares:plotSeries')
 
-              const dimensionNames = Object.entries(_.get(dataset, `["cube:dimensions"].${plotSeries}.values`))
-
+              const dimensionNames = Object.entries(_.get(dataset, `cube:dimensions.${plotSeries}.values`))
+              console.log('check', dimensionNames)
               // Add function to resolve decadal window, if required by dataset
               if (cubeDimensions[xAxis].description === "decade window") {
 
@@ -325,6 +325,7 @@ export default {
               } else if (cubeDimensions[xAxis].description === "time") {
                 cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent
               }
+              console.log(series)
               for (var i = 0; i < series.length; i++) {
                 if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
                   var dimensionName = String(dimensionNames[i][1])
