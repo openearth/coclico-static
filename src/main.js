@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import './registerServiceWorker'
 /* The vue-composition API should always being imported before all others plugins */
-import './plugins/composition-api' 
+import './plugins/composition-api'
 import './plugins/vuelidate'
+import './plugins/vue2mapbox-gl'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'

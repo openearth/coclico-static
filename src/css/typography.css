@@ -78,11 +78,9 @@ body {
   line-height: 1rem;
 }
 
-.news-text {
-  color: white;
-}
-
-.stories-text {
+.stories-subhead{
+  font-size: 1.5rem;
+  line-height: 2rem;
   color: white;
 }
 

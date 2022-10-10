@@ -4,14 +4,14 @@
     rounded
     outlined
     class="stories-card"
+    dark
   >
     <v-card-title>
       <custom-icon
         :name="theme"
         icon-folder="themes"
-        class="ma-2"
       />
-      <span><strong>{{ theme }}</strong></span>
+      <span><strong class="stories-subhead">{{ theme }}</strong></span>
     </v-card-title>
     <v-list
       color="rgba(0, 0, 0, 0)"
@@ -26,7 +26,7 @@
 
         <v-list-item-content>
           <v-list-item-title
-            class="stories-text"
+            class="text-subtitle-1"
             v-text="story.title"
           />
         </v-list-item-content>

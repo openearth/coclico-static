@@ -59,6 +59,6 @@ export default {
         "fontSize":14,
         "fontFamily":"Helvetica"
      },
-     "name": "Extreme surge level [m]"
+     "name": "Episodic extreme water level [m]"
   }
 }

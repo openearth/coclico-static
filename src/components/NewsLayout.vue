@@ -7,6 +7,7 @@
   >
     <v-list
       color="rgba(0, 0, 0, 0)"
+      dark
     >
       <v-list-item
         v-for="feed in feeds"
@@ -14,7 +15,7 @@
       >
         <v-list-item-content>
           <v-list-item-title
-            class="news-text"
+            class="text-subtitle-1"
             v-text="feed.title"
           />
           <v-list-item-subtitle

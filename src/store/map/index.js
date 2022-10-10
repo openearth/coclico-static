@@ -24,7 +24,7 @@ export default {
     activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
     lockedDatasets: [],
     activeSummary: [],
-    activeVariableId: null
+    activeVariableId: ""
   }),
 
   getters: {
@@ -114,6 +114,8 @@ export default {
     getCatalog(process.env.VUE_APP_CATALOG_URL)
       .then(datasets => {
         const themes = _.get(datasets, 'summaries.keywords')
+        console.log('logging dataset', datasets)
+        console.log('logging themes', themes)
         themes.forEach(theme => commit('addTheme', theme))
         const children = datasets.links.filter(ds => ds.rel === 'child')
 
@@ -122,7 +124,7 @@ export default {
             .then(dataset => {
               // Exclude template folder from selection (check with backend whether this should stay in STAC catalog)
               if (dataset.id !== 'template') {
-
+                console.log('logging dataset', dataset)
                 //All the below functionality will be added in a function at the end
                 const summaries = _.get(dataset, 'summaries')
                 const mappedSummaries = Object.keys(summaries).map(id => {
@@ -230,18 +232,11 @@ export default {
 
       // check which variable is of "data" type, and set path to this
       const variables = Object.entries(_.get(dataset, 'cube:variables'))
+
       let path = []
       variables.forEach(dim => {
         if (dim[1].type === 'data') {
-          // Look for dimension which corresponds to selected variable
-          // for bar plots, all variables should be read. For line and area plot, only one variable should be read
-          if (_.get(dataset, 'deltares:plotType') !== 'bar') {
-            if (dim[0] === state.activeVariableId) {
-              path.push(dim[0])
-            }
-          } else if (_.get(dataset, 'deltares:plotType') === 'bar') {
-            path.push(dim[0])
-          }
+          path.push(dim[0])
         }
       })
 
@@ -265,10 +260,10 @@ export default {
           return scenarioIndex.allowedValues.findIndex(object => {
             return object === summaryList.find(object => object.id === 'scenarios').chosenValue
           })
-        } else if (dim[1] === 'rp' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
-          return summaryList.find(object => object.id === 'rp').allowedValues.findIndex(object => {
-            return object === summaryList[summaryList.findIndex(object => object.id === 'rp')].chosenValue
-          })
+        // } else if (dim[1] === 'rp' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
+        //   return summaryList.find(object => object.id === 'rp').allowedValues.findIndex(object => {
+        //     return object === summaryList[summaryList.findIndex(object => object.id === 'rp')].chosenValue
+        //   })
         } else {
         return null
         }
@@ -291,7 +286,7 @@ export default {
                   data: [],
                   type: _.get(dataset, 'deltares:plotType'),
                   name: ''
-                } ];
+                } ]
               if (typeof data.data[0].length === 'undefined') {
                 // In case there is just 1 series, data.data.map(serie => does not seem to work. Resolved like this.
                 series[0].data = Array.from(data.data)
@@ -407,8 +402,9 @@ export default {
       const layer = matchLayerIdToProperties(dataset)
       //get info of the layer from stac catalog
       const activeVariableId = state.activeVariableId
-      if (typeof activeVariableId !== 'undefined' && activeVariableId !== null) {
-        layer.href = layer.href.replaceAll([ dataset.variables[0] + '-mapbox' ], [ activeVariableId + '-mapbox' ])
+      console.log(activeVariableId, dataset.variables[0])
+      if (typeof activeVariableId !== undefined && activeVariableId !== null && activeVariableId !== '') {
+        layer.href = layer.href.replaceAll(`${dataset.variables[0]}-mapbox`, `${activeVariableId}-mapbox`)
       }
       getCatalog(layer.href)
         .then(layerInfo => {

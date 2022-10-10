@@ -15,8 +15,9 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <div
-        class="flex-grow-1 py-3 scrollbar"
+        class="flex-grow-1 py-3"
         align-space-between
+        scrollbar
       >
         <v-expansion-panels
           v-if="selectedDatasets[0]"
@@ -36,9 +37,9 @@
               dark
             >
               <div>
-                <span style="margin-left: 50px;"/><b>Data set:</b> {{ data.id }}
+                <span style="margin-left: 50px;" /><b>Dataset:</b> {{ data.id }}
                 <h3 class="h4">
-                  <span style="margin-left: 50px;"/><b>Location id:</b> {{ $route.params.locationId }}
+                  <span style="margin-left: 50px;" /><b>Location id:</b> {{ $route.params.locationId }}
                 </h3>
               </div>
 
@@ -101,9 +102,9 @@
               dark
             >
               <div>
-                <span style="margin-left: 50px;"/><b>Data set:</b> {{ data.dataset }}
+                <span style="margin-left: 50px;" /><b>Dataset:</b> {{ data.dataset }}
                 <h3 class="h4">
-                  <span style="margin-left: 50px;"/><b>Location id:</b> {{ data.location }}
+                  <span style="margin-left: 50px;" /><b>Location id:</b> {{ data.location }}
                 </h3>
               </div>
 
@@ -140,7 +141,7 @@
           </v-expansion-panel>
         </v-expansion-panels>
         <template v-else>
-          <p>No data available.</p>
+          <p>Loading data...</p>
         </template>
       </div>
       <div class="flex-shrink-1 bodytext-xs disclaimer">
@@ -250,13 +251,13 @@
         deep: true
       },
       // Update figure when different variable is selected
-      '$store.state.map.activeVariableId': function() {
+      activeVariableId () {
         this.updateTimeseries()
         this.getBaseOption(this.$route.params.datasetIds)
       }
     },
     computed: {
-      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets' ]),
+      ...mapGetters([ 'selectedVectorData', 'selectedDatasets', 'lockedDatasets', 'activeVariableId' ]),
       datasets () {
         return this.selectedDatasets.map(set => {
           const theme = getStyle(getColors('coclico'))
@@ -279,7 +280,6 @@
     methods: {
       ...mapActions([ 'storeactiveDatasetIds', 'loadPointDataForLocation' ]),
       ...mapMutations([ 'setActiveDatasetIds', 'lockDataset', 'removeLockedDataset' ]),
-      ...mapGetters([ 'activeVariableId' ]),
       close () {
         this.$router.push({
           path: `/data/${this.$route.params.datasetIds}`,
@@ -340,5 +340,9 @@
 
 .disclaimer {
   text-align: center;
+}
+
+.close-button {
+  z-index: 100;
 }
 </style>

@@ -74,7 +74,7 @@ export default {
         }
      },
      "nameLocation":"center",
-     "name":"Wave energy flux [x1000 MW/m]",
+     "name":"Wave energy flux [MW/m]",
      "nameGap":45,
      "nameTextStyle":{
         "color":"white",
