@@ -8,7 +8,7 @@ export default {
      "textStyle":{
         "color":"#fff"
      },
-     "valueFormatter": (value) => `${value.toFixed(2)} m`
+     "valueFormatter": (value) => `${value} m`
   },
   "legend":{
      "top":"horizontal"

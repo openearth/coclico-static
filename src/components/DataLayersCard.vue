@@ -252,15 +252,18 @@
         const { id } = dataset
         const summ = _.get(dataset, 'summaries[0]', [])
         if (!_.get(summ, 'chosenValue')) {
+          // If there are no chosenValues, use the first one of the list of allowed values
           summ.chosenValue = _.get(summ, 'allowedValues[0]')
         }
 
         if (!this.selectedVariable) {
+          // If there is no selectedvariable yet, set the selectedvariable with the new id
           this.selectedVariable = dataset.variables[0]
           this.setActiveVariableId(dataset.variables[0])
         }
         this.setActiveSummary(dataset.summaries)
         if (id !== this.activeLocationDatasetId ) {
+          // If another value is selected, deselect the previous
           this.clearActiveDatasetIds()
           this.clearActiveVariableId()
           this.$router.push('/data')
@@ -273,8 +276,8 @@
         let path = `/data/${params.datasetIds}`
         // plot is updated because of change in route
         this.$router.push({ path, params })
-        this.loadLocationDataset(dataset)
         this.setActiveVariableId(dataset.variables[0])
+        this.loadLocationDataset(dataset)
       },
       toggleRasterDataset(dataset) {
         const layerId = _.get(this.activeRasterLayer, 'layerId')

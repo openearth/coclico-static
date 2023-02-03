@@ -122,11 +122,13 @@ export default {
         return children.forEach(child => {
           return getCatalog(child.href)
             .then(dataset => {
+              console.log(child)
               // Exclude template folder from selection (check with backend whether this should stay in STAC catalog)
               if (dataset.id !== 'template') {
                 console.log('logging dataset', dataset)
                 //All the below functionality will be added in a function at the end
-                const summaries = _.get(dataset, 'summaries')
+                const summaries = _.get(dataset, 'summaries') || _.get(datasets, 'summaries')
+                console.log(summaries)
                 const mappedSummaries = Object.keys(summaries).map(id => {
                   const summary = _.get(summaries, id)
                   return {
@@ -253,17 +255,19 @@ export default {
       const summaryList = _.get(state, 'activeSummary')
 
       let slice = dimensions.map(dim => {
+        console.log(dim[1])
         if (dim[1] === 'stations') {
           return _.get(state.selectedVectorData, 'properties.locationId', 0)
         } else if (dim[1] === 'nscenarios' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
           const scenarioIndex = summaryList.find(object => object.id === 'scenarios')
+          console.log(scenarioIndex, summaryList)
           return scenarioIndex.allowedValues.findIndex(object => {
             return object === summaryList.find(object => object.id === 'scenarios').chosenValue
           })
-        // } else if (dim[1] === 'rp' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
-        //   return summaryList.find(object => object.id === 'rp').allowedValues.findIndex(object => {
-        //     return object === summaryList[summaryList.findIndex(object => object.id === 'rp')].chosenValue
-        //   })
+        } else if (dim[1] === 'rp' && _.get(dataset, 'deltares:plotSeries') !== 'scenarios') {
+          return summaryList.find(object => object.id === 'rp').allowedValues.findIndex(object => {
+            return object === summaryList[summaryList.findIndex(object => object.id === 'rp')].chosenValue
+          })
         } else {
         return null
         }
@@ -287,6 +291,7 @@ export default {
                   type: _.get(dataset, 'deltares:plotType'),
                   name: ''
                 } ]
+              console.log(typeof data.data[0].length, typeof data.data[0].length === 'undefined')
               if (typeof data.data[0].length === 'undefined') {
                 // In case there is just 1 series, data.data.map(serie => does not seem to work. Resolved like this.
                 series[0].data = Array.from(data.data)
@@ -294,6 +299,7 @@ export default {
                 series[0].name = 'default'
               } else {
                 series = data.data.map(serie => {
+                  console.log( Array.from(serie))
                   return {
                     type: 'line',
                     data: Array.from(serie)
@@ -308,7 +314,6 @@ export default {
               const plotSeries = _.get(dataset, 'deltares:plotSeries')
 
               const dimensionNames = Object.entries(_.get(dataset, `cube:dimensions.${plotSeries}.values`))
-              console.log('check', dimensionNames)
               // Add function to resolve decadal window, if required by dataset
               if (cubeDimensions[xAxis].description === "decade window") {
 
@@ -325,24 +330,25 @@ export default {
               } else if (cubeDimensions[xAxis].description === "time") {
                 cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent
               }
-              console.log(series)
               for (var i = 0; i < series.length; i++) {
-                if (typeof dimensionNames[i][1] === 'number' && dimensionNames.length === series.length) {
-                  var dimensionName = String(dimensionNames[i][1])
-                  series[i].name = dimensionName
-                } else if (typeof dimensionNames[i][1] === 'string' && dimensionNames.length === series.length) {
-                  series[i].name = dimensionNames[i][1]
-                } else if (dimensionNames.length !== series.length) {
+                if (dimensionNames.length === series.length) {
+                  if (typeof dimensionNames[i][1] === 'number') {
+                    var dimensionName = String(dimensionNames[i][1])
+                    series[i].name = dimensionName
+                  } else if (typeof dimensionNames[i][1] === 'string') {
+                    series[i].name = dimensionNames[i][1]
+                  }
+                } else {
                   // update name based on selection from summary
                   var serieName = summaryList.map(summary => {
-                    if (summary.id === plotSeries) {
-                      serieName = summary.id + ' ' + String(summary.chosenValue)
-                      return serieName
+                    if (summary.id === plotSeries || summary.id == 'rp') {
+                      serieName = summary.id + ' ' + String(summary.allowedValues[i])
+                      series[i].name = serieName
                     }
                   })
-                  series[i].name = serieName[i]
                 }
               }
+              console.log(series,cubeDimensions[xAxis].values )
               commit('addDatasetPointData', {
                 id: datasetId,
                 name: datasetName,
@@ -403,7 +409,6 @@ export default {
       const layer = matchLayerIdToProperties(dataset)
       //get info of the layer from stac catalog
       const activeVariableId = state.activeVariableId
-      console.log(activeVariableId, dataset.variables[0])
       if (typeof activeVariableId !== undefined && activeVariableId !== null && activeVariableId !== '') {
         layer.href = layer.href.replaceAll(`${dataset.variables[0]}-mapbox`, `${activeVariableId}-mapbox`)
       }
