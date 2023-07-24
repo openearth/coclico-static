@@ -100,7 +100,7 @@
         console.log('loaded')
         if (!this.$route.params.locationId) {
           this.map.flyTo({
-            center: [5.2913, 48.1326],
+            center: [ 5.2913, 48.1326 ],
             zoom: 4
           })
         }

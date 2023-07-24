@@ -383,7 +383,7 @@ export default {
                 commit('addDatasetPointData', {
                   id: datasetId,
                   name: datasetName,
-                  series: [{ type: 'bar', data: series }],
+                  series: [ { type: 'bar', data: series } ],
                   xAxis: {
                     type: 'category',
                     data: xAxisdata,

@@ -324,15 +324,17 @@
   display: flex;
   flex-direction: column;
   top: var(--spacing-default);
-  right: var(--spacing-default);
+  left: var(--spacing-large);
   z-index: 5;
   width: 30vw;
   max-width: 400px;
   min-width: 250px;
   background-color: var(--v-textColor-base);
+  border-radius: 40px !important;
 }
-.data-layers-card__text {
+.data-layers-card__text{
   height: 90%;
+  overflow-y: auto;
 }
 .data-layers-card__group {
   height: 100%;
