@@ -20,6 +20,7 @@ export const coclico = {
   warning: '#f79502',
   white100: '#ffffff',
   green: '#068B95',
+  lightblue: '#b8e5f0',
 }
 
 
@@ -46,6 +47,18 @@ const context = {
     coclico: coclico.white100,
   },
   secondaryPressed: {
+    coclico: coclico.white100,
+  },
+  terciary: {
+    coclico: coclico.lightblue,
+  },
+  terciaryHover: {
+    coclico: coclico.white100,
+  },
+  terciaryFocus: {
+    coclico: coclico.white100,
+  },
+  terciaryPressed: {
     coclico: coclico.white100,
   },
   quiet: {

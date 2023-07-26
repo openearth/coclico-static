@@ -50,6 +50,48 @@
         </v-list-item-group>
       </v-list>
       <template #append>
+        <div class="mb-4">
+          <v-list
+            dense
+            class="pa-0"
+            color="terciary"
+          >
+            <v-list-item @click="openLandingPage">
+              <v-list-item-icon class="mr-6">
+                <v-icon color="black">mdi-information-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Landing page</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item-group active-class="active-theme">
+            <v-list-item @click="openStoriesPage">
+              <v-list-item-icon class="mr-6">
+                <v-icon color="black">mdi-account-details</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Stories</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+              <v-list-item @click="openPlatformPage">
+                <v-list-item-icon class="mr-6">
+                  <v-icon color="black"> mdi-database-search </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Platform</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+              <v-list-item @click="openWorkbenchPage">
+                <v-list-item-icon class="mr-6">
+                  <v-icon color="black"> mdi-hammer </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title data-v-step="6">Workbench</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+          </v-list>
+        </div>
         <div>
           <v-list
             dense
@@ -58,7 +100,7 @@
           >
             <v-list-item @click="$emit('toggle-tour')">
               <v-list-item-icon class="mr-6">
-                <v-icon>mdi-flag-outline</v-icon>
+                <v-icon color="black">mdi-flag-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title>Tour</v-list-item-title>
@@ -106,6 +148,20 @@
         drawer: true,
         mini: true,
         activeTheme: null
+      }
+    },
+    methods: {
+      openLandingPage() {
+        window.open('https://coclicoservices.eu', '_blank')
+      },
+      openWorkbenchPage() {
+        window.open('https://github.com/openearth/coclico-workbench', '_blank')
+      },
+      openStoriesPage() {
+        this.$router.push({ name: 'stories' })
+      },
+      openPlatformPage() {
+        this.$router.push({ name: 'data' })
       }
     }
   }
