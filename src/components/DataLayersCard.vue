@@ -330,7 +330,7 @@
   max-width: 400px;
   min-width: 250px;
   background-color: var(--v-textColor-base);
-  border-radius: 40px !important;
+  border-radius: 28px !important;
 }
 .data-layers-card__text{
   height: 90%;

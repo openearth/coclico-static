@@ -3,12 +3,14 @@
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant.sync="mini"
+      mini-variant-width="100"
       stateless
       fixed
       expand-on-hover
       color="background"
+      floating
     >
-      <v-list
+      <v-list 
         dense
         class="pa-0"
         dark
@@ -37,7 +39,7 @@
             v-for="item in getThemes" 
             :key="item"
           >
-            <v-list-item-icon class="mr-6">
+            <v-list-item-icon>
               <custom-icon
                 :name="item"
                 icon-folder="themes"
@@ -57,7 +59,7 @@
             color="terciary"
           >
             <v-list-item @click="openLandingPage">
-              <v-list-item-icon class="mr-6">
+              <v-list-item-icon>
                 <v-icon color="black">mdi-information-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
@@ -66,7 +68,7 @@
             </v-list-item>
             <v-list-item-group active-class="active-theme">
             <v-list-item @click="openStoriesPage">
-              <v-list-item-icon class="mr-6">
+              <v-list-item-icon>
                 <v-icon color="black">mdi-account-details</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
@@ -74,7 +76,7 @@
               </v-list-item-content>
             </v-list-item>
               <v-list-item @click="openPlatformPage">
-                <v-list-item-icon class="mr-6">
+                <v-list-item-icon>
                   <v-icon color="black"> mdi-database-search </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
@@ -83,11 +85,11 @@
               </v-list-item>
             </v-list-item-group>
               <v-list-item @click="openWorkbenchPage">
-                <v-list-item-icon class="mr-6">
+                <v-list-item-icon>
                   <v-icon color="black"> mdi-hammer </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title data-v-step="6">Workbench</v-list-item-title>
+                  <v-list-item-title>Workbench</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
           </v-list>
@@ -99,7 +101,7 @@
             color="secondary"
           >
             <v-list-item @click="$emit('toggle-tour')">
-              <v-list-item-icon class="mr-6">
+              <v-list-item-icon>
                 <v-icon color="black">mdi-flag-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
@@ -108,7 +110,7 @@
             </v-list-item>
             <v-list-item-group active-class="active-theme">
               <v-list-item @click="$emit('toggle-about')">
-                <v-list-item-icon class="mr-6">
+                <v-list-item-icon>
                   <custom-icon name="info" />
                 </v-list-item-icon>
                 <v-list-item-content>
@@ -116,7 +118,7 @@
                 </v-list-item-content>
               </v-list-item>
               <v-list-item @click="$emit('toggle-account')">
-                <v-list-item-icon class="mr-6">
+                <v-list-item-icon>
                   <custom-icon name="account" />
                 </v-list-item-icon>
                 <v-list-item-content>
@@ -167,3 +169,11 @@
   }
 </script>
 
+<style>
+/* Custom CSS to add 10-pixel offset to the left */
+.v-navigation-drawer {
+  margin-top: 10px;
+  margin-left: 10px;
+  max-height: calc(100% - 20px)
+}
+</style>
