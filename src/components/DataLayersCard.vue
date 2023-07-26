@@ -331,6 +331,7 @@
   min-width: 250px;
   background-color: var(--v-textColor-base);
   border-radius: 28px !important;
+  box-shadow: none !important;
 }
 .data-layers-card__text{
   height: 90%;
