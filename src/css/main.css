@@ -3,8 +3,8 @@ html {
 }
 
 :root {
-  --spacing-default: 1.5rem;
-  --spacing-large: calc(var(--spacing-default) * 12);
+  --spacing-default: 2rem;
+  --spacing-large: calc(var(--spacing-default) * 10);
   --spacing-small: 1rem;
 
   --icon-size: 30px;

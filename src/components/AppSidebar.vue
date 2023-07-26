@@ -7,7 +7,7 @@
       stateless
       fixed
       expand-on-hover
-      color="background"
+      color="white"
       floating
     >
       <v-list 
@@ -24,7 +24,9 @@
           <v-list-item-avatar>
             <custom-icon name="coclico" />
           </v-list-item-avatar>
-          <v-list-item-content>
+          <v-list-item-content
+            style="color: black"
+          >
             <v-list-item-title>
               CoCliCo
             </v-list-item-title>
@@ -36,6 +38,8 @@
           active-class="active-theme"
         >
           <v-list-item
+            class="list-elements"
+            style="color: black"
             v-for="item in getThemes" 
             :key="item"
           >
@@ -170,10 +174,13 @@
 </script>
 
 <style>
-/* Custom CSS to add 10-pixel offset to the left */
 .v-navigation-drawer {
-  margin-top: 10px;
-  margin-left: 10px;
-  max-height: calc(100% - 20px)
+  margin-top: var(--spacing-default);
+  margin-left: var(--spacing-default);
+  max-height: calc(100% - 2*(var(--spacing-default)))
+}
+
+.list-elements {
+  margin-top: 40px;
 }
 </style>
