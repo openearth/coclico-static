@@ -1,6 +1,6 @@
 <template>
   <div class="data-layers">
-    <data-layers-card :datasets="availableDatasets" />
+    <data-layers-card :datasets="datasetsInActiveTheme" />
     <v-mapbox
       id="map"
       ref="map"
@@ -92,7 +92,7 @@
       }
     },
     computed: {
-      ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'activeRasterLayer', 'selectedVectorData' ]),
+      ...mapGetters([ 'datasetsInActiveTheme', 'availableDatasets', 'activeLocationLayer', 'activeRasterLayer', 'selectedVectorData' ]),
     },
     mounted () {
       this.map = this.$refs.map.map

@@ -1,7 +1,6 @@
 <template>
   <v-card
     raised
-    max-height="80vh"
     class="pa-0 data-layers-card"
     data-v-step="3"
   >
@@ -332,6 +331,8 @@
   background-color: var(--v-textColor-base);
   border-radius: 28px !important;
   box-shadow: none !important;
+  height: 100%;
+  max-height: calc(100% - 2*(var(--spacing-default)));
 }
 .data-layers-card__text{
   height: 90%;
@@ -374,6 +375,5 @@
 .v-input--selection-controls__input .v-icon {
   color: var(--v-primary-darken2);
 }
-
 
 </style>

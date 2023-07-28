@@ -1,14 +1,14 @@
 <template>
-  <v-card color="background">
     <v-navigation-drawer
       v-model="drawer"
-      :mini-variant.sync="mini"
+      mini-variant
       mini-variant-width="100"
+      expand-on-hover
       stateless
       fixed
-      expand-on-hover
       color="white"
       floating
+      class="app-sidebar"
     >
       <v-list 
         dense
@@ -42,6 +42,8 @@
             style="color: black"
             v-for="item in getThemes" 
             :key="item"
+            @click="toggleTheme(item)"
+            :active="isActive(item)"
           >
             <v-list-item-icon>
               <custom-icon
@@ -56,91 +58,56 @@
         </v-list-item-group>
       </v-list>
       <template #append>
-        <div class="mb-4">
+        <div>
           <v-list
             dense
             class="pa-0"
             color="terciary"
           >
             <v-list-item @click="openLandingPage">
-              <v-list-item-icon>
-                <v-icon color="black">mdi-information-outline</v-icon>
-              </v-list-item-icon>
+              <div class="extra-list-item">
+                  <v-icon color="black">mdi-information-outline</v-icon>
+                  <v-list-item-subtitle class="extra-list-item-text">LANDING PAGE</v-list-item-subtitle>
+              </div>
               <v-list-item-content>
                 <v-list-item-title>Landing page</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item-group active-class="active-theme">
             <v-list-item @click="openStoriesPage">
-              <v-list-item-icon>
+              <div class="extra-list-item">
                 <v-icon color="black">mdi-account-details</v-icon>
-              </v-list-item-icon>
+                <v-list-item-subtitle class="extra-list-item-text">STORIES</v-list-item-subtitle>
+              </div>
               <v-list-item-content>
                 <v-list-item-title>Stories</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
               <v-list-item @click="openPlatformPage">
-                <v-list-item-icon>
+                <div class="extra-list-item">
                   <v-icon color="black"> mdi-database-search </v-icon>
-                </v-list-item-icon>
+                  <v-list-item-subtitle class="extra-list-item-text">PLATFORM</v-list-item-subtitle>
+                </div>
                 <v-list-item-content>
                   <v-list-item-title>Platform</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-            </v-list-item-group>
               <v-list-item @click="openWorkbenchPage">
-                <v-list-item-icon>
+                <div class="extra-list-item-container">
                   <v-icon color="black"> mdi-hammer </v-icon>
-                </v-list-item-icon>
+                  <v-list-item-subtitle class="extra-list-item-text">WORKBENCH</v-list-item-subtitle>
+                </div>
                 <v-list-item-content>
                   <v-list-item-title>Workbench</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
           </v-list>
         </div>
-        <div>
-          <v-list
-            dense
-            class="pa-0"
-            color="secondary"
-          >
-            <v-list-item @click="$emit('toggle-tour')">
-              <v-list-item-icon>
-                <v-icon color="black">mdi-flag-outline</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Tour</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item-group active-class="active-theme">
-              <v-list-item @click="$emit('toggle-about')">
-                <v-list-item-icon>
-                  <custom-icon name="info" />
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>About</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item @click="$emit('toggle-account')">
-                <v-list-item-icon>
-                  <custom-icon name="account" />
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title data-v-step="6">
-                    Account
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
-        </div>
       </template>
     </v-navigation-drawer>
-  </v-card>
 </template>
 <script>
   import CustomIcon from '@/components/CustomIcon'
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapMutations } from 'vuex'
 
   export default {
     components: {
@@ -157,6 +124,7 @@
       }
     },
     methods: {
+      ...mapMutations(['toggleActiveTheme']),
       openLandingPage() {
         window.open('https://coclicoservices.eu', '_blank')
       },
@@ -168,19 +136,55 @@
       },
       openPlatformPage() {
         this.$router.push({ name: 'data' })
-      }
+      },
+      toggleTheme (id) {
+        console.log('try change theme')
+        this.toggleActiveTheme(id)
+
+        if (this.activeTheme === id) {
+          this.activeTheme = null
+        } else {
+          this.activeTheme = id
+        }
+
+        this.$emit('change-theme')
+      },
+      isActive (id) {
+        return this.activeTheme === id
+      },
     }
   }
 </script>
 
 <style>
-.v-navigation-drawer {
+.app-sidebar {
   margin-top: var(--spacing-default);
   margin-left: var(--spacing-default);
-  max-height: calc(100% - 2*(var(--spacing-default)))
+  height: 100%;
+  max-height: calc(100% - 2*(var(--spacing-default)));
 }
 
 .list-elements {
-  margin-top: 40px;
+  margin-top: 45px;
+}
+
+.extra-list-item {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.extra-list-item-container {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.extra-list-item-text {
+  font-size: 10x !important;
+  margin-top: 4px;
 }
 </style>

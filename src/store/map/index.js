@@ -24,7 +24,8 @@ export default {
     activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
     lockedDatasets: [],
     activeSummary: [],
-    activeVariableId: ""
+    activeVariableId: "",
+    activeTheme: ''
   }),
 
   getters: {
@@ -61,6 +62,20 @@ export default {
     activeSummary (state) {
       return state.activeSummary
     },
+    datasetsInActiveTheme (state) {
+      const sets = _.values(state.datasets)
+      const activeSets = {}
+      if (state.activeTheme !== '') {
+        sets.forEach(set => {
+          if (set.keywords.includes(state.activeTheme)) {
+            activeSets[set.id] = set
+          }
+        })
+        return activeSets
+      } else {
+        return state.datasets
+      }
+    }
   },
   mutations: {
     setActiveLocationLayer(state, layer) {
@@ -106,6 +121,13 @@ export default {
     },
     setActiveSummary (state, summary) {
       Vue.set(state, 'activeSummary', summary)
+    },
+    toggleActiveTheme (state, id) {
+      if (state.activeTheme === id) {
+        state.activeTheme = ''
+      } else {
+        state.activeTheme = id
+      }
     },
   },
   actions: {
