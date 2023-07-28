@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <!-- <app-header /> -->
-    <app-sidebar @toggle-about="togglePanel('about')" style="border-radius: 28px" />
+    <app-sidebar @toggle-about="togglePanel('about')" style="border-radius: 28px 0px 0px 28px" />
     <v-main>
       <router-view />
       <about-panel

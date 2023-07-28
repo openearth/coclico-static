@@ -323,13 +323,13 @@
   display: flex;
   flex-direction: column;
   top: var(--spacing-default);
-  left: var(--spacing-large);
+  left: calc(var(--spacing-default) + 200px);
   z-index: 5;
   width: 30vw;
   max-width: 400px;
   min-width: 250px;
   background-color: var(--v-textColor-base);
-  border-radius: 28px !important;
+  border-radius: 0px 28px 28px 0px !important;
   box-shadow: none !important;
   height: 100%;
   max-height: calc(100% - 2*(var(--spacing-default)));

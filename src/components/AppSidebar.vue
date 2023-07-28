@@ -2,8 +2,7 @@
     <v-navigation-drawer
       v-model="drawer"
       mini-variant
-      mini-variant-width="100"
-      expand-on-hover
+      mini-variant-width="200"
       stateless
       fixed
       color="white"
@@ -45,12 +44,16 @@
             @click="toggleTheme(item)"
             :active="isActive(item)"
           >
+          <div class="list-item">
             <v-list-item-icon>
               <custom-icon
+                class="ml-8"
                 :name="item"
                 icon-folder="themes"
               />
             </v-list-item-icon>
+            <v-list-item-title>{{ item }}</v-list-item-title>
+          </div>
             <v-list-item-content>
               <v-list-item-title>{{ item }}</v-list-item-title>
             </v-list-item-content>
@@ -138,7 +141,6 @@
         this.$router.push({ name: 'data' })
       },
       toggleTheme (id) {
-        console.log('try change theme')
         this.toggleActiveTheme(id)
 
         if (this.activeTheme === id) {
@@ -165,7 +167,13 @@
 }
 
 .list-elements {
-  margin-top: 45px;
+  margin-top: 20px;
+}
+
+.list-item {
+  display: grid;
+  place-items: center;
+  text-align: center;
 }
 
 .extra-list-item {
@@ -184,7 +192,7 @@
 }
 
 .extra-list-item-text {
-  font-size: 10x !important;
+  font-size: 12px !important;
   margin-top: 4px;
 }
 </style>
