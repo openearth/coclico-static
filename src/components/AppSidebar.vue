@@ -8,6 +8,7 @@
       color="white"
       floating
       class="app-sidebar"
+      style="border-right: 1px solid rgba(0, 0, 0, 0.12) !important"
     >
       <v-list 
         dense
@@ -60,8 +61,46 @@
           </v-list-item>
         </v-list-item-group>
       </v-list>
+      <v-row
+        class="mt-10"
+        :align="align"
+        no-gutters
+      >
+        <v-col>
+          <div class="list-item">
+            <v-btn
+              icon
+              color="black"
+            >
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+            <v-subtitle
+              class="text-caption"
+            > Search </v-subtitle>
+          </div>
+        </v-col>
+        <v-col>
+          <div class="list-item">
+            <v-btn
+              icon
+              color="black"
+              @click="expandMenu = !expandMenu"
+            >
+              <v-icon>mdi-dots-horizontal</v-icon>
+            </v-btn>
+            <v-subtitle
+              v-show="expandMenu"
+              class="text-caption"
+            > Less </v-subtitle>
+            <v-subtitle
+              v-show="!expandMenu"
+              class="text-caption"
+            > More </v-subtitle>
+          </div>
+        </v-col>
+      </v-row>
       <template #append>
-        <div>
+        <div v-show="expandMenu">
           <v-list
             dense
             class="pa-0"
@@ -69,7 +108,7 @@
           >
             <v-list-item @click="openLandingPage">
               <div class="extra-list-item">
-                  <v-icon color="black">mdi-information-outline</v-icon>
+                  <v-icon color="black" size="18px">mdi-information-outline</v-icon>
                   <v-list-item-subtitle class="extra-list-item-text">LANDING PAGE</v-list-item-subtitle>
               </div>
               <v-list-item-content>
@@ -78,7 +117,7 @@
             </v-list-item>
             <v-list-item @click="openStoriesPage">
               <div class="extra-list-item">
-                <v-icon color="black">mdi-account-details</v-icon>
+                <v-icon color="black" size="18px">mdi-account-details</v-icon>
                 <v-list-item-subtitle class="extra-list-item-text">STORIES</v-list-item-subtitle>
               </div>
               <v-list-item-content>
@@ -87,7 +126,7 @@
             </v-list-item>
               <v-list-item @click="openPlatformPage">
                 <div class="extra-list-item">
-                  <v-icon color="black"> mdi-database-search </v-icon>
+                  <v-icon color="black" size="18px"> mdi-database-search </v-icon>
                   <v-list-item-subtitle class="extra-list-item-text">PLATFORM</v-list-item-subtitle>
                 </div>
                 <v-list-item-content>
@@ -96,7 +135,7 @@
               </v-list-item>
               <v-list-item @click="openWorkbenchPage">
                 <div class="extra-list-item-container">
-                  <v-icon color="black"> mdi-hammer </v-icon>
+                  <v-icon color="black" size="18px"> mdi-hammer </v-icon>
                   <v-list-item-subtitle class="extra-list-item-text">WORKBENCH</v-list-item-subtitle>
                 </div>
                 <v-list-item-content>
@@ -123,7 +162,8 @@
       return { 
         drawer: true,
         mini: true,
-        activeTheme: null
+        activeTheme: null,
+        expandMenu: false
       }
     },
     methods: {
@@ -180,19 +220,19 @@
   display: grid;
   place-items: center;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 9px;
 }
 
 .extra-list-item-container {
   display: grid;
   place-items: center;
   text-align: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 9px;
+  margin-bottom: 9px;
 }
 
 .extra-list-item-text {
-  font-size: 12px !important;
-  margin-top: 4px;
+  font-size: 8px !important;
+  margin-top: 3px;
 }
 </style>
