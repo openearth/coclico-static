@@ -3,6 +3,7 @@
     class="pl-16"
     permanent
     absolute
+    right
     width="40vw"
     color="background"
   >
