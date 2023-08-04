@@ -5,7 +5,7 @@
     data-v-step="3"
   >
     <v-card-title class="h3">
-      All datasets
+      {{ themeName }}
     </v-card-title>
     <v-card-text
       class="scrollbar data-layers-card__text
@@ -206,7 +206,11 @@
       LayerLegend
     },
     computed: {
-      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId' ]),
+      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId', 'getActiveVectorDataIds', 'getActiveTheme' ]),
+      ...mapMutations('setActiveVectorDataIds'),
+      themeName () {
+        return this.getActiveTheme || 'All Datasets'
+      },
       activeLocationDatasetId: {
         get() {
           return this.activeDatasetId
@@ -245,7 +249,7 @@
       }
     },
     methods: {
-      ...mapMutations([ 'setActiveSummary' ]),
+      ...mapMutations([ 'setActiveSummary', 'setActiveVectorDataIds' ]),
       ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId' ]),
       toggleLocationDataset(dataset) {
         const { id } = dataset

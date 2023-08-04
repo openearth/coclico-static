@@ -25,7 +25,8 @@ export default {
     lockedDatasets: [],
     activeSummary: [],
     activeVariableId: "",
-    activeTheme: ''
+    activeTheme: '',
+    activeVectorDataIds: ''
   }),
 
   getters: {
@@ -36,6 +37,9 @@ export default {
       return state.activeDatasetIds.map(datasetId => {
         return _.get(state.selectedVectorData, `data.${datasetId}`)
       })
+    },
+    getActiveTheme (state) {
+      return state.activeTheme
     },
     //active location layer on map
     activeLocationLayer(state) {
@@ -75,7 +79,10 @@ export default {
       } else {
         return state.datasets
       }
-    }
+    },
+    getActiveVectorDataIds (state) {
+      return state.activeVectorDataIds
+    },
   },
   mutations: {
     setActiveLocationLayer(state, layer) {
@@ -128,6 +135,9 @@ export default {
       } else {
         state.activeTheme = id
       }
+    },
+    setActiveVectorDataIds (state, id) {
+      state.activeVectorDataIds = id
     },
   },
   actions: {
