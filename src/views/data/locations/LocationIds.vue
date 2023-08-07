@@ -1,11 +1,8 @@
 <template>
-  <v-navigation-drawer
-    class="pl-16"
-    permanent
-    absolute
-    right
-    width="40vw"
-    color="background"
+  <v-card
+    class="location-ids"
+    color="white"
+    flat
   >
     <v-container class="graph-menu d-flex flex-column">
       <v-btn
@@ -25,7 +22,7 @@
           flat
           multiple
           v-model="expandedDatasets"
-          color="background"
+          color="white"
         >
           <v-expansion-panel
             v-for="data in datasets"
@@ -34,7 +31,7 @@
           >
             <v-expansion-panel-header
               class="h4"
-              color="background"
+              color="white"
               dark
             >
               <div>
@@ -77,7 +74,7 @@
                 </v-tooltip>
               </div>
             </v-expansion-panel-header>
-            <v-expansion-panel-content color="background">
+            <v-expansion-panel-content color="white">
               <v-container class="pa-0">
                 <v-col
                   cols="12"
@@ -99,7 +96,7 @@
           >
             <v-expansion-panel-header
               class="h4"
-              color="background"
+              color="white"
               dark
             >
               <div>
@@ -125,7 +122,7 @@
                 </v-tooltip>
               </div>
             </v-expansion-panel-header>
-            <v-expansion-panel-content color="background">
+            <v-expansion-panel-content color="white">
               <v-container class="pa-0">
                 <v-col
                   cols="12"
@@ -150,7 +147,7 @@
         dataset descriptions for more information.
       </div>
     </v-container>
-  </v-navigation-drawer>
+  </v-card>
 </template>
 
 <script>
@@ -206,26 +203,26 @@
 
 
   const getStyle = (colors = {}) => ({
-    backgroundColor: colors.background,
+    backgroundColor: colors.white,
     textStyle: {
-      color: colors.textColor
+      color: colors.black100
     },
     xAxis: {
       axisLine: {
         lineStyle: {
-          color: colors.textColor
+          color: colors.black100
         }
       }
     },
     yAxis: {
       axisLine: {
         lineStyle: {
-          color: colors.textColor
+          color: colors.black100
         }
       },
       splitLine: {
         lineStyle: {
-          color: colors.formBase
+          color: colors.black100
         }
       }
     }
@@ -311,6 +308,16 @@
 </script>
 
 <style>
+.location-ids {
+  position: fixed;
+  top: var(--spacing-default);
+  right: var(--spacing-default);
+  max-height: calc(100% - 2*(var(--spacing-default)));
+  width: 30vw;
+  max-width: 500px;
+  border-radius: 28px !important;
+}
+
 .graph-menu {
   height: 100%;
 }

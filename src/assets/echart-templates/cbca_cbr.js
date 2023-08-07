@@ -39,7 +39,7 @@ export default {
    "nameLocation":"center",
    "nameGap":30,
    "nameTextStyle":{
-      "color":"white",
+      "color":"black",
       "fontSize":14,
       "fontFamily":"Helvetica"
    },
@@ -55,7 +55,7 @@ export default {
       "nameLocation":"center",
       "nameGap":45,
       "nameTextStyle":{
-         "color":"white",
+         "color":"black",
          "fontSize":14,
          "fontFamily":"Helvetica"
       },

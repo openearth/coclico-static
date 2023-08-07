@@ -39,7 +39,7 @@ export default {
      "nameGap":20,
      "name":"-",
      "nameTextStyle":{
-        "color":"white",
+        "color":"black",
         "fontSize":14,
         "fontFamily":"Helvetica"
      }
@@ -53,7 +53,7 @@ export default {
      "name":"-",
      "nameGap":30,
      "nameTextStyle":{
-        "color":"white",
+        "color":"black",
         "fontSize":14,
         "fontFamily":"Helvetica"
      }

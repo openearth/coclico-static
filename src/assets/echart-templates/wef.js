@@ -58,7 +58,7 @@ export default {
      "nameGap":30,
      "name":"Time [years]",
      "nameTextStyle":{
-        "color":"white",
+        "color":"black",
         "fontSize":14,
         "fontFamily":"Helvetica"
      }
@@ -77,7 +77,7 @@ export default {
      "name":"Wave energy flux [MW/m]",
      "nameGap":45,
      "nameTextStyle":{
-        "color":"white",
+        "color":"black",
         "fontSize":14,
         "fontFamily":"Helvetica"
      }
