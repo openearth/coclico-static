@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <!-- <app-header /> -->
-    <app-sidebar @toggle-about="togglePanel('about')" style="border-radius: 28px 0px 0px 28px" />
+    <app-sidebar @toggle-about="togglePanel('about')" :style="sidebarStyle" />
     <v-main>
       <router-view />
       <about-panel
@@ -19,6 +19,7 @@
   import AppSidebar from './components/AppSidebar'
   import LegalDialog from './components/LegalDialog'
   import { mapActions } from 'vuex'
+  import { mapGetters } from 'vuex'
 
   export default {
   
@@ -44,6 +45,15 @@
     },
     mounted() { 
       this.loadDatasets()
+    },
+    computed: {
+      ...mapGetters(['showLayersCard']),
+      
+      sidebarStyle() {
+        return {
+          borderRadius: this.showLayersCard ? '28px 0px 0px 28px' : '28px 28px 28px 28px'
+        }
+      }
     }
   };
 </script>
