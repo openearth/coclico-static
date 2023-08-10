@@ -45,8 +45,8 @@
 }
 
 .icon--large {
-  width: 2rem;
-  height: 2rem;
+  width: 8rem;
+  height: 4rem;
 }
 
 .icon span {

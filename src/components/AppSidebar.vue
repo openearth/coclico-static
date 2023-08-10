@@ -21,9 +21,7 @@
           data-v-step="1"
         >
           <!-- TODO: add routing -->
-          <v-list-item-avatar>
-            <custom-icon name="coclico" />
-          </v-list-item-avatar>
+          <custom-icon name="coclico-full" class="icon--large" />
           <v-list-item-content
             style="color: black"
           >
