@@ -26,10 +26,14 @@ export default {
     activeSummary: [],
     activeVariableId: "",
     activeTheme: '',
-    activeVectorDataIds: ''
+    activeVectorDataIds: '',
+    showLayersCard: true
   }),
 
   getters: {
+    showLayersCard(state) {
+      return state.showLayersCard
+    },
     availableDatasets(state) {
       return state.datasets
     },
@@ -85,6 +89,12 @@ export default {
     },
   },
   mutations: {
+    setShowLayersCardOpen(state) {
+      state.showLayersCard = true
+    },
+    setShowLayersCardClose(state) {
+      state.showLayersCard = false
+    },
     setActiveLocationLayer(state, layer) {
       state.activeLocationLayer = layer
     },

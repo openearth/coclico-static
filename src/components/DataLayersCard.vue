@@ -3,10 +3,18 @@
     raised
     class="pa-0 data-layers-card"
     data-v-step="3"
+    v-show="showLayersCard"
   >
     <v-card-title class="h3">
       {{ themeName }}
     </v-card-title>
+    <v-btn
+        icon
+        class="close-button"
+        @click="closeLayersCard"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
     <v-card-text
       class="scrollbar data-layers-card__text
       px-0
@@ -206,7 +214,7 @@
       LayerLegend
     },
     computed: {
-      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId', 'getActiveVectorDataIds', 'getActiveTheme' ]),
+      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId', 'getActiveVectorDataIds', 'getActiveTheme', 'showLayersCard' ]),
       ...mapMutations('setActiveVectorDataIds'),
       themeName () {
         return this.getActiveTheme || 'All Datasets'
@@ -239,7 +247,8 @@
     data () {
       return {
         hoverId: null,
-        activeRasterDatasetId: null
+        activeRasterDatasetId: null,
+        // showLayersCard: true
       }
     },
     mounted () {
@@ -249,8 +258,11 @@
       }
     },
     methods: {
-      ...mapMutations([ 'setActiveSummary', 'setActiveVectorDataIds' ]),
+      ...mapMutations([ 'setActiveSummary', 'setActiveVectorDataIds', 'setShowLayersCardClose' ]),
       ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId' ]),
+      closeLayersCard (event) {
+        this.setShowLayersCardClose()
+      },
       toggleLocationDataset(dataset) {
         const { id } = dataset
         const summ = _.get(dataset, 'summaries[0]', [])
@@ -380,4 +392,7 @@
   color: var(--v-primary-darken2);
 }
 
+.close-button {
+  z-index: 100;
+}
 </style>

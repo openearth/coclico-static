@@ -40,7 +40,7 @@
             style="color: black"
             v-for="item in getThemes" 
             :key="item"
-            @click="toggleTheme(item)"
+            @click="toggleTheme(item); openLayersCard()" 
             :active="isActive(item)"
           >
           <div class="list-item">
@@ -165,7 +165,10 @@
       }
     },
     methods: {
-      ...mapMutations(['toggleActiveTheme']),
+      ...mapMutations(['toggleActiveTheme', 'setShowLayersCardOpen' ]),
+      openLayersCard (event) {
+        this.setShowLayersCardOpen()
+      },
       openLandingPage() {
         window.open('https://coclicoservices.eu', '_blank')
       },
@@ -173,7 +176,7 @@
         window.open('https://github.com/openearth/coclico-workbench', '_blank')
       },
       openStoriesPage() {
-        this.$router.push({ name: 'stories' })
+        window.open(this.$router.resolve({ name: 'stories' }).href, '_blank');
       },
       openPlatformPage() {
         this.$router.push({ name: 'data' })
