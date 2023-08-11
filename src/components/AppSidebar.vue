@@ -9,6 +9,7 @@
       floating
       class="app-sidebar"
       style="border-right: 1px solid rgba(0, 0, 0, 0.12) !important"
+      v-show="!shouldHideDrawer"
     >
       <v-list 
         dense
@@ -161,7 +162,8 @@
         drawer: true,
         mini: true,
         activeTheme: null,
-        expandMenu: false
+        expandMenu: false,
+        shouldHideDrawer: false
       }
     },
     methods: {
@@ -194,6 +196,17 @@
       },
       isActive (id) {
         return this.activeTheme === id
+      },
+      checkRoute() {
+        this.shouldHideDrawer = this.$route.path.endsWith('/stories');
+      },
+    },
+    created() {
+      this.checkRoute();
+    },
+    watch: {
+      $route(to) {
+        this.checkRoute();
       },
     }
   }
