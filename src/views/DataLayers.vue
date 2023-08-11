@@ -8,6 +8,7 @@
       :preserve-drawing-buffer="true"
       map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
     >
+      <v-mapbox-navigation-control :position="'top-right'" />
       <v-mapbox-layer
         v-if="activeLocationLayer"
         :key="activeLocationLayer.id"

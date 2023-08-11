@@ -311,7 +311,7 @@
 .location-ids {
   position: fixed;
   top: var(--spacing-default);
-  right: var(--spacing-default);
+  right: calc(1.5*(var(--spacing-default)));
   max-height: calc(100% - 2*(var(--spacing-default)));
   width: 30vw;
   max-width: 500px;
