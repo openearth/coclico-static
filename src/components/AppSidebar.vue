@@ -123,10 +123,10 @@
                 <v-list-item-title>Stories</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-              <v-list-item @click="openPlatformPage">
+              <v-list-item @click="openCatalogPage">
                 <div class="extra-list-item">
                   <v-icon color="black" size="18px"> mdi-database-search </v-icon>
-                  <v-list-item-subtitle class="extra-list-item-text">PLATFORM</v-list-item-subtitle>
+                  <v-list-item-subtitle class="extra-list-item-text">CATALOG</v-list-item-subtitle>
                 </div>
                 <v-list-item-content>
                   <v-list-item-title>Platform</v-list-item-title>
@@ -180,8 +180,8 @@
       openStoriesPage() {
         window.open(this.$router.resolve({ name: 'stories' }).href, '_blank');
       },
-      openPlatformPage() {
-        this.$router.push({ name: 'data' })
+      openCatalogPage() {
+        window.open('https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/dgds-data-public/coclico/coclico-stac/catalog.json?.language=en', '_blank')
       },
       toggleTheme (id) {
         this.toggleActiveTheme(id)
