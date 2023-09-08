@@ -108,7 +108,7 @@
             <v-list-item @click="openLandingPage">
               <div class="extra-list-item">
                   <v-icon color="black" size="18px">mdi-information-outline</v-icon>
-                  <v-list-item-subtitle class="extra-list-item-text">LANDING PAGE</v-list-item-subtitle>
+                  <v-list-item-subtitle class="extra-list-item-text">WEBSITE</v-list-item-subtitle>
               </div>
               <v-list-item-content>
                 <v-list-item-title>Landing page</v-list-item-title>
@@ -126,7 +126,7 @@
               <v-list-item @click="openCatalogPage">
                 <div class="extra-list-item">
                   <v-icon color="black" size="18px"> mdi-database-search </v-icon>
-                  <v-list-item-subtitle class="extra-list-item-text">CATALOG</v-list-item-subtitle>
+                  <v-list-item-subtitle class="extra-list-item-text">DATA CATALOG</v-list-item-subtitle>
                 </div>
                 <v-list-item-content>
                   <v-list-item-title>Platform</v-list-item-title>
