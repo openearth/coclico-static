@@ -1,13 +1,20 @@
 <template>
   <v-card
     raised
-    max-height="80vh"
     class="pa-0 data-layers-card"
     data-v-step="3"
+    v-show="showLayersCard"
   >
     <v-card-title class="h3">
-      All datasets
+      {{ themeName }}
     </v-card-title>
+    <v-btn
+        icon
+        class="close-button"
+        @click="closeLayersCard"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
     <v-card-text
       class="scrollbar data-layers-card__text
       px-0
@@ -207,7 +214,11 @@
       LayerLegend
     },
     computed: {
-      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId' ]),
+      ...mapGetters([ 'activeDatasetId', 'activeRasterLayer', 'activeVariableId', 'getActiveVectorDataIds', 'getActiveTheme', 'showLayersCard' ]),
+      ...mapMutations('setActiveVectorDataIds'),
+      themeName () {
+        return this.getActiveTheme || 'All Datasets'
+      },
       activeLocationDatasetId: {
         get() {
           return this.activeDatasetId
@@ -236,7 +247,8 @@
     data () {
       return {
         hoverId: null,
-        activeRasterDatasetId: null
+        activeRasterDatasetId: null,
+        // showLayersCard: true
       }
     },
     mounted () {
@@ -246,8 +258,11 @@
       }
     },
     methods: {
-      ...mapMutations([ 'setActiveSummary' ]),
+      ...mapMutations([ 'setActiveSummary', 'setActiveVectorDataIds', 'setShowLayersCardClose' ]),
       ...mapActions ([ 'loadLocationDataset', 'loadRasterDataset','clearActiveDatasetIds', 'resetActiveLocationLayer', 'resetActiveRasterLayer','setActiveDatasetId' ,'setActiveVariableId', 'clearActiveVariableId' ]),
+      closeLayersCard (event) {
+        this.setShowLayersCardClose()
+      },
       toggleLocationDataset(dataset) {
         const { id } = dataset
         const summ = _.get(dataset, 'summaries[0]', [])
@@ -324,15 +339,20 @@
   display: flex;
   flex-direction: column;
   top: var(--spacing-default);
-  right: var(--spacing-default);
+  left: calc(var(--spacing-default) + 200px);
   z-index: 5;
   width: 30vw;
   max-width: 400px;
   min-width: 250px;
   background-color: var(--v-textColor-base);
+  border-radius: 0px 28px 28px 0px !important;
+  box-shadow: none !important;
+  height: 100%;
+  max-height: calc(100% - 2*(var(--spacing-default)));
 }
-.data-layers-card__text {
+.data-layers-card__text{
   height: 90%;
+  overflow-y: auto;
 }
 .data-layers-card__group {
   height: 100%;
@@ -372,5 +392,7 @@
   color: var(--v-primary-darken2);
 }
 
-
+.close-button {
+  z-index: 100;
+}
 </style>

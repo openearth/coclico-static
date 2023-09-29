@@ -24,10 +24,16 @@ export default {
     activeDatasetId: null, //introduced only temporarily. To be removed when the dataset share the same location ids
     lockedDatasets: [],
     activeSummary: [],
-    activeVariableId: ""
+    activeVariableId: "",
+    activeTheme: '',
+    activeVectorDataIds: '',
+    showLayersCard: true
   }),
 
   getters: {
+    showLayersCard(state) {
+      return state.showLayersCard
+    },
     availableDatasets(state) {
       return state.datasets
     },
@@ -35,6 +41,9 @@ export default {
       return state.activeDatasetIds.map(datasetId => {
         return _.get(state.selectedVectorData, `data.${datasetId}`)
       })
+    },
+    getActiveTheme (state) {
+      return state.activeTheme
     },
     //active location layer on map
     activeLocationLayer(state) {
@@ -61,8 +70,31 @@ export default {
     activeSummary (state) {
       return state.activeSummary
     },
+    datasetsInActiveTheme (state) {
+      const sets = _.values(state.datasets)
+      const activeSets = {}
+      if (state.activeTheme !== '') {
+        sets.forEach(set => {
+          if (set.keywords.includes(state.activeTheme)) {
+            activeSets[set.id] = set
+          }
+        })
+        return activeSets
+      } else {
+        return state.datasets
+      }
+    },
+    getActiveVectorDataIds (state) {
+      return state.activeVectorDataIds
+    },
   },
   mutations: {
+    setShowLayersCardOpen(state) {
+      state.showLayersCard = true
+    },
+    setShowLayersCardClose(state) {
+      state.showLayersCard = false
+    },
     setActiveLocationLayer(state, layer) {
       state.activeLocationLayer = layer
     },
@@ -106,6 +138,16 @@ export default {
     },
     setActiveSummary (state, summary) {
       Vue.set(state, 'activeSummary', summary)
+    },
+    toggleActiveTheme (state, id) {
+      if (state.activeTheme === id) {
+        state.activeTheme = ''
+      } else {
+        state.activeTheme = id
+      }
+    },
+    setActiveVectorDataIds (state, id) {
+      state.activeVectorDataIds = id
     },
   },
   actions: {
@@ -383,7 +425,7 @@ export default {
                 commit('addDatasetPointData', {
                   id: datasetId,
                   name: datasetName,
-                  series: [{ type: 'bar', data: series }],
+                  series: [ { type: 'bar', data: series } ],
                   xAxis: {
                     type: 'category',
                     data: xAxisdata,

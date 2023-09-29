@@ -1,13 +1,14 @@
 <template>
   <div class="data-layers">
-    <data-layers-card :datasets="availableDatasets" />
+    <data-layers-card :datasets="datasetsInActiveTheme" />
     <v-mapbox
       id="map"
       ref="map"
       :access-token="accessToken"
       :preserve-drawing-buffer="true"
-      map-style="mapbox://styles/mapbox/light-v10"
+      map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
     >
+      <v-mapbox-navigation-control :position="'top-right'" />
       <v-mapbox-layer
         v-if="activeLocationLayer"
         :key="activeLocationLayer.id"
@@ -92,7 +93,7 @@
       }
     },
     computed: {
-      ...mapGetters([ 'availableDatasets', 'activeLocationLayer', 'activeRasterLayer', 'selectedVectorData' ]),
+      ...mapGetters([ 'datasetsInActiveTheme', 'availableDatasets', 'activeLocationLayer', 'activeRasterLayer', 'selectedVectorData' ]),
     },
     mounted () {
       this.map = this.$refs.map.map
@@ -100,7 +101,7 @@
         console.log('loaded')
         if (!this.$route.params.locationId) {
           this.map.flyTo({
-            center: [5.2913, 48.1326],
+            center: [ 5.2913, 48.1326 ],
             zoom: 4
           })
         }
