@@ -1,53 +1,24 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import DataLayers from '../views/DataLayers.vue'
-import LandPage from '../views/LandPage.vue'
-import Stories from '../views/Stories.vue'
-import WorkbenchPage from '../views/WorkbenchPage.vue'
-import DatasetIds from '../views/data/DatasetIds.vue'
-import LocationIds from '../views/data/locations/LocationIds.vue'
-
-
-Vue.use(VueRouter)
+import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
 
 const routes = [
- {
+  {
     path: '/',
     name: 'home',
-    redirect: '/data'
+    component: HomeView
   },
   {
-    name: 'data',
-    path: '/data',
-    component: DataLayers, // this is the Platform page
-        children: [ {
-      path: ':datasetIds',
-      component: DatasetIds,
-      children: [ {
-        path: ':locationId',
-        component: LocationIds,
-      } ]
-    } ]
-  },
-    {
-    name: 'landpage',
-    path: '/landpage',
-    component: LandPage
-  },
-    {
-    name: 'workbench',
-    path: '/workbench',
-    component: WorkbenchPage
-  },
-  {
-    name: 'stories',
-    path: '/stories',
-    component: Stories
+    path: '/about',
+    name: 'about',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   }
 ]
 
-const router = new VueRouter({
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
