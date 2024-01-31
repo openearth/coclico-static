@@ -4,7 +4,7 @@ import Stories from "../views/Stories.vue";
 
 const routes = [
   {
-    path: "/",
+    path: "/data",
     name: "data",
     component: MapLayers,
   },
