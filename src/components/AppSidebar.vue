@@ -10,7 +10,7 @@
       <img :src="coclicoIcon" alt="Coclico Icon" class="coclico-image" />
     </div>
     <v-list>
-      <v-list-item class="list-item">
+      <v-list-item class="list-item" @click="openLayersCard()">
         <v-list-img class="list-item-img">
           <img :src="sealevelsIcon" alt="Sea Levels Icon" class="item-image" />
         </v-list-img>
@@ -54,6 +54,18 @@
           >Risk & Adaptation</v-list-item-title
         >
       </v-list-item>
+      <v-list-item class="list-item">
+        <v-list-img class="list-item-img">
+          <img :src="searchIcon" alt="Search Icon" class="item-image" />
+        </v-list-img>
+        <v-list-item-title class="list-item-title">Search</v-list-item-title>
+      </v-list-item>
+      <v-list-item class="list-item-more">
+        <v-list-img class="list-item-img">
+          <img :src="moreIcon" alt="More Icon" class="item-image-more" />
+        </v-list-img>
+        <v-list-item-title class="list-item-title"></v-list-item-title>
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -67,21 +79,29 @@ export default {
       naturalhazardsIcon: require("@/assets/icons/themes/icon-Natural Hazards.svg"),
       exposurevulnerabilityIcon: require("@/assets/icons/themes/icon-Exposure & Vulnerability.svg"),
       riskadaptationIcon: require("@/assets/icons/themes/icon-Risk & Adaptation.svg"),
+      searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
+      moreIcon: require("@/assets/icons/themes/icon-More.svg"),
     };
+  },
+  methods: {
+    openLayersCard() {
+      this.setShowLayersCardOpen();
+    },
   },
 };
 </script>
 
 <style scoped>
 .custom-navigation-drawer {
-  margin-top: 50px;
+  margin-top: 30px;
   margin-left: 50px;
-  max-height: calc(100% - 2 * (50px));
+  max-height: calc(100% - 2 * (30px));
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .image-container {
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -95,9 +115,16 @@ export default {
   justify-content: center;
   margin: 40px;
 }
+.list-item-more {
+  display: flex;
+  justify-content: center;
+  margin: 40px;
+  margin-top: 100px;
+}
 .list-item-img {
   display: flex;
   justify-content: center;
+  margin-top: 6px;
 }
 .list-item-title {
   display: flex;
@@ -111,5 +138,9 @@ export default {
 .item-image {
   width: 2.5rem;
   height: 1.5rem;
+}
+.item-image-more {
+  width: 1.5rem;
+  height: 0.5rem;
 }
 </style>
