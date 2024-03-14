@@ -2,9 +2,9 @@
   <v-navigation-drawer
     permanent
     floating
-    rounded="xl"
     width="200"
     class="custom-navigation-drawer"
+    :style="sidebarStyle"
   >
     <div class="image-container">
       <img :src="coclicoIcon" alt="Coclico Icon" class="coclico-image" />
@@ -68,6 +68,9 @@
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
+
+  <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
+  </v-card>
 </template>
 
 <script>
@@ -81,11 +84,22 @@ export default {
       riskadaptationIcon: require("@/assets/icons/themes/icon-Risk & Adaptation.svg"),
       searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
       moreIcon: require("@/assets/icons/themes/icon-More.svg"),
+      showLayersCard: false,
     };
   },
   methods: {
     openLayersCard() {
-      this.setShowLayersCardOpen();
+      this.showLayersCard = !this.showLayersCard;
+      console.log("showLayersCard", this.showLayersCard);
+    },
+  },
+  computed: {
+    sidebarStyle() {
+      return {
+        borderRadius: this.showLayersCard
+          ? "28px 0px 0px 28px"
+          : "28px 28px 28px 28px",
+      };
     },
   },
 };
@@ -142,5 +156,20 @@ export default {
 .item-image-more {
   width: 1.5rem;
   height: 0.5rem;
+}
+.custom-data-layers-card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 30px;
+  left: 250px;
+  z-index: 5;
+  width: 30vw;
+  max-width: 400px;
+  min-width: 250px;
+  border-radius: 0px 28px 28px 0px;
+  box-shadow: none;
+  height: 100%;
+  max-height: calc(100% - 2 * (30px));
 }
 </style>
