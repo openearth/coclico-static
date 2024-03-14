@@ -18,7 +18,7 @@
           >Sea Levels</v-list-item-title
         >
       </v-list-item>
-      <v-list-item class="list-item">
+      <v-list-item class="list-item" @click="openLayersCard()">
         <v-list-img class="list-item-img">
           <img
             :src="naturalhazardsIcon"
@@ -30,7 +30,7 @@
           >Natural Hazards</v-list-item-title
         >
       </v-list-item>
-      <v-list-item class="list-item">
+      <v-list-item class="list-item" @click="openLayersCard()">
         <v-list-img class="list-item-img">
           <img
             :src="exposurevulnerabilityIcon"
@@ -42,7 +42,7 @@
           >Exposure & Vulnerability</v-list-item-title
         >
       </v-list-item>
-      <v-list-item class="list-item">
+      <v-list-item class="list-item" @click="openLayersCard()">
         <v-list-img class="list-item-img">
           <img
             :src="riskadaptationIcon"
@@ -54,13 +54,13 @@
           >Risk & Adaptation</v-list-item-title
         >
       </v-list-item>
-      <v-list-item class="list-item">
+      <v-list-item class="list-item" @click="openLayersCard()">
         <v-list-img class="list-item-img">
           <img :src="searchIcon" alt="Search Icon" class="item-image" />
         </v-list-img>
         <v-list-item-title class="list-item-title">Search</v-list-item-title>
       </v-list-item>
-      <v-list-item class="list-item-more">
+      <v-list-item class="list-item-more" @click="openLayersCard()">
         <v-list-img class="list-item-img">
           <img :src="moreIcon" alt="More Icon" class="item-image-more" />
         </v-list-img>
