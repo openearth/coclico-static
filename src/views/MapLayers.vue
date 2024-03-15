@@ -5,6 +5,8 @@
       :access-token="accessToken"
       :preserve-drawing-buffer="true"
       map-style="mapbox://styles/mapbox/streets-v12"
+      :zoom="4"
+      :center="[5.2913, 48.1326]"
     >
       <!-- "mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d" -->
       <MapboxNavigationControl :visualizePitch="true" />
