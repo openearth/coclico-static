@@ -1,11 +1,11 @@
 <template>
   <mapbox-map
-    style="height: 100vh"
+    id="map"
+    ref="map"
     :access-token="accessToken"
     :preserve-drawing-buffer="true"
-    map-style="mapbox://styles/mapbox/streets-v12"
+    map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
   >
-    <!-- "mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d" -->
     <MapboxNavigationControl :visualizePitch="true" />
   </mapbox-map>
 </template>
@@ -19,12 +19,15 @@ export default {
       accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
     };
   },
-  mounted() {
-    console.log("view has been mounted");
-  },
   components: {
     MapboxMap,
     MapboxNavigationControl,
   },
 };
 </script>
+<style>
+#map {
+  width: 100%;
+  height: 100%;
+}
+</style>
