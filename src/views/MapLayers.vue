@@ -12,12 +12,14 @@
       <MapboxNavigationControl :visualizePitch="true" />
     </mapbox-map>
     <app-sidebar />
+    <dataset-card />
   </v-app>
 </template>
 
 <script>
 import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
 import AppSidebar from "@/components/AppSidebar.vue";
+import DatasetCard from "@/components/DatasetCard.vue";
 
 export default {
   data() {
@@ -29,6 +31,7 @@ export default {
     MapboxMap,
     MapboxNavigationControl,
     AppSidebar,
+    DatasetCard,
   },
 };
 </script>
