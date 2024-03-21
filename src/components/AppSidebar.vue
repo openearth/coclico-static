@@ -99,6 +99,9 @@ export default {
         borderRadius: this.showLayersCard
           ? "28px 0px 0px 28px"
           : "28px 28px 28px 28px",
+        borderRight: this.showLayersCard
+          ? "2px solid #e4e4e4"
+          : "2px solid white",
       };
     },
   },
@@ -127,12 +130,13 @@ export default {
 .list-item {
   display: flex;
   justify-content: center;
-  margin: 40px;
+  margin: auto;
+  margin-top: 20px;
 }
 .list-item-more {
   display: flex;
   justify-content: center;
-  margin: 40px;
+  margin: auto;
   margin-top: 100px;
 }
 .list-item-img {
