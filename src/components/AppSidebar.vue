@@ -70,6 +70,9 @@
   </v-navigation-drawer>
 
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
+    <v-btn icon @click="close" flat class="close-button">
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
   </v-card>
 </template>
 
@@ -164,6 +167,7 @@ export default {
 .custom-data-layers-card {
   position: absolute;
   display: flex;
+  align-items: center;
   flex-direction: column;
   top: 30px;
   left: 250px;
@@ -175,5 +179,10 @@ export default {
   box-shadow: none;
   height: 100%;
   max-height: calc(100% - 2 * (30px));
+}
+.close-button {
+  margin-left: auto;
+  margin-top: 10px;
+  margin-right: 10px;
 }
 </style>
