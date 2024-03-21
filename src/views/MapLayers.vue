@@ -10,6 +10,7 @@
   >
     <MapboxNavigationControl :visualizePitch="true" />
   </mapbox-map>
+  <app-sidebar />
 </template>
 
 <script>
