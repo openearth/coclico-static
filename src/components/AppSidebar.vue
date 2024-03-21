@@ -92,8 +92,11 @@ export default {
   },
   methods: {
     openLayersCard() {
-      this.showLayersCard = !this.showLayersCard;
+      this.showLayersCard = true;
       console.log("showLayersCard", this.showLayersCard);
+    },
+    close() {
+      this.showLayersCard = false;
     },
   },
   computed: {
