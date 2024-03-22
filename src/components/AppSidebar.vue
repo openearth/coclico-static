@@ -70,7 +70,7 @@
   </v-navigation-drawer>
 
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
-    <v-row style="width: 100%; max-height: 100px">
+    <v-row style="width: 100%; max-height: 60px">
       <v-col>
         <v-card-title class="layer-card-title"> 9 data layers </v-card-title>
       </v-col>
@@ -80,7 +80,36 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row style="width: 100%"> </v-row>
+    <v-row style="width: 100%">
+      <v-col>
+        <v-card-title class="layer-category-title"> Category 1 </v-card-title>
+        <v-row>
+          <v-col style="min-width: 80%">
+            <v-list :items="category1Items" class="layer-list">
+              <template v-slot:prepend>
+                <v-switch hide-details class="mr-5" color="#068b95"></v-switch>
+              </template>
+            </v-list>
+          </v-col>
+          <v-col> </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+    <v-row style="width: 100%">
+      <v-col>
+        <v-card-title class="layer-category-title"> Category 2 </v-card-title>
+        <v-row>
+          <v-col style="min-width: 80%">
+            <v-list :items="category2Items" class="layer-list">
+              <template v-slot:prepend>
+                <v-switch hide-details class="mr-5" color="#068b95"></v-switch>
+              </template>
+            </v-list>
+          </v-col>
+          <v-col> </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 
@@ -96,12 +125,42 @@ export default {
       searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
       moreIcon: require("@/assets/icons/themes/icon-More.svg"),
       showLayersCard: true,
+      category1Items: [
+        {
+          title: "Sea level projections",
+        },
+        {
+          title: "Vertical land motions (subsidence)",
+        },
+        {
+          title: "Wave projections",
+        },
+        {
+          title: "IBI-CSS-SL",
+        },
+      ],
+      category2Items: [
+        {
+          title: "Storm surge and wave climate",
+        },
+        {
+          title: "Total water level",
+        },
+        {
+          title: "Extreme storm surge levels",
+        },
+        {
+          title: "Extreme wave energy flux",
+        },
+        {
+          title: "Extreme sea level",
+        },
+      ],
     };
   },
   methods: {
     openLayersCard() {
       this.showLayersCard = true;
-      console.log("showLayersCard", this.showLayersCard);
     },
     close() {
       this.showLayersCard = false;
@@ -183,8 +242,8 @@ export default {
   top: 30px;
   left: 250px;
   z-index: 5;
-  width: 30vw;
-  max-width: 400px;
+  width: 40vw;
+  max-width: 500px;
   min-width: 250px;
   border-radius: 0px 28px 28px 0px;
   box-shadow: none;
@@ -206,5 +265,18 @@ export default {
 .column-right {
   display: flex;
   justify-content: flex-end;
+}
+.layer-category-title {
+  margin-top: 10px;
+  color: #068b95;
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+.layer-list {
+  color: #293a45;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
 }
 </style>
