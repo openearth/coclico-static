@@ -70,9 +70,17 @@
   </v-navigation-drawer>
 
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
-    <v-btn icon @click="close" flat class="close-button">
-      <v-icon>mdi-close</v-icon>
-    </v-btn>
+    <v-row style="width: 100%; max-height: 100px">
+      <v-col>
+        <v-card-title class="layer-card-title"> 9 data layers </v-card-title>
+      </v-col>
+      <v-col class="column-right">
+        <v-btn icon @click="close" flat class="close-button">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row style="width: 100%"> </v-row>
   </v-card>
 </template>
 
@@ -87,7 +95,7 @@ export default {
       riskadaptationIcon: require("@/assets/icons/themes/icon-Risk & Adaptation.svg"),
       searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
       moreIcon: require("@/assets/icons/themes/icon-More.svg"),
-      showLayersCard: false,
+      showLayersCard: true,
     };
   },
   methods: {
@@ -184,8 +192,19 @@ export default {
   max-height: calc(100% - 2 * (30px));
 }
 .close-button {
-  margin-left: auto;
   margin-top: 10px;
-  margin-right: 10px;
+  color: #a9b0b5;
+}
+.layer-card-title {
+  margin-top: 10px;
+  color: #a9b0b5;
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+.column-right {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
