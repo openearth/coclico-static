@@ -70,7 +70,7 @@
   </v-navigation-drawer>
 
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
-    <v-row style="width: 100%; max-height: 100px">
+    <v-row style="width: 100%; max-height: 60px">
       <v-col>
         <v-card-title class="layer-card-title"> 9 data layers </v-card-title>
       </v-col>
@@ -80,7 +80,12 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row style="width: 100%"> </v-row>
+    <v-row style="width: 100%">
+      <v-col>
+        <v-card-title class="layer-category-title"> Category 1 </v-card-title>
+        <v-list :items="category1Items" class="layer-names"></v-list>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 
@@ -96,12 +101,25 @@ export default {
       searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
       moreIcon: require("@/assets/icons/themes/icon-More.svg"),
       showLayersCard: true,
+      category1Items: [
+        {
+          title: "Sea level projections",
+        },
+        {
+          title: "Vertical land motions (subsidence)",
+        },
+        {
+          title: "Wave projections",
+        },
+        {
+          title: "IBI-CSS-SL",
+        },
+      ],
     };
   },
   methods: {
     openLayersCard() {
       this.showLayersCard = true;
-      console.log("showLayersCard", this.showLayersCard);
     },
     close() {
       this.showLayersCard = false;
@@ -206,5 +224,18 @@ export default {
 .column-right {
   display: flex;
   justify-content: flex-end;
+}
+.layer-category-title {
+  margin-top: 10px;
+  color: #068b95;
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+.layer-names {
+  color: #293a45;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
 }
 </style>
