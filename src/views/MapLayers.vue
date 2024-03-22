@@ -10,9 +10,9 @@
       map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
     >
       <MapboxNavigationControl :visualizePitch="true" />
+      <dataset-card />
     </mapbox-map>
     <app-sidebar />
-    <dataset-card />
   </v-app>
 </template>
 
