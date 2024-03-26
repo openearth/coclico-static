@@ -124,7 +124,7 @@ export default {
       riskadaptationIcon: require("@/assets/icons/themes/icon-Risk & Adaptation.svg"),
       searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
       moreIcon: require("@/assets/icons/themes/icon-More.svg"),
-      showLayersCard: true,
+      showLayersCard: false,
       category1Items: [
         {
           title: "Sea level projections",
