@@ -7,7 +7,7 @@
     :style="sidebarStyle"
   >
     <div class="image-container">
-      <img :src="coclicoIcon" alt="Coclico Icon" class="coclico-image" />
+      <custom-icon name="coclico-full" />
     </div>
     <v-list>
       <v-list-item class="list-item" @click="openLayersCard()">
@@ -18,42 +18,7 @@
           >Sea Levels</v-list-item-title
         >
       </v-list-item>
-      <v-list-item class="list-item" @click="openLayersCard()">
-        <v-list-img class="list-item-img">
-          <img
-            :src="naturalhazardsIcon"
-            alt="Natural Hazards Icon"
-            class="item-image"
-          />
-        </v-list-img>
-        <v-list-item-title class="list-item-title"
-          >Natural Hazards</v-list-item-title
-        >
-      </v-list-item>
-      <v-list-item class="list-item" @click="openLayersCard()">
-        <v-list-img class="list-item-img">
-          <img
-            :src="exposurevulnerabilityIcon"
-            alt="Exposure & Vulnerability Icon"
-            class="item-image"
-          />
-        </v-list-img>
-        <v-list-item-title class="list-item-title"
-          >Exposure & Vulnerability</v-list-item-title
-        >
-      </v-list-item>
-      <v-list-item class="list-item" @click="openLayersCard()">
-        <v-list-img class="list-item-img">
-          <img
-            :src="riskadaptationIcon"
-            alt="Risk & Adaptation Icon"
-            class="item-image"
-          />
-        </v-list-img>
-        <v-list-item-title class="list-item-title"
-          >Risk & Adaptation</v-list-item-title
-        >
-      </v-list-item>
+
       <v-list-item class="list-item" @click="openLayersCard()">
         <v-list-img class="list-item-img">
           <img :src="searchIcon" alt="Search Icon" class="item-image" />
@@ -114,16 +79,19 @@
 </template>
 
 <script>
+import CustomIcon from "@/components/CustomIcon.vue";
 export default {
+  components: {
+    CustomIcon,
+  },
   data() {
     return {
-      coclicoIcon: require("@/assets/icons/icon-coclico-full.svg"),
-      sealevelsIcon: require("@/assets/icons/themes/icon-Sea Levels.svg"),
+      /*   sealevelsIcon: require("@/assets/icons/themes/icon-Sea Levels.svg"),
       naturalhazardsIcon: require("@/assets/icons/themes/icon-Natural Hazards.svg"),
       exposurevulnerabilityIcon: require("@/assets/icons/themes/icon-Exposure & Vulnerability.svg"),
       riskadaptationIcon: require("@/assets/icons/themes/icon-Risk & Adaptation.svg"),
       searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
-      moreIcon: require("@/assets/icons/themes/icon-More.svg"),
+      moreIcon: require("@/assets/icons/themes/icon-More.svg"), */
       showLayersCard: false,
       category1Items: [
         {
