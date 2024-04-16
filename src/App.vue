@@ -7,11 +7,16 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   name: "App",
+  methods: {
+    ...mapActions({ loadDatasets: "loadDatasets" }),
+  },
 
-  data: () => ({
-    //
-  }),
+  mounted() {
+    console.log("app has been mounted");
+    this.loadDatasets();
+  },
 };
 </script>
