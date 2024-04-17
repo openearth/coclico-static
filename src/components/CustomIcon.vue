@@ -28,14 +28,10 @@ export default {
     icon() {
       try {
         const subFolder = this.iconFolder ? `${this.iconFolder}/` : "";
-        console.log("subfolder", subFolder);
-        console.log("name", this.name);
-        console.log(
-          require(`@/assets/icons/${subFolder}icon-${this.name}.svg`)
-        );
-        return require(`@/assets/icons/${subFolder}icon-${this.name}.svg`);
+
+        return require(`..//assets/icons/${subFolder}icon-${this.name}.svg`);
       } catch {
-        return require("@/assets/icons/icon-placeholder.svg");
+        return require("../assets/icons/icon-placeholder.svg");
       }
     },
   },
