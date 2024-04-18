@@ -11,7 +11,7 @@ import { mapActions } from "vuex";
 export default {
   name: "App",
   methods: {
-    ...mapActions({ loadDatasets: "loadDatasets" }),
+    ...mapActions("map", ["loadDatasets"]),
   },
 
   mounted() {

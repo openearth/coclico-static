@@ -1,6 +1,7 @@
 import getCatalog from "@/lib/request/get-catalog";
 import _ from "lodash";
 export default {
+  namespaced: true,
   state: {
     themes: [],
     datasets: [],

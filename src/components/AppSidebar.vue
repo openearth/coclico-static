@@ -10,16 +10,22 @@
       <custom-icon name="coclico-full" />
     </div>
     <v-list>
-      <v-list-item class="list-item" @click="openLayersCard()">
+      <v-list-item
+        class="list-item"
+        @click="openLayersCard()"
+        v-for="theme in themes"
+        :key="theme"
+      >
         <v-list-img class="list-item-img">
-          <img :src="sealevelsIcon" alt="Sea Levels Icon" class="item-image" />
+          <custom-icon :name="theme" icon-folder="themes" class="item-image" />
         </v-list-img>
-        <v-list-item-title class="list-item-title"
-          >Sea Levels</v-list-item-title
-        >
+        <v-list-item-title class="list-item-title">{{
+          theme
+        }}</v-list-item-title>
       </v-list-item>
 
       <v-list-item class="list-item" @click="openLayersCard()">
+        <!-- All below need to become custom icons -->
         <v-list-img class="list-item-img">
           <img :src="searchIcon" alt="Search Icon" class="item-image" />
         </v-list-img>
@@ -79,6 +85,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import CustomIcon from "@/components/CustomIcon.vue";
 export default {
   components: {
@@ -86,13 +93,8 @@ export default {
   },
   data() {
     return {
-      /*   sealevelsIcon: require("@/assets/icons/themes/icon-Sea Levels.svg"),
-      naturalhazardsIcon: require("@/assets/icons/themes/icon-Natural Hazards.svg"),
-      exposurevulnerabilityIcon: require("@/assets/icons/themes/icon-Exposure & Vulnerability.svg"),
-      riskadaptationIcon: require("@/assets/icons/themes/icon-Risk & Adaptation.svg"),
-      searchIcon: require("@/assets/icons/themes/icon-Search.svg"),
-      moreIcon: require("@/assets/icons/themes/icon-More.svg"), */
       showLayersCard: false,
+      //TODO: remove the hardcoded part
       category1Items: [
         {
           title: "Sea level projections",
@@ -134,7 +136,14 @@ export default {
       this.showLayersCard = false;
     },
   },
+  watch: {
+    themes() {
+      console.log("themes", this.themes);
+    },
+  },
   computed: {
+    ...mapGetters("map", ["themes"]),
+
     sidebarStyle() {
       return {
         borderRadius: this.showLayersCard
