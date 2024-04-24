@@ -7,7 +7,7 @@
     :style="sidebarStyle"
   >
     <div class="image-container">
-      <custom-icon name="coclico-full" />
+      <custom-icon name="coclico-full" class="coclico-image" />
     </div>
     <v-list>
       <v-list-item
@@ -27,13 +27,17 @@
       <v-list-item class="list-item" @click="openLayersCard()">
         <!-- All below need to become custom icons -->
         <v-list-img class="list-item-img">
-          <img :src="searchIcon" alt="Search Icon" class="item-image" />
+          <custom-icon name="Search" icon-folder="themes" class="item-image" />
         </v-list-img>
         <v-list-item-title class="list-item-title">Search</v-list-item-title>
       </v-list-item>
       <v-list-item class="list-item-more" @click="openLayersCard()">
         <v-list-img class="list-item-img">
-          <img :src="moreIcon" alt="More Icon" class="item-image-more" />
+          <custom-icon
+            name="More"
+            icon-folder="themes"
+            class="item-image-more"
+          />
         </v-list-img>
         <v-list-item-title class="list-item-title"></v-list-item-title>
       </v-list-item>
