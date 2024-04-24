@@ -10,7 +10,7 @@
       <v-tab
         value="option-1"
         hide-slider
-        rounded="lg"
+        rounded="xl"
         :ripple="false"
         selected-class="selected-tab-style"
         class="mr-2"
@@ -20,7 +20,7 @@
       <v-tab
         value="option-2"
         hide-slider
-        rounded="lg"
+        rounded="xl"
         :ripple="false"
         selected-class="selected-tab-style"
         class="mr-2"
