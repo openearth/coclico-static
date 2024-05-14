@@ -214,11 +214,11 @@ export default {
 }
 .close-button {
   margin-top: 10px;
-  color: #a9b0b5;
+  color: rgb(var(--v-theme-grey80));
 }
 .layer-card-title {
   margin-top: 10px;
-  color: #a9b0b5;
+  color: rgb(var(--v-theme-grey80));
   font-family: "Inter", sans-serif;
   text-transform: uppercase;
   font-size: 12px;
@@ -230,14 +230,14 @@ export default {
 }
 .layer-category-title {
   margin-top: 10px;
-  color: #068b95;
+  color: rgb(var(--v-theme-primary));
   font-family: "Inter", sans-serif;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 600;
 }
 .layer-list {
-  color: #293a45;
+  color: rgb(var(--v-theme-black80));
   font-family: "Inter", sans-serif;
   font-size: 12px;
 }
