@@ -1,14 +1,39 @@
 import getCatalog from "@/lib/request/get-catalog";
+import buildGeojsonMapboxLayer from "@/lib/mapbox/build-geojson-mapbox-layer";
+import buildRasterMapboxLayer from "@/lib/mapbox/build-raster-mapbox-layer";
+import matchLayerIdToProperties from "@/lib/match-layer-id-to-properties.js";
 import _ from "lodash";
+
 export default {
   namespaced: true,
   state: {
     themes: [],
     datasets: [],
+    activeTheme: null,
+    activeDatasets: [],
+    mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
   },
   getters: {
     themes(state) {
       return state.themes;
+    },
+    activeTheme(state) {
+      return state.activeTheme;
+    },
+    datasetsInActiveTheme(state) {
+      if (!state.activeTheme) {
+        return state.datasets;
+      }
+      const filteredDatasets = state.datasets.filter((dataset) =>
+        dataset?.keywords?.includes(state.activeTheme)
+      );
+      return filteredDatasets;
+    },
+    activeDatasets(state) {
+      return state.activeDatasets;
+    },
+    mapboxLayers(state) {
+      return state.mapboxLayers;
     },
   },
   mutations: {
@@ -18,6 +43,25 @@ export default {
     ADD_DATASET(state, dataset) {
       state.datasets = [...state.datasets, dataset];
     },
+    SET_ACTIVE_THEME(state, theme) {
+      state.activeTheme = theme;
+    },
+    ADD_ACTIVE_DATASET(state, dataset) {
+      state.activeDatasets = [...state.activeDatasets, dataset];
+    },
+    REMOVE_ACTIVE_DATASET(state, id) {
+      state.activeDatasets = state.activeDatasets.filter(
+        (activeDataset) => activeDataset.id !== id
+      );
+    },
+    ADD_MAPBOX_LAYER(state, mapboxLayer) {
+      state.mapboxLayers = [...state.mapboxLayers, mapboxLayer];
+    },
+    REMOVE_MAPBOX_LAYER(state, id) {
+      state.mapboxLayers = state.mapboxLayers.filter(
+        (mapboxLayer) => mapboxLayer.id !== id
+      );
+    },
   },
   actions: {
     //TODO:
@@ -26,7 +70,6 @@ export default {
       getCatalog(process.env.VUE_APP_CATALOG_URL)
         //1. first  we get the parent catalog
         .then((catalog) => {
-          console.log("catalog", catalog);
           //2. read themes from the main catalog
           const keywords = _.get(catalog, "summaries.keywords");
           keywords.forEach((keyword) => commit("ADD_THEME", keyword));
@@ -76,6 +119,34 @@ export default {
               });
           });
         });
+    },
+    setActiveTheme({ commit }, theme) {
+      commit("SET_ACTIVE_THEME", theme);
+    },
+    loadDatasetOnMap({ commit }, dataset) {
+      const layer = matchLayerIdToProperties(dataset);
+      //Check if the layer is vector or a raster
+      const layerType = _.has(dataset, "cube:dimensions") ? "vector" : "raster";
+      getCatalog(layer.href).then((layerInfo) => {
+        layerInfo.id = dataset.id; // I will use the dataset id
+        if (layerType === "vector") {
+          commit("ADD_MAPBOX_LAYER", buildGeojsonMapboxLayer(layerInfo));
+        } else {
+          commit("ADD_MAPBOX_LAYER", buildRasterMapboxLayer(layerInfo));
+        }
+      });
+    },
+    updateActiveDatasetsArray({ state, commit, dispatch }, dataset) {
+      const datasetExist = state.activeDatasets.find(
+        (activeDataset) => activeDataset.id === dataset.id
+      );
+      if (datasetExist) {
+        commit("REMOVE_ACTIVE_DATASET", dataset.id);
+        commit("REMOVE_MAPBOX_LAYER", dataset.id);
+      } else {
+        commit("ADD_ACTIVE_DATASET", dataset);
+        dispatch("loadDatasetOnMap", dataset);
+      }
     },
   },
 };

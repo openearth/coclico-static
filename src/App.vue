@@ -15,7 +15,6 @@ export default {
   },
 
   mounted() {
-    console.log("app has been mounted");
     this.loadDatasets();
   },
 };

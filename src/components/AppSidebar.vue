@@ -12,9 +12,14 @@
     <v-list>
       <v-list-item
         class="list-item"
-        @click="openLayersCard()"
-        v-for="theme in themes"
-        :key="theme"
+        @click="
+          openLayersCard();
+          setTheme(theme);
+        "
+        v-for="(theme, i) in themes"
+        :key="i"
+        :value="theme"
+        color="#068b95"
       >
         <v-list-img class="list-item-img">
           <custom-icon :name="theme" icon-folder="themes" class="item-image" />
@@ -23,31 +28,38 @@
           theme
         }}</v-list-item-title>
       </v-list-item>
-
-      <v-list-item class="list-item" @click="openLayersCard()">
-        <!-- All below need to become custom icons -->
-        <v-list-img class="list-item-img">
-          <custom-icon name="Search" icon-folder="themes" class="item-image" />
-        </v-list-img>
-        <v-list-item-title class="list-item-title">Search</v-list-item-title>
-      </v-list-item>
-      <v-list-item class="list-item-more" @click="openLayersCard()">
-        <v-list-img class="list-item-img">
-          <custom-icon
-            name="More"
-            icon-folder="themes"
-            class="item-image-more"
-          />
-        </v-list-img>
-        <v-list-item-title class="list-item-title"></v-list-item-title>
-      </v-list-item>
+      <v-list>
+        <v-list-item class="list-item" @click="openLayersCard()">
+          <v-list-img class="list-item-img">
+            <custom-icon
+              name="Search"
+              icon-folder="themes"
+              class="item-image"
+            />
+          </v-list-img>
+          <v-list-item-title class="list-item-title">Search</v-list-item-title>
+        </v-list-item>
+        <v-list-item class="list-item-more" @click="openLayersCard()">
+          <v-list-img class="list-item-img">
+            <custom-icon
+              name="More"
+              icon-folder="themes"
+              class="item-image-more"
+            />
+          </v-list-img>
+          <v-list-item-title class="list-item-title"></v-list-item-title>
+        </v-list-item>
+      </v-list>
     </v-list>
   </v-navigation-drawer>
 
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
     <v-row style="width: 100%; max-height: 60px">
       <v-col>
-        <v-card-title class="layer-card-title"> 9 data layers </v-card-title>
+        <v-card-title class="layer-card-title">
+          {{ numberOfActiveDatasets }} data layers
+        </v-card-title>
+        <!-- TODO: number of selectedLayers -->
       </v-col>
       <v-col class="column-right">
         <v-btn icon @click="close" flat class="close-button">
@@ -55,33 +67,28 @@
         </v-btn>
       </v-col>
     </v-row>
+
     <v-row style="width: 100%">
       <v-col>
-        <v-card-title class="layer-category-title"> Category 1 </v-card-title>
         <v-row>
           <v-col style="min-width: 80%">
-            <v-list :items="category1Items" class="layer-list">
-              <template v-slot:prepend>
-                <v-switch hide-details class="mr-5" color="#068b95"></v-switch>
-              </template>
+            <v-list class="layer-list">
+              <v-list-item
+                v-for="dataset in datasetsInActiveTheme"
+                :key="dataset.id"
+                :title="dataset.title"
+              >
+                <template v-slot:prepend>
+                  <v-switch
+                    hide-details
+                    class="mr-5"
+                    color="#068b95"
+                    @change="toggleDataset(dataset)"
+                  ></v-switch>
+                </template>
+              </v-list-item>
             </v-list>
           </v-col>
-          <v-col> </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-row style="width: 100%">
-      <v-col>
-        <v-card-title class="layer-category-title"> Category 2 </v-card-title>
-        <v-row>
-          <v-col style="min-width: 80%">
-            <v-list :items="category2Items" class="layer-list">
-              <template v-slot:prepend>
-                <v-switch hide-details class="mr-5" color="#068b95"></v-switch>
-              </template>
-            </v-list>
-          </v-col>
-          <v-col> </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -89,7 +96,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import CustomIcon from "@/components/CustomIcon.vue";
 export default {
   components: {
@@ -98,55 +105,26 @@ export default {
   data() {
     return {
       showLayersCard: false,
-      //TODO: remove the hardcoded part
-      category1Items: [
-        {
-          title: "Sea level projections",
-        },
-        {
-          title: "Vertical land motions (subsidence)",
-        },
-        {
-          title: "Wave projections",
-        },
-        {
-          title: "IBI-CSS-SL",
-        },
-      ],
-      category2Items: [
-        {
-          title: "Storm surge and wave climate",
-        },
-        {
-          title: "Total water level",
-        },
-        {
-          title: "Extreme storm surge levels",
-        },
-        {
-          title: "Extreme wave energy flux",
-        },
-        {
-          title: "Extreme sea level",
-        },
-      ],
     };
   },
   methods: {
+    ...mapActions("map", ["setActiveTheme", "updateActiveDatasetsArray"]),
     openLayersCard() {
       this.showLayersCard = true;
+    },
+    setTheme(theme) {
+      this.setActiveTheme(theme);
     },
     close() {
       this.showLayersCard = false;
     },
-  },
-  watch: {
-    themes() {
-      console.log("themes", this.themes);
+    /* TODO activate and deactivate the layer */
+    toggleDataset(dataset) {
+      this.updateActiveDatasetsArray(dataset);
     },
   },
   computed: {
-    ...mapGetters("map", ["themes"]),
+    ...mapGetters("map", ["themes", "datasetsInActiveTheme"]),
 
     sidebarStyle() {
       return {
@@ -157,6 +135,9 @@ export default {
           ? "2px solid #e4e4e4"
           : "2px solid white",
       };
+    },
+    numberOfActiveDatasets() {
+      return this.datasetsInActiveTheme.length;
     },
   },
 };

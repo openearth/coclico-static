@@ -3,24 +3,22 @@
     <v-container>
       <v-row>
         <v-col cols="6">
-          <v-select label="Report" :items="['AR5']" outlined dense></v-select>
+          <v-select
+            v-model="varA"
+            :items="['AR5']"
+            variant="outlined"
+          ></v-select>
         </v-col>
         <v-col cols="6">
-          <v-select
-            label="Return Period"
-            :items="['5']"
-            outlined
-            dense
-          ></v-select>
+          <v-select v-model="varB" :items="['5']" variant="outlined"></v-select>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
           <v-select
-            label="Scenarios"
+            v-model="varC"
             :items="['Historical']"
-            outlined
-            dense
+            variant="outlined"
           ></v-select>
         </v-col>
       </v-row>
@@ -34,6 +32,17 @@
     </v-container>
   </v-card>
 </template>
+<script>
+export default {
+  data() {
+    return {
+      varA: "AR5",
+      varB: 5,
+      varC: "Historical",
+    };
+  },
+};
+</script>
 <style>
 .text-style {
   background: #f0f0f0;

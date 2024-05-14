@@ -15,8 +15,9 @@
         selected-class="selected-tab-style"
         class="mr-2"
       >
-        <v-icon start> mdi-lock </v-icon>Active Data Layers</v-tab
-      >
+        <custom-icon name="layers" class="pr-1 mr-1"></custom-icon> Active Data
+        Layers
+      </v-tab>
       <v-tab
         value="option-2"
         hide-slider
@@ -25,8 +26,8 @@
         selected-class="selected-tab-style"
         class="mr-2"
       >
-        <v-icon start> mdi-lock </v-icon>Dashboard</v-tab
-      >
+        <custom-icon name="dashboard" class="pr-1 mr-1"></custom-icon>Dashboard
+      </v-tab>
     </v-tabs>
     <v-window v-model="tab">
       <v-window-item value="option-1">
@@ -41,11 +42,13 @@
 <script>
 import ActiveDatasetTab from "./ActiveDatasetTab.vue";
 import DashboardTab from "./DashboardTab.vue";
+import CustomIcon from "./CustomIcon.vue";
 
 export default {
   components: {
     ActiveDatasetTab,
     DashboardTab,
+    CustomIcon,
   },
 
   data() {

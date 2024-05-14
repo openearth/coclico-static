@@ -10,6 +10,12 @@
       map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
     >
       <MapboxNavigationControl :visualizePitch="true" />
+      <MapboxLayer
+        v-for="layer in mapboxLayers"
+        :key="layer.id"
+        :id="layer.id"
+        :options="layer"
+      />
       <dataset-card />
     </mapbox-map>
     <app-sidebar />
@@ -17,9 +23,15 @@
 </template>
 
 <script>
-import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
+import {
+  MapboxMap,
+  MapboxNavigationControl,
+  MapboxLayer,
+} from "@studiometa/vue-mapbox-gl";
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
+
+import { mapGetters } from "vuex";
 
 export default {
   data() {
@@ -30,8 +42,12 @@ export default {
   components: {
     MapboxMap,
     MapboxNavigationControl,
+    MapboxLayer,
     AppSidebar,
     DatasetCard,
+  },
+  computed: {
+    ...mapGetters("map", ["mapboxLayers"]),
   },
 };
 </script>
