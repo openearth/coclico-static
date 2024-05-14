@@ -34,6 +34,12 @@
 </template>
 <script>
 export default {
+  props: {
+    datasets: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       varA: "AR5",
