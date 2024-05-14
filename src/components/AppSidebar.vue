@@ -19,7 +19,7 @@
         v-for="(theme, i) in themes"
         :key="i"
         :value="theme"
-        color="#068b95"
+        color="primary"
       >
         <v-list-img class="list-item-img">
           <custom-icon :name="theme" icon-folder="themes" class="item-image" />
@@ -82,7 +82,7 @@
                   <v-switch
                     hide-details
                     class="mr-5"
-                    color="#068b95"
+                    color="primary"
                     @change="toggleDataset(dataset)"
                   ></v-switch>
                 </template>
