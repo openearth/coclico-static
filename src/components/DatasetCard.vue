@@ -69,9 +69,9 @@ export default {
   z-index: 5;
 }
 .selected-tab-style {
-  background-color: #068b95;
+  background-color: rgb(var(--v-theme-primary));
   border: none;
-  color: white;
+  color: rgb(var(--v-theme-white100));
 }
 
 ::v-deep .v-slide-group {
