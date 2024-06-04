@@ -16,6 +16,7 @@
           <v-select
             v-model="summary.chosenValue"
             :items="summary.allowedValues"
+            @update:modelValue="reloadDataset(dataset)"
             variant="outlined"
           ></v-select>
         </v-col>
@@ -32,6 +33,7 @@
   </v-card>
 </template>
 <script>
+import { mapActions } from "vuex";
 export default {
   props: {
     datasets: {
@@ -39,12 +41,11 @@ export default {
       default: () => [],
     },
   },
-  data() {
-    return {
-      varA: "AR5",
-      varB: 5,
-      varC: "Historical",
-    };
+  methods: {
+    ...mapActions("map", ["reloadDatasetOnMap"]),
+    reloadDataset(dataset) {
+      this.reloadDatasetOnMap(dataset);
+    },
   },
 };
 </script>

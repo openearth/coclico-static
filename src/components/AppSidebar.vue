@@ -21,8 +21,21 @@
         :value="theme"
         color="#068b95"
       >
-        <v-list-img class="list-item-img">
-          <custom-icon :name="theme" icon-folder="themes" class="item-image" />
+        <v-list-img class="pa-2 list-item-img">
+          <v-badge color="#068B95" v-if="false">
+            <custom-icon
+              :name="theme"
+              icon-folder="themes"
+              class="item-image"
+            />
+          </v-badge>
+
+          <custom-icon
+            v-else
+            :name="theme"
+            icon-folder="themes"
+            class="item-image"
+          />
         </v-list-img>
         <v-list-item-title class="list-item-title">{{
           theme
