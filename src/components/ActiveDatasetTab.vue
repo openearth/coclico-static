@@ -1,6 +1,8 @@
 <template>
   <v-card flat class="scrollable-card">
     <v-container v-for="dataset in datasets" :key="dataset.id">
+      <v-title class="layer-title"> {{ dataset.title }} </v-title>
+      <v-icon small class="summary-info, ml-4">mdi-information-outline</v-icon>
       <v-row>
         <v-col cols="6" v-for="summary in dataset.summaries" :key="summary.id">
           <v-row class="align-center">
@@ -59,5 +61,9 @@ export default {
 }
 .summary-info {
   color: #a9b0b5;
+}
+.layer-title {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
 }
 </style>
