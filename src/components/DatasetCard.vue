@@ -1,9 +1,8 @@
 <template>
   <!-- TODO:
-        * Add custom icon compponent 
-        * Load correct icons
         * Add colors based on the color library
         * Replace option-1 or 2 in values
+        * Add no data has been selected text
  -->
   <v-card width="450px" height="397px" class="custom-dataset-card">
     <v-tabs v-model="tab" grow hide-slider class="pa-2" height="35px">
@@ -29,9 +28,17 @@
         <custom-icon name="dashboard" class="pr-1 mr-1"></custom-icon>Dashboard
       </v-tab>
     </v-tabs>
-    <v-window v-model="tab">
+    <div v-if="!activeDatasets.length" class="text-center mx-16">
+      <p class="font-weight-black">No data layers have been selected.</p>
+      <p class="mt-4">
+        Explore data categories and activate data layers from the left hand-side
+        navigation bar.
+      </p>
+    </div>
+
+    <v-window v-model="tab" v-else>
       <v-window-item value="option-1">
-        <active-dataset-tab />
+        <active-dataset-tab :datasets="activeDatasets" />
       </v-window-item>
       <v-window-item value="option-2">
         <dashboard-tab />
@@ -43,6 +50,7 @@
 import ActiveDatasetTab from "./ActiveDatasetTab.vue";
 import DashboardTab from "./DashboardTab.vue";
 import CustomIcon from "./CustomIcon.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -56,6 +64,9 @@ export default {
       tab: "option-1",
       sliderValue: 0,
     };
+  },
+  computed: {
+    ...mapGetters("map", ["activeDatasets"]),
   },
   methods: {},
 };

@@ -136,6 +136,10 @@ export default {
         }
       });
     },
+    reloadDatasetOnMap({ commit, dispatch }, dataset) {
+      commit("REMOVE_MAPBOX_LAYER", dataset.id);
+      dispatch("loadDatasetOnMap", dataset);
+    },
     updateActiveDatasetsArray({ state, commit, dispatch }, dataset) {
       const datasetExist = state.activeDatasets.find(
         (activeDataset) => activeDataset.id === dataset.id
