@@ -70,9 +70,8 @@
     <v-row style="width: 100%; max-height: 60px">
       <v-col>
         <v-card-title class="layer-card-title">
-          {{ numberOfActiveDatasets }} data layers
+          {{ numberOfDatasetsInTheme }} data layers
         </v-card-title>
-        <!-- TODO: number of selectedLayers -->
       </v-col>
       <v-col class="column-right">
         <v-btn icon @click="close" flat class="close-button">
@@ -93,6 +92,7 @@
               >
                 <template v-slot:prepend>
                   <v-switch
+                    v-model="dataset.active"
                     hide-details
                     class="mr-5"
                     color="#068b95"
@@ -149,7 +149,7 @@ export default {
           : "2px solid white",
       };
     },
-    numberOfActiveDatasets() {
+    numberOfDatasetsInTheme() {
       return this.datasetsInActiveTheme.length;
     },
   },
