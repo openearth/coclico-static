@@ -45,9 +45,11 @@
       <!-- </v-row> -->
       <v-row class="pb-4">
         <v-col cols="12">
-          <p class="text-style">
-            Select an element in the map for specific location analysis.
-          </p>
+          <v-card-text class="text-style">
+            <v-icon> mdi-cursor-default-click </v-icon>
+            Select an element in the map for specific
+            <strong>location analysis</strong>.
+          </v-card-text>
         </v-col>
       </v-row>
       <v-divider />
@@ -79,6 +81,7 @@ export default {
 <style>
 .text-style {
   background: #f0f0f0;
+  padding: 5px;
 }
 .scrollable-card {
   max-height: 300px;
