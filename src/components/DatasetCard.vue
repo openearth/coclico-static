@@ -89,6 +89,6 @@ export default {
 }
 
 ::v-deep .v-slide-group {
-  height: 80px;
+  height: auto;
 }
 </style>

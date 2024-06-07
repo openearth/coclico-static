@@ -1,8 +1,17 @@
 <template>
   <v-card flat class="scrollable-card">
-    <v-container v-for="dataset in datasets" :key="dataset.id">
-      <v-title class="layer-title"> {{ dataset.title }} </v-title>
-      <v-icon small class="summary-info, ml-4">mdi-information-outline</v-icon>
+    <v-container
+      style="padding-top: 0px"
+      v-for="dataset in datasets"
+      :key="dataset.id"
+    >
+      <v-card-text class="layer-title">
+        {{ dataset.title }}
+        <v-icon small class="summary-info, ml-4"
+          >mdi-information-outline</v-icon
+        >
+      </v-card-text>
+
       <v-row>
         <v-col cols="6" v-for="summary in dataset.summaries" :key="summary.id">
           <v-row class="align-center">
@@ -23,6 +32,17 @@
           ></v-select>
         </v-col>
       </v-row>
+      <!-- <v-row
+        v-if="
+          checkLayerType(dataset) === 'vector' &&
+          dataset.id === activeLocationDatasetId &&
+          activeLegend(dataset)
+        "
+      > -->
+      <v-col>
+        <layer-legend :dataset="dataset" />
+      </v-col>
+      <!-- </v-row> -->
       <v-row class="pb-4">
         <v-col cols="12">
           <p class="text-style">
@@ -35,13 +55,18 @@
   </v-card>
 </template>
 <script>
+import LayerLegend from "./LayerLegend.vue";
 import { mapActions } from "vuex";
+
 export default {
   props: {
     datasets: {
       type: Array,
       default: () => [],
     },
+  },
+  components: {
+    LayerLegend,
   },
   methods: {
     ...mapActions("map", ["reloadDatasetOnMap"]),
