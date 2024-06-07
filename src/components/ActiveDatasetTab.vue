@@ -7,9 +7,17 @@
     >
       <v-card-text class="layer-title">
         {{ dataset.title }}
-        <v-icon small class="summary-info, ml-4"
-          >mdi-information-outline</v-icon
+        <v-tooltip
+          location="bottom"
+          max-width="450px"
+          :text="dataset.description"
         >
+          <template v-slot:activator="{ props }">
+            <v-icon v-bind="props" small class="summary-info, ml-4"
+              >mdi-information-outline</v-icon
+            >
+          </template>
+        </v-tooltip>
       </v-card-text>
 
       <v-row>
