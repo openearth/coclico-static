@@ -32,17 +32,22 @@
           ></v-select>
         </v-col>
       </v-row>
-      <!-- <v-row
-        v-if="
-          checkLayerType(dataset) === 'vector' &&
-          dataset.id === activeLocationDatasetId &&
-          activeLegend(dataset)
-        "
-      > -->
-      <v-col>
-        <layer-legend :dataset="dataset" />
-      </v-col>
-      <!-- </v-row> -->
+      <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here -->
+      <v-row
+        v-if="checkLayerType(dataset) === 'vector' && activeLegend(dataset)"
+      >
+        <v-col>
+          <layer-legend :dataset="dataset" />
+        </v-col>
+      </v-row>
+      <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here -->
+      <v-row
+        v-if="checkLayerType(dataset) === 'raster' && activeLegend(dataset)"
+      >
+        <v-col>
+          <layer-legend :dataset="dataset" />
+        </v-col>
+      </v-row>
       <v-row class="pb-4">
         <v-col cols="12">
           <v-card-text class="text-style">
@@ -59,6 +64,7 @@
 <script>
 import LayerLegend from "./LayerLegend.vue";
 import { mapActions } from "vuex";
+import _ from "lodash";
 
 export default {
   props: {
@@ -74,6 +80,15 @@ export default {
     ...mapActions("map", ["reloadDatasetOnMap"]),
     reloadDataset(dataset) {
       this.reloadDatasetOnMap(dataset);
+    },
+    checkLayerType(dataset) {
+      //Assumption: if layer has cube:dimensions then it is a vector
+      //TODO: add in the stacCatalogue structure a file format parameter somehow better so
+      return _.has(dataset, "cube:dimensions") ? "vector" : "raster";
+    },
+    activeLegend(dataset) {
+      // Check if linearGradient is defined. If so, assume that legend has to be shown
+      return _.has(dataset, "deltares:linearGradient");
     },
   },
 };
