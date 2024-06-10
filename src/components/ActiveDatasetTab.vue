@@ -48,7 +48,8 @@
           <layer-legend :dataset="dataset" />
         </v-col>
       </v-row>
-      <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here -->
+      <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here
+      TODO: check why the raster layer is not picked up. In the old live version it does not work either -->
       <v-row
         v-if="checkLayerType(dataset) === 'raster' && activeLegend(dataset)"
       >
