@@ -131,7 +131,6 @@ export default {
     close() {
       this.showLayersCard = false;
     },
-    /* TODO activate and deactivate the layer */
     toggleDataset(dataset) {
       this.updateActiveDatasetsArray(dataset);
     },
