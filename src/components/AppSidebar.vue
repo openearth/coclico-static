@@ -14,17 +14,17 @@
         class="list-item"
         @click="
           openLayersCard();
-          setTheme(theme);
+          setTheme(theme.name);
         "
         v-for="(theme, i) in themes"
         :key="i"
-        :value="theme"
         color="primary"
+        :value="theme.name"
       >
         <v-list-img class="pa-2 list-item-img">
-          <v-badge color="#068B95" v-if="false">
+          <v-badge color="primary" v-if="theme.count" :content="theme.count">
             <custom-icon
-              :name="theme"
+              :name="theme.name"
               icon-folder="themes"
               class="item-image"
             />
@@ -32,13 +32,13 @@
 
           <custom-icon
             v-else
-            :name="theme"
+            :name="theme.name"
             icon-folder="themes"
             class="item-image"
           />
         </v-list-img>
         <v-list-item-title class="list-item-title">{{
-          theme
+          theme.name
         }}</v-list-item-title>
       </v-list-item>
       <v-list>
@@ -121,7 +121,11 @@ export default {
     };
   },
   methods: {
-    ...mapActions("map", ["setActiveTheme", "updateActiveDatasetsArray"]),
+    ...mapActions("map", [
+      "setActiveTheme",
+      "updateActiveDatasetsArray",
+      "updateThemeObject",
+    ]),
     openLayersCard() {
       this.showLayersCard = true;
     },
@@ -133,6 +137,7 @@ export default {
     },
     toggleDataset(dataset) {
       this.updateActiveDatasetsArray(dataset);
+      this.updateThemeObject();
     },
   },
   computed: {

@@ -37,8 +37,19 @@ export default {
     },
   },
   mutations: {
-    ADD_THEME(state, theme) {
-      state.themes = [...state.themes, theme];
+    ADD_THEME(state, themeObject) {
+      state.themes = [...state.themes, themeObject];
+    },
+    //Add or remove number of selected datasets of the theme.
+    UPDATE_NUMBER_OF_ACTIVE_DATASETS_ON_THEME(state, { name, count }) {
+      state.themes = state.themes.map((themeObject) => {
+        //console.log("themeObject", themeObject, theme, count);
+        if (themeObject.name === name) {
+          return { ...themeObject, count: count };
+        } else {
+          return themeObject;
+        }
+      });
     },
     ADD_DATASET(state, dataset) {
       state.datasets = [...state.datasets, dataset];
@@ -64,7 +75,6 @@ export default {
     },
   },
   actions: {
-    //TODO:
     loadDatasets({ commit }) {
       //Get STAC collection
       getCatalog(process.env.VUE_APP_CATALOG_URL)
@@ -72,7 +82,9 @@ export default {
         .then((catalog) => {
           //2. read themes from the main catalog
           const keywords = _.get(catalog, "summaries.keywords");
-          keywords.forEach((keyword) => commit("ADD_THEME", keyword));
+          keywords.forEach((keyword) =>
+            commit("ADD_THEME", { name: keyword, count: 0 })
+          );
           //3. get collections of the catalog
           const collections = catalog.links.filter((el) => el.rel === "child");
           collections.forEach((collection) => {
@@ -123,6 +135,15 @@ export default {
     setActiveTheme({ commit }, theme) {
       commit("SET_ACTIVE_THEME", theme);
     },
+    updateThemeObject({ commit, getters }) {
+      const countActiveDatasets = getters.datasetsInActiveTheme.filter(
+        (dataset) => dataset.active === true
+      ).length;
+      commit("UPDATE_NUMBER_OF_ACTIVE_DATASETS_ON_THEME", {
+        name: getters.activeTheme,
+        count: countActiveDatasets,
+      });
+    },
     loadDatasetOnMap({ commit }, dataset) {
       const layer = matchLayerIdToProperties(dataset);
       //Check if the layer is vector or a raster
@@ -136,6 +157,7 @@ export default {
         }
       });
     },
+    //Used when new selections have been made
     reloadDatasetOnMap({ commit, dispatch }, dataset) {
       commit("REMOVE_MAPBOX_LAYER", dataset.id);
       dispatch("loadDatasetOnMap", dataset);
