@@ -1,4 +1,5 @@
 export default ({ id, assets, tileSize = 256 }) => {
+  console.log("id", id, assets);
   const { visual } = assets;
   return {
     id,
