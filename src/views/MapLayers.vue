@@ -49,6 +49,23 @@ export default {
   computed: {
     ...mapGetters("map", ["mapboxLayers"]),
   },
+  watch: {
+    map: {
+      handler(value) {
+        if (value) {
+          this.addEventsToMap();
+        }
+      },
+    },
+  },
+  methods: {
+    onMouseEnter() {
+      console.log("enter mouse");
+    },
+    addEventsToMap() {
+      this.map.on("mouseenter", this.layer.id, this.onMouseEnter);
+    },
+  },
 };
 </script>
 <style>
