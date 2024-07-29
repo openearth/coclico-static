@@ -42,8 +42,6 @@ import {
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
 
-import { mapGetters } from "vuex";
-
 import { ref, nextTick } from "vue";
 
 export default {
@@ -53,6 +51,49 @@ export default {
       isOpen: ref(false),
       position: ref([0, 0]),
       content: ref(),
+      mapboxLayers: [
+        {
+          id: "example-layer",
+          type: "symbol",
+          source: {
+            type: "geojson",
+            data: {
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  geometry: {
+                    type: "Point",
+                    coordinates: [4.9041, 52.3676], // Amsterdam
+                  },
+                  properties: {
+                    title: "Amsterdam",
+                    description: "Amsterdam, Netherlands",
+                  },
+                },
+                {
+                  type: "Feature",
+                  geometry: {
+                    type: "Point",
+                    coordinates: [4.4777, 51.9244], // Rotterdam
+                  },
+                  properties: {
+                    title: "Rotterdam",
+                    description: "Rotterdam, Netherlands",
+                  },
+                },
+              ],
+            },
+          },
+          layout: {
+            "icon-image": "marker-15",
+            "icon-size": 1.5,
+            "text-field": ["get", "title"],
+            "text-offset": [0, 0.6],
+            "text-anchor": "top",
+          },
+        },
+      ],
     };
   },
   components: {
@@ -62,9 +103,6 @@ export default {
     MapboxPopup,
     AppSidebar,
     DatasetCard,
-  },
-  computed: {
-    ...mapGetters("map", ["mapboxLayers"]),
   },
   methods: {
     onMapLoad() {
