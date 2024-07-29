@@ -17,9 +17,7 @@
       <VMapboxLayer
         v-for="layer in mapboxLayers"
         :key="layer.id"
-        :id="layer.id"
-        :options="layer"
-        @mb-click="testMethod"
+        :layer="layer"
       />
 
       <MapboxPopup
@@ -41,7 +39,6 @@
 import {
   MapboxMap,
   MapboxNavigationControl,
-  /* MapboxLayer, */
   MapboxPopup,
 } from "@studiometa/vue-mapbox-gl";
 import AppSidebar from "@/components/AppSidebar.vue";

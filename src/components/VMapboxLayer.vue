@@ -1,121 +1,43 @@
 <template>
-  <div :id="id" />
+  <MapboxLayer
+    v-if="layer"
+    :id="layer.id"
+    :options="layer"
+    @mb-click="onLayerClicked"
+    @mb-mouseenter="onMouseenter"
+    @mb-mouseleave="onMouseleave"
+  >
+  </MapboxLayer>
 </template>
-
 <script>
-const propsConfig = {
-  /**
-   * Id of the layer
-   * @see  https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer
-   * @type {string}
-   */
-  id: {
-    type: String,
-    required: true,
+import { MapboxLayer } from "@studiometa/vue-mapbox-gl";
+import { useMap } from "@studiometa/vue-mapbox-gl";
+import { unref } from "vue";
+
+export default {
+  mounted() {
+    const { map } = useMap();
+    this.map = map;
   },
-  /**
-   * Options for the layer
-   * @see  https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer
-   * @see  https://docs.mapbox.com/mapbox-gl-js/style-spec/#layers
-   * @type {object}
-   */
-  options: {
-    type: Object,
-    default: () => {},
+  props: {
+    layer: {
+      type: Object,
+      default: () => {},
+    },
   },
-  /**
-   * The ID of an existing layer to insert the new layer before.
-   * @see  https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer
-   * @type {string}
-   */
-  beforeId: {
-    type: String,
-    default: undefined,
+  components: {
+    MapboxLayer,
+  },
+  methods: {
+    onLayerClicked(e) {
+      console.log("e", e.features[0]);
+    },
+    onMouseenter() {
+      unref(this.map).getCanvas().style.cursor = "pointer";
+    },
+    onMouseleave() {
+      unref(this.map).getCanvas().style.cursor = "";
+    },
   },
 };
-
-/**
- * All Map events which will be mapped/bounded to the component
- * @see  https://docs.mapbox.com/mapbox-gl-js/api/#map#on
- * @type {Array}
- */
-const events = [
-  "mousedown",
-  "mouseup",
-  "click",
-  "dblclick",
-  "mousemove",
-  "mouseenter",
-  "mouseleave",
-  "mouseover",
-  "mouseout",
-  "contextmenu",
-  "touchstart",
-  "touchend",
-  "touchcancel",
-];
-</script>
-
-<script setup>
-import {
-  onMounted,
-  onUnmounted,
-  computed,
-  unref,
-  defineProps,
-  defineEmits,
-} from "vue";
-
-import { useEventsBinding, useMap } from "../composables/index.js";
-
-const props = defineProps(propsConfig);
-const emit = defineEmits(events);
-console.log("emit", emit);
-
-const { map } = useMap();
-const options = computed(() => {
-  const opts = { ...props.options, id: props.id };
-
-  if (opts.paint === null || opts.paint === undefined) {
-    delete opts.paint;
-  }
-
-  if (opts.layout === null || opts.layout === undefined) {
-    delete opts.layout;
-  }
-
-  return opts;
-});
-
-useEventsBinding(emit, map, events, props.id);
-
-/**
- * Remove the layer.
- */
-function removeLayer() {
-  if (typeof unref(map).getLayer(props.id) !== "undefined") {
-    unref(map).removeLayer(props.id);
-  }
-}
-
-/**
- * Remove the source.
- */
-function removeSource() {
-  if (typeof unref(map).getSource(props.id) !== "undefined") {
-    unref(map).removeSource(props.id);
-  }
-}
-
-onMounted(() => {
-  removeLayer();
-  removeSource();
-  unref(map).addLayer(unref(options), props.beforeId);
-  //register the events?
-});
-
-onUnmounted(() => {
-  removeLayer();
-  removeSource();
-});
 </script>
