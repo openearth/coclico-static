@@ -25,7 +25,9 @@
         @mb-close="() => (isOpen = false)"
       >
         <pre style="width: 450px; height: 350px; overflow: hidden">
-          <div ref="chartContainer" style="width: 100%; height: 100%;"></div>
+          <v-btn class="button-popup"> Move to dashboard </v-btn>
+          THIS IS JUST TO HAVE SOMETHING HERE
+          <generic-graph />
         </pre>
       </MapboxPopup>
       <dataset-card />
@@ -43,7 +45,7 @@ import {
 } from "@studiometa/vue-mapbox-gl";
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
-import * as echarts from "echarts";
+import GenericGraph from "@/components/GenericGraph.vue";
 import { ref, nextTick } from "vue";
 
 export default {
@@ -105,6 +107,7 @@ export default {
     MapboxPopup,
     AppSidebar,
     DatasetCard,
+    GenericGraph,
   },
   methods: {
     onMapLoad() {
@@ -139,55 +142,6 @@ export default {
       );
 
       await nextTick();
-      this.renderChart();
-    },
-    renderChart() {
-      const chartDom = this.$refs.chartContainer;
-      const myChart = echarts.init(chartDom);
-      const option = {
-        title: {
-          text: "Traffic Sources",
-          left: "center",
-        },
-        tooltip: {
-          trigger: "item",
-          formatter: "{a} <br/>{b} : {c} ({d}%)",
-        },
-        legend: {
-          orient: "vertical",
-          left: "left",
-          data: [
-            "Direct",
-            "Email",
-            "Ad Networks",
-            "Video Ads",
-            "Search Engines",
-          ],
-        },
-        series: [
-          {
-            name: "Traffic Sources",
-            type: "pie",
-            radius: "55%",
-            center: ["50%", "60%"],
-            data: [
-              { value: 335, name: "Direct" },
-              { value: 310, name: "Email" },
-              { value: 234, name: "Ad Networks" },
-              { value: 135, name: "Video Ads" },
-              { value: 1548, name: "Search Engines" },
-            ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)",
-              },
-            },
-          },
-        ],
-      };
-      myChart.setOption(option);
     },
   },
 };
@@ -201,5 +155,11 @@ export default {
 
 .mapboxgl-popup-content {
   width: fit-content;
+}
+
+.button-popup {
+  background-color: rgb(var(--v-theme-primary));
+  border: none;
+  color: rgb(var(--v-theme-white100));
 }
 </style>
