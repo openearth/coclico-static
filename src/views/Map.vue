@@ -11,14 +11,7 @@
       @mb-load="onMapLoad"
     >
       <MapboxNavigationControl :visualizePitch="true" />
-      <!-- TODO: create a component on top of the component of the MapboxLayer
-       1. In this new component import the MapboxLayer
-       2. Listen to the events that are needed: click, mouseenter, mouseleave and while listening them do something -->
-      <VMapboxLayer
-        v-for="layer in mapboxLayers"
-        :key="layer.id"
-        :layer="layer"
-      />
+      <MapLayer v-for="layer in mapboxLayers" :key="layer.id" :layer="layer" />
 
       <MapboxPopup
         v-if="isOpen"
@@ -43,7 +36,7 @@ import {
 } from "@studiometa/vue-mapbox-gl";
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
-import VMapboxLayer from "@/components/VMapboxLayer.vue";
+import MapLayer from "@/components/MapLayer.vue";
 
 import { mapGetters } from "vuex";
 
@@ -61,7 +54,7 @@ export default {
   components: {
     MapboxMap,
     MapboxNavigationControl,
-    VMapboxLayer,
+    MapLayer,
     MapboxPopup,
     AppSidebar,
     DatasetCard,

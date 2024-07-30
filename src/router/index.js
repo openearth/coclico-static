@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import MapLayers from "../views/MapLayers.vue";
+import Map from "../views/Map.vue";
 import Stories from "../views/Stories.vue";
 
 const routes = [
   {
     path: "/data",
     name: "data",
-    component: MapLayers,
+    component: Map,
   },
   {
     path: "/stories",
