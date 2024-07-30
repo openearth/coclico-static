@@ -8,10 +8,14 @@
       :zoom="4"
       :center="[5.2913, 48.1326]"
       map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
-      @mb-load="onMapLoad"
     >
       <MapboxNavigationControl :visualizePitch="true" />
-      <MapLayer v-for="layer in mapboxLayers" :key="layer.id" :layer="layer" />
+      <MapLayer
+        v-for="layer in mapboxLayers"
+        :key="layer.id"
+        :layer="layer"
+        @click="onFeatureClick"
+      />
 
       <MapboxPopup
         v-if="isOpen"
@@ -39,16 +43,14 @@ import DatasetCard from "@/components/DatasetCard.vue";
 import MapLayer from "@/components/MapLayer.vue";
 
 import { mapGetters } from "vuex";
-
-import { ref, nextTick } from "vue";
+import { nextTick } from "vue";
 
 export default {
   data() {
     return {
       accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
-      isOpen: ref(false),
-      position: ref([0, 0]),
-      content: ref(),
+      isOpen: false,
+      position: [],
     };
   },
   components: {
@@ -63,24 +65,14 @@ export default {
     ...mapGetters("map", ["mapboxLayers"]),
   },
   methods: {
-    onMapLoad() {
-      this.map = this.$refs.map.map;
-      this.map.on("click", "example-layer", this.openPopup);
-    },
-    async openPopup(e) {
-      const { features } = e;
-      if (!features.length) return;
-
-      const feature = features[0];
+    async onFeatureClick(feature) {
       const { geometry, properties } = feature;
-
       await nextTick();
       this.position = [...geometry.coordinates];
-      this.isOpen = true;
 
       /**
-       * Mapbox GL convert's properties values to JSON, so we need to parse them
-       * to retrieve any complex data structure such as arrays and objects.
+       * Placeholder, replace with chart
+       *
        */
       this.content = Object.fromEntries(
         Object.entries(properties).map(([key, value]) => {
@@ -93,10 +85,8 @@ export default {
           return [key, value];
         })
       );
-    },
-    testMethod(event) {
-      console.log("it was clicked", event);
-      console.log("feature", event.features);
+
+      this.isOpen = true;
     },
   },
 };

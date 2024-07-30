@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     onLayerClicked(e) {
-      console.log("e", e.features[0]);
+      this.$emit("click", e.features[0]);
     },
     onMouseenter() {
       unref(this.map).getCanvas().style.cursor = "pointer";
