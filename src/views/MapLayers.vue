@@ -23,7 +23,6 @@
         :lng-lat="position"
         anchor="bottom"
         @mb-close="() => (isOpen = false)"
-        style="width: fit-content"
       >
         <pre style="width: 450px; height: 350px; overflow: hidden">
           <div ref="chartContainer" style="width: 100%; height: 100%;"></div>
@@ -198,5 +197,9 @@ export default {
 #map {
   width: 100%;
   height: 100%;
+}
+
+.mapboxgl-popup-content {
+  width: fit-content;
 }
 </style>
