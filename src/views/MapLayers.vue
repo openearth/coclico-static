@@ -23,11 +23,11 @@
         :lng-lat="position"
         anchor="bottom"
         @mb-close="() => (isOpen = false)"
+        style="width: 450px; height: 450px"
       >
-        <pre style="width: 450px; height: 350px; overflow: hidden">
-          <v-btn class="button-popup"> Move to dashboard </v-btn>
-          THIS IS JUST TO HAVE SOMETHING HERE
+        <pre style="width: 450px; height: 350px">
           <generic-graph />
+          <v-btn @click="saveGraphOnDashboard" class="button-popup"> Move to dashboard </v-btn>
         </pre>
       </MapboxPopup>
       <dataset-card />
@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import {
   MapboxMap,
   MapboxNavigationControl,
@@ -110,6 +111,7 @@ export default {
     GenericGraph,
   },
   methods: {
+    ...mapActions("map", ["setGraphInDashboard"]),
     onMapLoad() {
       this.map = this.$refs.map.map;
       this.map.on("click", "example-layer", this.openPopup);
@@ -143,6 +145,12 @@ export default {
 
       await nextTick();
     },
+    saveGraphOnDashboard() {
+      this.setGraphInDashboard(true);
+    },
+  },
+  computed: {
+    ...mapGetters("map", ["graphInDashboard"]),
   },
 };
 </script>

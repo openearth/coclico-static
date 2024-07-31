@@ -1,6 +1,6 @@
 <template>
   <v-card flat class="ma-3" style="height: 200px">
-    <generic-graph />
+    <generic-graph v-if="graphInDashboard" />
   </v-card>
   <v-card flat>
     <v-card-text>
@@ -14,11 +14,15 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import GenericGraph from "@/components/GenericGraph.vue";
 
 export default {
   components: {
     GenericGraph,
+  },
+  computed: {
+    ...mapGetters("map", ["graphInDashboard"]),
   },
 };
 </script>
