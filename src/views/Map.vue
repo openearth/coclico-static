@@ -8,7 +8,6 @@
       :zoom="4"
       :center="[5.2913, 48.1326]"
       map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
-     
     >
       <MapboxNavigationControl :visualizePitch="true" />
       <MapLayer
@@ -49,7 +48,8 @@ import {
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
 import GenericGraph from "@/components/GenericGraph.vue";
-import { ref, nextTick } from "vue";
+import MapLayer from "@/components/MapLayer.vue";
+import { nextTick } from "vue";
 
 export default {
   data() {
@@ -70,36 +70,20 @@ export default {
   },
   methods: {
     ...mapActions("map", ["setGraphInDashboard"]),
-    async openPopup(e) {
-      const { features } = e;
-      if (!features.length) return;
-
-      const feature = features[0];
+    async onFeatureClick(feature) {
       const { geometry, properties } = feature;
+      console.log("propertie", properties);
 
       await nextTick();
       this.position = [...geometry.coordinates];
       this.isOpen = true;
-  },
-},
-  computed: {
-    ...mapGetters("map", ["mapboxLayers"]),
-  },
-  methods: {
-    async onFeatureClick(feature) {
-      const { geometry, properties } = feature;
-      await nextTick();
-      this.position = [...geometry.coordinates];
-
-
-      await nextTick();
     },
     saveGraphOnDashboard() {
       this.setGraphInDashboard(true);
     },
   },
   computed: {
-    ...mapGetters("map", ["graphInDashboard"]),
+    ...mapGetters("map", ["mapboxLayers", "graphInDashboard"]),
   },
 };
 </script>
