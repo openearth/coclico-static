@@ -12,6 +12,7 @@ export default {
     activeTheme: null,
     activeDatasets: [],
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
+    graphInDashboard: null,
   },
   getters: {
     themes(state) {
@@ -34,6 +35,9 @@ export default {
     },
     mapboxLayers(state) {
       return state.mapboxLayers;
+    },
+    graphInDashboard(state) {
+      return state.graphInDashboard;
     },
   },
   mutations: {
@@ -72,6 +76,9 @@ export default {
       state.mapboxLayers = state.mapboxLayers.filter(
         (mapboxLayer) => mapboxLayer.id !== id
       );
+    },
+    SET_GRAPH_IN_DASHBOARD(state, graph) {
+      state.graphInDashboard = graph;
     },
   },
   actions: {
@@ -173,6 +180,9 @@ export default {
         commit("ADD_ACTIVE_DATASET", dataset);
         dispatch("loadDatasetOnMap", dataset);
       }
+    },
+    setGraphInDashboard({ commit }, graph) {
+      commit("SET_GRAPH_IN_DASHBOARD", graph);
     },
   },
 };

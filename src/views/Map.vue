@@ -23,8 +23,12 @@
         :lng-lat="position"
         anchor="bottom"
         @mb-close="() => (isOpen = false)"
+        style="width: 450px; height: 450px"
       >
-        <pre>{{ content }}</pre>
+        <pre style="width: 450px; height: 350px">
+          <generic-graph />
+          <v-btn @click="saveGraphOnDashboard" class="button-popup"> Move to dashboard </v-btn>
+        </pre>
       </MapboxPopup>
       <dataset-card />
     </mapbox-map>
@@ -33,16 +37,18 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+
 import {
   MapboxMap,
   MapboxNavigationControl,
   MapboxPopup,
 } from "@studiometa/vue-mapbox-gl";
+
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
+import GenericGraph from "@/components/GenericGraph.vue";
 import MapLayer from "@/components/MapLayer.vue";
-
-import { mapGetters } from "vuex";
 import { nextTick } from "vue";
 
 export default {
@@ -60,34 +66,24 @@ export default {
     MapboxPopup,
     AppSidebar,
     DatasetCard,
-  },
-  computed: {
-    ...mapGetters("map", ["mapboxLayers"]),
+    GenericGraph,
   },
   methods: {
+    ...mapActions("map", ["setGraphInDashboard"]),
     async onFeatureClick(feature) {
       const { geometry, properties } = feature;
+      console.log("propertie", properties);
+
       await nextTick();
       this.position = [...geometry.coordinates];
-
-      /**
-       * Placeholder, replace with chart
-       *
-       */
-      this.content = Object.fromEntries(
-        Object.entries(properties).map(([key, value]) => {
-          try {
-            return [key, JSON.parse(value)];
-          } catch (err) {
-            // Silence is golden.
-          }
-
-          return [key, value];
-        })
-      );
-
       this.isOpen = true;
     },
+    saveGraphOnDashboard() {
+      this.setGraphInDashboard(true);
+    },
+  },
+  computed: {
+    ...mapGetters("map", ["mapboxLayers", "graphInDashboard"]),
   },
 };
 </script>
@@ -96,5 +92,14 @@ export default {
 #map {
   width: 100%;
   height: 100%;
+}
+.mapboxgl-popup-content {
+  width: fit-content;
+}
+
+.button-popup {
+  background-color: rgb(var(--v-theme-primary));
+  border: none;
+  color: rgb(var(--v-theme-white100));
 }
 </style>
