@@ -1,5 +1,5 @@
 <template>
-  <v-card flat class="ma-3" style="height: 200px">
+  <v-card flat class="ma-3" style="height: 350px">
     <generic-graph v-if="graphInDashboard" />
   </v-card>
   <v-card flat>
