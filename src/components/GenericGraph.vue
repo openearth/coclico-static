@@ -20,20 +20,50 @@ export default {
           },
           tooltip: {
             trigger: "axis",
+            confine: false,
             formatter: function (params) {
-              var tar0 = params[0];
-              var tar1 = params[1];
-              var tar2 = params[2];
+              var varsSsp3Low = params[0];
+              var varsSsp3Med = params[1];
+              var varsSsp3High = params[2];
+              var varsSsp4Low = params[3];
+              var varsSsp4Med = params[4];
+              var varsSsp4High = params[5];
+              var varsSsp6Low = params[6];
+              var varsSsp6Med = params[7];
+              var varsSsp6High = params[8];
+              const formatValue = (value) => parseFloat(value).toFixed(2);
               return (
-                tar1.name +
+                varsSsp3Med.name +
                 "<br/>" +
-                tar1.seriesName +
+                varsSsp3Med.seriesName +
                 " [m] : " +
-                tar0.value +
+                formatValue(varsSsp3Low.value) +
                 " - " +
-                (tar0.value + tar1.value) +
+                formatValue(varsSsp3Low.value + varsSsp3Med.value) +
                 " - " +
-                (tar0.value + tar1.value + tar2.value)
+                formatValue(
+                  varsSsp3Low.value + varsSsp3Med.value + varsSsp3High.value
+                ) +
+                "<br/>" +
+                varsSsp4Med.seriesName +
+                " [m] : " +
+                formatValue(varsSsp4Low.value) +
+                " - " +
+                formatValue(varsSsp4Low.value + varsSsp4Med.value) +
+                " - " +
+                formatValue(
+                  varsSsp4Low.value + varsSsp4Med.value + varsSsp4High.value
+                ) +
+                "<br/>" +
+                varsSsp6Med.seriesName +
+                " [m] : " +
+                formatValue(varsSsp6Low.value) +
+                " - " +
+                formatValue(varsSsp6Low.value + varsSsp6Med.value) +
+                " - " +
+                formatValue(
+                  varsSsp6Low.value + varsSsp6Med.value + varsSsp6High.value
+                )
               );
             },
           },
@@ -79,6 +109,7 @@ export default {
               },
               data: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
               animation: false,
+              silent: true,
             },
             {
               name: "Sea Level Rise SSP3",
@@ -91,6 +122,7 @@ export default {
               },
               data: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
               animation: false,
+              silent: true,
             },
             {
               name: "Sea Level Rise top SSP3",
@@ -103,6 +135,7 @@ export default {
               },
               data: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
               animation: false,
+              silent: true,
             },
             {
               name: "Placeholder SSP4",
@@ -120,6 +153,7 @@ export default {
               },
               data: [0.25, 0.35, 0.5, 0.6, 0.75, 0.9],
               animation: false,
+              silent: true,
             },
             {
               name: "Sea Level Rise SSP4",
@@ -132,6 +166,7 @@ export default {
               },
               data: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
               animation: false,
+              silent: true,
             },
             {
               name: "Sea Level Rise top SSP4",
@@ -144,6 +179,7 @@ export default {
               },
               data: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
               animation: false,
+              silent: true,
             },
             {
               name: "Placeholder SSP5",
@@ -161,6 +197,7 @@ export default {
               },
               data: [0.3, 0.45, 0.55, 0.75, 0.9, 1],
               animation: false,
+              silent: true,
             },
             {
               name: "Sea Level Rise SSP5",
@@ -173,6 +210,7 @@ export default {
               },
               data: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
               animation: false,
+              silent: true,
             },
             {
               name: "Sea Level Rise top SSP5",
@@ -185,6 +223,7 @@ export default {
               },
               data: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
               animation: false,
+              silent: true,
             },
           ],
         };
