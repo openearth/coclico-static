@@ -20,7 +20,7 @@ export default {
           },
           tooltip: {
             trigger: "axis",
-            confine: false,
+            confine: true,
             formatter: function (params) {
               var varsSsp3Low = params[0];
               var varsSsp3Med = params[1];
