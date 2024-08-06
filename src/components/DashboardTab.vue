@@ -1,15 +1,17 @@
 <template>
-  <v-card flat class="ma-3" style="height: 200px">
-    <generic-graph v-if="graphInDashboard" />
-  </v-card>
-  <v-card flat>
-    <v-card-text>
-      Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus
-      ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis,
-      eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor
-      urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae,
-      posuere imperdiet, leo. Nunc sed turpis.
-    </v-card-text>
+  <v-card flat class="scrollable-card">
+    <v-card flat class="ma-3" style="height: 350px">
+      <generic-graph v-if="graphInDashboard" />
+    </v-card>
+    <v-card flat>
+      <v-card-text>
+        Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas,
+        lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed
+        mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non
+        adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non,
+        euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
+      </v-card-text>
+    </v-card>
   </v-card>
 </template>
 
@@ -26,3 +28,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.scrollable-card {
+  max-height: 300px;
+  overflow-y: visible;
+}
+</style>
