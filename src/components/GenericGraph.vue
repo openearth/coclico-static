@@ -76,6 +76,9 @@ export default {
             selectedMode: false,
             orient: "vertical",
             left: "right",
+            itemStyle: {
+              borderWidth: 0.5,
+            },
           },
           grid: {
             top: "25%",
