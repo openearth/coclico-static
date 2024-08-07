@@ -23,12 +23,15 @@
         :lng-lat="position"
         anchor="bottom"
         @mb-close="() => (isOpen = false)"
-        style="width: 470px; height: 440px"
+        style="width: 470px; height: 450px"
+        :closeButton="false"
       >
         <pre style="width: 450px; height: 350px">
           <generic-graph />
-              <v-btn @click="saveGraphOnDashboard" class="button-popup"> Add to dashboard </v-btn>
-              <v-btn> Close </v-btn>   
+          <div class="buttons-container">
+            <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
+            <v-btn flat @click="closeDashboard" class="close-button-popup"> Close </v-btn>
+          </div>
         </pre>
       </MapboxPopup>
       <dataset-card />
@@ -82,6 +85,9 @@ export default {
     saveGraphOnDashboard() {
       this.setGraphInDashboard(true);
     },
+    closeDashboard() {
+      this.isOpen = false;
+    },
   },
   computed: {
     ...mapGetters("map", ["mapboxLayers", "graphInDashboard"]),
@@ -98,13 +104,29 @@ export default {
   width: fit-content;
 }
 
-.button-popup {
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.add-to-dashboard-button-popup {
   background-color: #293a45;
-  border: none;
   color: white !important;
   font-family: "Inter", sans-serif;
   text-transform: none;
   font-weight: 100 !important;
-  margin-left: -20px;
+  border-radius: 8px;
+  min-width: 180px;
+}
+.close-button-popup {
+  background-color: white;
+  color: #293a45 !important;
+  font-family: "Inter", sans-serif;
+  text-transform: none;
+  font-weight: 100 !important;
+  border-radius: 8px;
+  border: 1px solid #293a45;
+  min-width: 180px;
 }
 </style>

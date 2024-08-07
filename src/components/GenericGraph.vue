@@ -33,7 +33,7 @@ export default {
               var varsSsp6High = params[8];
               const formatValue = (value) => parseFloat(value).toFixed(2);
               return (
-                varsSsp3Med.name +
+                varsSsp3Med.name.bold() +
                 "<br/>" +
                 varsSsp3Med.seriesName +
                 " [m] : " +
