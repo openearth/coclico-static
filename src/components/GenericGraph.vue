@@ -76,6 +76,9 @@ export default {
             selectedMode: false,
             orient: "vertical",
             left: "right",
+            itemStyle: {
+              borderWidth: 0.5,
+            },
           },
           grid: {
             top: "25%",
@@ -110,6 +113,7 @@ export default {
               data: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Sea Level Rise SSP3",
@@ -123,6 +127,7 @@ export default {
               data: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Sea Level Rise top SSP3",
@@ -136,6 +141,7 @@ export default {
               data: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Placeholder SSP4",
@@ -154,6 +160,7 @@ export default {
               data: [0.25, 0.35, 0.5, 0.6, 0.75, 0.9],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Sea Level Rise SSP4",
@@ -167,6 +174,7 @@ export default {
               data: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Sea Level Rise top SSP4",
@@ -180,6 +188,7 @@ export default {
               data: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Placeholder SSP5",
@@ -198,6 +207,7 @@ export default {
               data: [0.3, 0.45, 0.55, 0.75, 0.9, 1],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Sea Level Rise SSP5",
@@ -211,6 +221,7 @@ export default {
               data: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
             {
               name: "Sea Level Rise top SSP5",
@@ -224,6 +235,7 @@ export default {
               data: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
               animation: false,
               silent: true,
+              barWidth: 10,
             },
           ],
         };
