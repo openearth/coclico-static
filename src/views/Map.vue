@@ -23,11 +23,12 @@
         :lng-lat="position"
         anchor="bottom"
         @mb-close="() => (isOpen = false)"
-        style="width: 450px; height: 450px"
+        style="width: 470px; height: 440px"
       >
         <pre style="width: 450px; height: 350px">
           <generic-graph />
-          <v-btn @click="saveGraphOnDashboard" class="button-popup"> Move to dashboard </v-btn>
+              <v-btn @click="saveGraphOnDashboard" class="button-popup"> Add to dashboard </v-btn>
+              <v-btn> Close </v-btn>   
         </pre>
       </MapboxPopup>
       <dataset-card />
@@ -98,8 +99,12 @@ export default {
 }
 
 .button-popup {
-  background-color: rgb(var(--v-theme-primary));
+  background-color: #293a45;
   border: none;
-  color: rgb(var(--v-theme-white100));
+  color: white !important;
+  font-family: "Inter", sans-serif;
+  text-transform: none;
+  font-weight: 100 !important;
+  margin-left: -20px;
 }
 </style>
