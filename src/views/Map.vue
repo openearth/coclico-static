@@ -87,7 +87,7 @@ export default {
     GenericGraph,
   },
   methods: {
-    ...mapActions("map", ["setGraphInDashboard"]),
+    ...mapActions("map", ["setGraphInDashboard", "setSeaLevelRiseData"]),
     async onFeatureClick(feature) {
       const { geometry, properties } = feature;
       console.log("propertie", properties);
@@ -97,6 +97,7 @@ export default {
       this.isOpen = true;
     },
     saveGraphOnDashboard() {
+      this.setSeaLevelRiseData(this.seaLevelRiseData);
       this.setGraphInDashboard(true);
     },
     closeDashboard() {
@@ -104,7 +105,14 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("map", ["mapboxLayers", "graphInDashboard"]),
+    ...mapGetters("map", [
+      "mapboxLayers",
+      "graphInDashboard",
+      "seaLevelRiseData",
+    ]),
+  },
+  created() {
+    this.setSeaLevelRiseData(this.seaLevelRiseData);
   },
 };
 </script>

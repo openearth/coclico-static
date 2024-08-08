@@ -13,6 +13,7 @@ export default {
     activeDatasets: [],
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
     graphInDashboard: null,
+    seaLevelRiseData: {},
   },
   getters: {
     themes(state) {
@@ -38,6 +39,9 @@ export default {
     },
     graphInDashboard(state) {
       return state.graphInDashboard;
+    },
+    seaLevelRiseData(state) {
+      return state.seaLevelRiseData;
     },
   },
   mutations: {
@@ -79,6 +83,9 @@ export default {
     },
     SET_GRAPH_IN_DASHBOARD(state, graph) {
       state.graphInDashboard = graph;
+    },
+    SET_SEA_LEVEL_RISE_DATA(state, data) {
+      state.seaLevelRiseData = data;
     },
   },
   actions: {
@@ -183,6 +190,9 @@ export default {
     },
     setGraphInDashboard({ commit }, graph) {
       commit("SET_GRAPH_IN_DASHBOARD", graph);
+    },
+    setSeaLevelRiseData({ commit }, graph) {
+      commit("SET_SEA_LEVEL_RISE_DATA", graph);
     },
   },
 };
