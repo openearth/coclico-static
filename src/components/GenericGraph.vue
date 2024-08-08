@@ -7,6 +7,12 @@ import { nextTick } from "vue";
 import * as echarts from "echarts";
 
 export default {
+  props: {
+    seaLevelRiseData: {
+      type: Object,
+      required: true,
+    },
+  },
   methods: {
     renderChart() {
       const chartDom = this.$refs.chartContainer;
@@ -15,8 +21,7 @@ export default {
         const option = {
           title: {
             text: "Sea Level Rise",
-            top: "20px",
-            left: "90px",
+            left: "center",
           },
           tooltip: {
             trigger: "axis",
@@ -68,32 +73,34 @@ export default {
             },
           },
           legend: {
-            data: [
-              "Sea Level Rise SSP3",
-              "Sea Level Rise SSP4",
-              "Sea Level Rise SSP5",
-            ],
+            data: ["SSP3", "SSP4", "SSP5"],
             selectedMode: false,
-            orient: "vertical",
-            left: "right",
+            orient: "horizontal",
+            bottom: 0,
             itemStyle: {
               borderWidth: 0.5,
             },
           },
           grid: {
-            top: "25%",
-            left: "3%",
-            right: "4%",
-            bottom: "0%",
+            top: "15%",
+            left: "5%",
+            right: "0%",
+            bottom: "15%",
             containLabel: true,
           },
           xAxis: {
             type: "category",
             splitLine: { show: false },
-            data: ["2010", "2020", "2030", "2040", "2050", "2060"],
+            data: this.seaLevelRiseData.xAxisData,
+            name: "Year",
+            nameLocation: "middle",
+            nameGap: 25,
           },
           yAxis: {
             type: "value",
+            name: "Sea level rise [m]",
+            nameLocation: "middle",
+            nameGap: 30,
           },
           series: [
             {
@@ -110,13 +117,13 @@ export default {
                   color: "transparent",
                 },
               },
-              data: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+              data: this.seaLevelRiseData.ssp3LowData,
               animation: false,
               silent: true,
               barWidth: 10,
             },
             {
-              name: "Sea Level Rise SSP3",
+              name: "SSP3",
               type: "bar",
               stack: "SSP3",
               color: "#173c66",
@@ -124,7 +131,7 @@ export default {
                 borderWidth: 0.5,
                 borderColor: "#000000",
               },
-              data: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
+              data: this.seaLevelRiseData.ssp3MedData,
               animation: false,
               silent: true,
               barWidth: 10,
@@ -138,7 +145,7 @@ export default {
                 borderWidth: 0.5,
                 borderColor: "#000000",
               },
-              data: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
+              data: this.seaLevelRiseData.ssp3HighData,
               animation: false,
               silent: true,
               barWidth: 10,
@@ -157,13 +164,13 @@ export default {
                   color: "transparent",
                 },
               },
-              data: [0.25, 0.35, 0.5, 0.6, 0.75, 0.9],
+              data: this.seaLevelRiseData.ssp4LowData,
               animation: false,
               silent: true,
               barWidth: 10,
             },
             {
-              name: "Sea Level Rise SSP4",
+              name: "SSP4",
               type: "bar",
               stack: "SSP4",
               color: "#f79320",
@@ -171,7 +178,7 @@ export default {
                 borderWidth: 0.5,
                 borderColor: "#000000",
               },
-              data: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
+              data: this.seaLevelRiseData.ssp4MedData,
               animation: false,
               silent: true,
               barWidth: 10,
@@ -185,7 +192,7 @@ export default {
                 borderWidth: 0.5,
                 borderColor: "#000000",
               },
-              data: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
+              data: this.seaLevelRiseData.ssp4HighData,
               animation: false,
               silent: true,
               barWidth: 10,
@@ -204,13 +211,13 @@ export default {
                   color: "transparent",
                 },
               },
-              data: [0.3, 0.45, 0.55, 0.75, 0.9, 1],
+              data: this.seaLevelRiseData.ssp5LowData,
               animation: false,
               silent: true,
               barWidth: 10,
             },
             {
-              name: "Sea Level Rise SSP5",
+              name: "SSP5",
               type: "bar",
               stack: "SSP5",
               color: "#e71d24",
@@ -218,7 +225,7 @@ export default {
                 borderWidth: 0.5,
                 borderColor: "#000000",
               },
-              data: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
+              data: this.seaLevelRiseData.ssp5MedData,
               animation: false,
               silent: true,
               barWidth: 10,
@@ -232,7 +239,7 @@ export default {
                 borderWidth: 0.5,
                 borderColor: "#000000",
               },
-              data: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
+              data: this.seaLevelRiseData.ssp5HighData,
               animation: false,
               silent: true,
               barWidth: 10,

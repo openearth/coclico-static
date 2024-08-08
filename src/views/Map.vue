@@ -27,7 +27,9 @@
         :closeButton="false"
       >
         <pre style="width: 450px; height: 350px">
-          <generic-graph />
+          <generic-graph
+            :sea-level-rise-data="seaLevelRiseData"
+          />
           <div class="buttons-container">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
             <v-btn flat @click="closeDashboard" class="close-button-popup"> Close </v-btn>
@@ -61,6 +63,18 @@ export default {
       accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
       isOpen: false,
       position: [],
+      seaLevelRiseData: {
+        xAxisData: ["2010", "2020", "2030", "2040", "2050", "2060"],
+        ssp3LowData: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+        ssp3MedData: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
+        ssp3HighData: [0.15, 0.25, 0.35, 0.45, 0.55, 0.65],
+        ssp4LowData: [0.25, 0.35, 0.5, 0.6, 0.75, 0.9],
+        ssp4MedData: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
+        ssp4HighData: [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
+        ssp5LowData: [0.3, 0.45, 0.55, 0.75, 0.9, 1],
+        ssp5MedData: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
+        ssp5HighData: [0.25, 0.355, 0.5, 0.65, 0.8, 0.95],
+      },
     };
   },
   components: {
