@@ -12,7 +12,7 @@ export default {
     activeTheme: null,
     activeDatasets: [],
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
-    graphInDashboard: null,
+    graphsInDashboard: [],
     seaLevelRiseData: {},
   },
   getters: {
@@ -37,8 +37,8 @@ export default {
     mapboxLayers(state) {
       return state.mapboxLayers;
     },
-    graphInDashboard(state) {
-      return state.graphInDashboard;
+    graphsInDashboard(state) {
+      return state.graphsInDashboard;
     },
     seaLevelRiseData(state) {
       return state.seaLevelRiseData;
@@ -81,8 +81,8 @@ export default {
         (mapboxLayer) => mapboxLayer.id !== id
       );
     },
-    SET_GRAPH_IN_DASHBOARD(state, graph) {
-      state.graphInDashboard = graph;
+    ADD_GRAPH_TO_DASHBOARD(state, graph) {
+      state.graphsInDashboard.push(graph);
     },
     SET_SEA_LEVEL_RISE_DATA(state, data) {
       state.seaLevelRiseData = data;
@@ -188,8 +188,8 @@ export default {
         dispatch("loadDatasetOnMap", dataset);
       }
     },
-    setGraphInDashboard({ commit }, graph) {
-      commit("SET_GRAPH_IN_DASHBOARD", graph);
+    addGraphToDashboard({ commit }, graph) {
+      commit("ADD_GRAPH_TO_DASHBOARD", graph);
     },
     setSeaLevelRiseData({ commit }, graph) {
       commit("SET_SEA_LEVEL_RISE_DATA", graph);

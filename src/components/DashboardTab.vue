@@ -1,10 +1,13 @@
 <template>
   <v-card flat class="scrollable-card">
-    <v-card flat class="ma-3" style="height: 350px">
-      <generic-graph
-        v-if="graphInDashboard"
-        :sea-level-rise-data="seaLevelRiseData"
-      />
+    <v-card
+      flat
+      v-for="(graphData, index) in graphsInDashboard"
+      :key="index"
+      class="ma-3"
+      style="height: 350px"
+    >
+      <generic-graph :sea-level-rise-data="graphData" />
     </v-card>
     <v-card flat>
       <v-card-text>
@@ -27,7 +30,7 @@ export default {
     GenericGraph,
   },
   computed: {
-    ...mapGetters("map", ["graphInDashboard", "seaLevelRiseData"]),
+    ...mapGetters("map", ["graphsInDashboard"]),
   },
 };
 </script>

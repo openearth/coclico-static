@@ -32,7 +32,7 @@
           />
           <div class="buttons-container">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
-            <v-btn flat @click="closeDashboard" class="close-button-popup"> Close </v-btn>
+            <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
           </div>
         </pre>
       </MapboxPopup>
@@ -87,7 +87,7 @@ export default {
     GenericGraph,
   },
   methods: {
-    ...mapActions("map", ["setGraphInDashboard", "setSeaLevelRiseData"]),
+    ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
     async onFeatureClick(feature) {
       const { geometry, properties } = feature;
       console.log("propertie", properties);
@@ -97,17 +97,17 @@ export default {
       this.isOpen = true;
     },
     saveGraphOnDashboard() {
-      this.setSeaLevelRiseData(this.seaLevelRiseData);
-      this.setGraphInDashboard(true);
+      // this.setSeaLevelRiseData(this.seaLevelRiseData);
+      this.addGraphToDashboard(this.seaLevelRiseData);
     },
-    closeDashboard() {
+    closePopup() {
       this.isOpen = false;
     },
   },
   computed: {
     ...mapGetters("map", [
       "mapboxLayers",
-      "graphInDashboard",
+      "graphsInDashboard",
       "seaLevelRiseData",
     ]),
   },
