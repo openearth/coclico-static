@@ -84,6 +84,9 @@ export default {
     ADD_GRAPH_TO_DASHBOARD(state, graph) {
       state.graphsInDashboard.push(graph);
     },
+    REMOVE_GRAPH_FROM_DASHBOARD(state, index) {
+      state.graphsInDashboard.splice(index, 1);
+    },
     SET_SEA_LEVEL_RISE_DATA(state, data) {
       state.seaLevelRiseData = data;
     },
@@ -190,6 +193,9 @@ export default {
     },
     addGraphToDashboard({ commit }, graph) {
       commit("ADD_GRAPH_TO_DASHBOARD", graph);
+    },
+    removeGraphFromDashboard({ commit }, index) {
+      commit("REMOVE_GRAPH_FROM_DASHBOARD", index);
     },
     setSeaLevelRiseData({ commit }, graph) {
       commit("SET_SEA_LEVEL_RISE_DATA", graph);
