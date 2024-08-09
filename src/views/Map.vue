@@ -108,7 +108,7 @@ export default {
     ...mapGetters("map", [
       "mapboxLayers",
       "graphsInDashboard",
-      "seaLevelRiseData",
+      "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
     ]),
   },
   created() {
