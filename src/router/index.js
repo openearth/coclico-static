@@ -4,6 +4,11 @@ import Stories from "../views/Stories.vue";
 
 const routes = [
   {
+    path: "/",
+    name: "home",
+    redirect: "/data",
+  },
+  {
     path: "/data",
     name: "data",
     component: Map,
