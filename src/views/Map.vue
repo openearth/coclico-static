@@ -3,6 +3,7 @@
     <mapbox-map
       id="map"
       ref="map"
+      @click="onMapcClicked"
       :access-token="accessToken"
       :preserve-drawing-buffer="true"
       :zoom="4"
@@ -88,12 +89,17 @@ export default {
   },
   methods: {
     ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
+    ...mapActions("graphs", ["getGraphData"]),
     async onFeatureClick(feature) {
       const { geometry, properties } = feature;
-      console.log("propertie", properties);
+      console.log("properties", properties);
+      this.position = [...geometry.coordinates];
+      //TODO: here I want to have if point layer the zarr call.
+      // if raster layer the getFeatureInfo better to make the calls in the store.
+      this.getGraphData();
 
       await nextTick();
-      this.position = [...geometry.coordinates];
+
       this.isOpen = true;
     },
     saveGraphOnDashboard() {
@@ -102,6 +108,9 @@ export default {
     },
     closePopup() {
       this.isOpen = false;
+    },
+    onMapcClicked(e) {
+      console.log("onMapClicked", e);
     },
   },
   computed: {
