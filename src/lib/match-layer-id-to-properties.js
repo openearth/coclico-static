@@ -1,7 +1,7 @@
 /**
  * Function that has as input the dataset
  * and based on the selected properties
- * returns the layer of the dataset
+ * returns one layer from the dataset object
  *
  *
  */

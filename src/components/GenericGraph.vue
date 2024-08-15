@@ -13,85 +13,88 @@ export default {
       required: true,
     },
   },
+  data: function () {
+    return {
+      colors: ["blue", "green", "red", "black"], // Standard colors
+    };
+  },
   methods: {
+    generateSeries() {
+      const series = [];
+
+      // Loop through each scenario in the data and generate the series
+      this.seaLevelRiseData.scenarios.forEach((scenario, index) => {
+        const color = this.colors[index % this.colors.length]; // Use standard colors in a cycle
+
+        // Add low data as a transparent placeholder (baseline)
+        series.push({
+          name: `Low ${scenario.name}`,
+          type: "bar",
+          stack: scenario.name,
+          itemStyle: {
+            borderColor: "transparent",
+            color: "transparent",
+          },
+          emphasis: {
+            itemStyle: {
+              borderColor: "transparent",
+              color: "transparent",
+            },
+          },
+          data: scenario.msl_l.values,
+          animation: false,
+          silent: true,
+          barWidth: 10,
+        });
+
+        // Add medium sea level rise data
+        series.push({
+          name: `Medium ${scenario.name}`,
+          type: "bar",
+          stack: scenario.name,
+          color: color, // Use one of the standard colors
+          itemStyle: {
+            borderWidth: 0.5,
+            borderColor: "#000000",
+          },
+          data: scenario.msl_m.values,
+          animation: false,
+          silent: true,
+          barWidth: 10,
+        });
+
+        // Add high sea level rise data (top)
+        series.push({
+          name: `High ${scenario.name}`,
+          type: "bar",
+          stack: scenario.name,
+          color: color, // Use the same color as medium
+          itemStyle: {
+            borderWidth: 0.5,
+            borderColor: "#000000",
+          },
+          data: scenario.msl_h.values,
+          animation: false,
+          silent: true,
+          barWidth: 10,
+        });
+      });
+
+      return series;
+    },
     renderChart() {
       const chartDom = this.$refs.chartContainer;
       if (chartDom && chartDom.clientWidth && chartDom.clientHeight) {
         const myChart = echarts.init(chartDom);
+
         const option = {
           title: {
             text: "Sea Level Rise",
             left: "center",
           },
-          tooltip: {
-            trigger: "axis",
-            confine: true,
-            formatter: function (params) {
-              var varsSsp3Low = params[0];
-              var varsSsp3Med = params[1];
-              var varsSsp3High = params[2];
-              var varsSsp4Low = params[3];
-              var varsSsp4Med = params[4];
-              var varsSsp4High = params[5];
-              var varsSsp6Low = params[6];
-              var varsSsp6Med = params[7];
-              var varsSsp6High = params[8];
-              const formatValue = (value) => parseFloat(value).toFixed(2);
-              return (
-                varsSsp3Med.name.bold() +
-                "<br/>" +
-                varsSsp3Med.seriesName +
-                " [m] : " +
-                formatValue(varsSsp3Low.value) +
-                " - " +
-                formatValue(varsSsp3Low.value + varsSsp3Med.value) +
-                " - " +
-                formatValue(
-                  varsSsp3Low.value + varsSsp3Med.value + varsSsp3High.value
-                ) +
-                "<br/>" +
-                varsSsp4Med.seriesName +
-                " [m] : " +
-                formatValue(varsSsp4Low.value) +
-                " - " +
-                formatValue(varsSsp4Low.value + varsSsp4Med.value) +
-                " - " +
-                formatValue(
-                  varsSsp4Low.value + varsSsp4Med.value + varsSsp4High.value
-                ) +
-                "<br/>" +
-                varsSsp6Med.seriesName +
-                " [m] : " +
-                formatValue(varsSsp6Low.value) +
-                " - " +
-                formatValue(varsSsp6Low.value + varsSsp6Med.value) +
-                " - " +
-                formatValue(
-                  varsSsp6Low.value + varsSsp6Med.value + varsSsp6High.value
-                )
-              );
-            },
-          },
-          legend: {
-            data: ["SSP3", "SSP4", "SSP5"],
-            selectedMode: false,
-            orient: "horizontal",
-            bottom: 0,
-            itemStyle: {
-              borderWidth: 0.5,
-            },
-          },
-          grid: {
-            top: "15%",
-            left: "5%",
-            right: "0%",
-            bottom: "15%",
-            containLabel: true,
-          },
           xAxis: {
             type: "category",
-            splitLine: { show: false },
-            data: this.seaLevelRiseData.xAxisData,
+            data: this.seaLevelRiseData.time, // Use time for x-axis
             name: "Year",
             nameLocation: "middle",
             nameGap: 25,
@@ -102,155 +105,47 @@ export default {
             nameLocation: "middle",
             nameGap: 30,
           },
-          series: [
-            {
-              name: "Placeholder SSP3",
-              type: "bar",
-              stack: "SSP3",
-              itemStyle: {
-                borderColor: "transparent",
-                color: "transparent",
-              },
-              emphasis: {
-                itemStyle: {
-                  borderColor: "transparent",
-                  color: "transparent",
-                },
-              },
-              data: this.seaLevelRiseData.ssp3LowData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
+          tooltip: {
+            trigger: "axis",
+            confine: true,
+            formatter: function (params) {
+              const formatValue = (value) => parseFloat(value).toFixed(2);
+              let tooltip = params[0].axisValue.bold() + "<br/>";
+              params.forEach((param) => {
+                tooltip += `${param.seriesName} : ${formatValue(
+                  param.value
+                )} m<br/>`;
+              });
+              return tooltip;
             },
-            {
-              name: "SSP3",
-              type: "bar",
-              stack: "SSP3",
-              color: "#173c66",
-              itemStyle: {
-                borderWidth: 0.5,
-                borderColor: "#000000",
-              },
-              data: this.seaLevelRiseData.ssp3MedData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
+          },
+          legend: {
+            data: this.seaLevelRiseData.scenarios.map(
+              (scenario) => `${scenario.name}`
+            ),
+            selectedMode: false,
+            orient: "horizontal",
+            bottom: 0,
+            itemStyle: {
+              borderWidth: 0.5,
             },
-            {
-              name: "Sea Level Rise top SSP3",
-              type: "bar",
-              stack: "SSP3",
-              color: "#173c66",
-              itemStyle: {
-                borderWidth: 0.5,
-                borderColor: "#000000",
-              },
-              data: this.seaLevelRiseData.ssp3HighData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
-            },
-            {
-              name: "Placeholder SSP4",
-              type: "bar",
-              stack: "SSP4",
-              itemStyle: {
-                borderColor: "transparent",
-                color: "transparent",
-              },
-              emphasis: {
-                itemStyle: {
-                  borderColor: "transparent",
-                  color: "transparent",
-                },
-              },
-              data: this.seaLevelRiseData.ssp4LowData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
-            },
-            {
-              name: "SSP4",
-              type: "bar",
-              stack: "SSP4",
-              color: "#f79320",
-              itemStyle: {
-                borderWidth: 0.5,
-                borderColor: "#000000",
-              },
-              data: this.seaLevelRiseData.ssp4MedData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
-            },
-            {
-              name: "Sea Level Rise top SSP4",
-              type: "bar",
-              stack: "SSP4",
-              color: "#f79320",
-              itemStyle: {
-                borderWidth: 0.5,
-                borderColor: "#000000",
-              },
-              data: this.seaLevelRiseData.ssp4HighData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
-            },
-            {
-              name: "Placeholder SSP5",
-              type: "bar",
-              stack: "SSP5",
-              itemStyle: {
-                borderColor: "transparent",
-                color: "transparent",
-              },
-              emphasis: {
-                itemStyle: {
-                  borderColor: "transparent",
-                  color: "transparent",
-                },
-              },
-              data: this.seaLevelRiseData.ssp5LowData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
-            },
-            {
-              name: "SSP5",
-              type: "bar",
-              stack: "SSP5",
-              color: "#e71d24",
-              itemStyle: {
-                borderWidth: 0.5,
-                borderColor: "#000000",
-              },
-              data: this.seaLevelRiseData.ssp5MedData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
-            },
-            {
-              name: "Sea Level Rise top SSP5",
-              type: "bar",
-              stack: "SSP5",
-              color: "#e71d24",
-              itemStyle: {
-                borderWidth: 0.5,
-                borderColor: "#000000",
-              },
-              data: this.seaLevelRiseData.ssp5HighData,
-              animation: false,
-              silent: true,
-              barWidth: 10,
-            },
-          ],
+          },
+          grid: {
+            top: "15%",
+            left: "5%",
+            right: "5%",
+            bottom: "15%",
+            containLabel: true,
+          },
+          series: this.generateSeries(), // Dynamically generate the series
         };
+
         myChart.setOption(option);
       }
     },
   },
   mounted() {
+    console.log("graphData", this.seaLevelRiseData);
     nextTick(() => {
       this.renderChart();
     });
