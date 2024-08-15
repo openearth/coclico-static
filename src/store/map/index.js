@@ -2,7 +2,9 @@ import getCatalog from "@/lib/request/get-catalog";
 import buildGeojsonMapboxLayer from "@/lib/mapbox/build-geojson-mapbox-layer";
 import buildRasterMapboxLayer from "@/lib/mapbox/build-raster-mapbox-layer";
 import matchLayerIdToProperties from "@/lib/match-layer-id-to-properties.js";
-import createLayerNamesArray from "@/lib/raster/create-layer-names-array";
+import createSeriesStructure from "@/lib/raster/create-series-structure";
+import extractGeoserverUrl from "@/lib/raster/extract-geoserver-url";
+
 import _ from "lodash";
 
 export default {
@@ -131,9 +133,9 @@ export default {
                     ? "vector"
                     : "raster";
 
-                  if (layerType === "raster") {
-                    const layerNamesArray = createLayerNamesArray(dataset);
-                    _.set(dataset, "layerNames", layerNamesArray);
+                  if (layerType === "raster" && dataset.id === "slp") {
+                    const series = createSeriesStructure(dataset);
+                    _.set(dataset, "series", series);
                   }
 
                   if (typeof variables !== "undefined") {
@@ -183,7 +185,11 @@ export default {
         if (layerType === "vector") {
           commit("ADD_MAPBOX_LAYER", buildGeojsonMapboxLayer(layerInfo));
         } else {
-          commit("ADD_MAPBOX_LAYER", buildRasterMapboxLayer(layerInfo));
+          const rasterMapboxLayer = buildRasterMapboxLayer(layerInfo);
+
+          // see how will it be used
+          console.log(extractGeoserverUrl(rasterMapboxLayer));
+          commit("ADD_MAPBOX_LAYER", rasterMapboxLayer);
         }
       });
     },

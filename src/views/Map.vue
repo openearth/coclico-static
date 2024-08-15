@@ -3,7 +3,7 @@
     <mapbox-map
       id="map"
       ref="map"
-      @click="onMapcClicked"
+      @mb-click="onMapcClicked"
       :access-token="accessToken"
       :preserve-drawing-buffer="true"
       :zoom="4"
@@ -96,7 +96,7 @@ export default {
       this.position = [...geometry.coordinates];
       //TODO: here I want to have if point layer the zarr call.
       // if raster layer the getFeatureInfo better to make the calls in the store.
-      this.getGraphData();
+      //this.getGraphData();
 
       await nextTick();
 
@@ -110,7 +110,10 @@ export default {
       this.isOpen = false;
     },
     onMapcClicked(e) {
-      console.log("onMapClicked", e);
+      const { lng, lat } = e.lngLat;
+
+      console.log("lng", lng, lat);
+      this.getGraphData({ lng, lat });
     },
   },
   computed: {

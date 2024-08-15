@@ -1,0 +1,64 @@
+import buildGeoServerUrl from "./build-geoserver-url";
+//https://gis.stackexchange.com/questions/79201/lat-long-values-in-a-wms-getfeatureinfo-request
+
+//copied from rws-viewers project
+
+export default async function getFeatureInfo({
+  url,
+  lng,
+  lat,
+  layers,
+  x = 50,
+  y = 50,
+  bounds,
+  width = 110,
+  height = 110,
+}) {
+  let bbox = null;
+  // Bounding box used with area selection.
+
+  if (bounds) {
+    bbox = [
+      bounds._sw.lng,
+      bounds._sw.lat,
+      bounds._ne.lng,
+      bounds._ne.lat,
+    ].join();
+  }
+
+  // Bounding box used with single point selection.
+  if (lng && lat) {
+    // raster requires a smaller bounding box to prevent selecting nearby points.
+    const radius = 0.00001;
+    bbox = [lng - radius, lat - radius, lng + radius, lat + radius].join(",");
+  }
+
+  const geoServerUrl = await buildGeoServerUrl({
+    url,
+    request: "GetFeatureInfo",
+    service: "WMS",
+    version: "1.1.1",
+    info_format: "application/json",
+    crs: "EPSG:4326",
+    layers: layers,
+    query_layers: layers,
+    width,
+    height,
+    x,
+    y,
+    bbox,
+    feature_count: 50,
+  });
+  console.log("geoserverUrl", geoServerUrl);
+
+  return (
+    fetch(geoServerUrl)
+      .then((response) => response.json())
+      .then(({ features }) => features)
+      //map and send back only the greyIndex values
+      .then((features) =>
+        features.map((feature) => feature.properties.GRAY_INDEX)
+      )
+      .catch(() => undefined)
+  );
+}

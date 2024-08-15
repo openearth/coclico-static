@@ -126,7 +126,7 @@ export default {
               name: "SSP3",
               type: "bar",
               stack: "SSP3",
-              color: "#173c66",
+              //color: "#173c66",
               itemStyle: {
                 borderWidth: 0.5,
                 borderColor: "#000000",
@@ -140,7 +140,7 @@ export default {
               name: "Sea Level Rise top SSP3",
               type: "bar",
               stack: "SSP3",
-              color: "#173c66",
+              //color: "#173c66",
               itemStyle: {
                 borderWidth: 0.5,
                 borderColor: "#000000",
@@ -173,7 +173,7 @@ export default {
               name: "SSP4",
               type: "bar",
               stack: "SSP4",
-              color: "#f79320",
+              //color: "#f79320",
               itemStyle: {
                 borderWidth: 0.5,
                 borderColor: "#000000",
@@ -187,7 +187,7 @@ export default {
               name: "Sea Level Rise top SSP4",
               type: "bar",
               stack: "SSP4",
-              color: "#f79320",
+              //color: "#f79320",
               itemStyle: {
                 borderWidth: 0.5,
                 borderColor: "#000000",
@@ -220,7 +220,7 @@ export default {
               name: "SSP5",
               type: "bar",
               stack: "SSP5",
-              color: "#e71d24",
+              //color: "#e71d24",
               itemStyle: {
                 borderWidth: 0.5,
                 borderColor: "#000000",
@@ -234,7 +234,7 @@ export default {
               name: "Sea Level Rise top SSP5",
               type: "bar",
               stack: "SSP5",
-              color: "#e71d24",
+              //color: "#e71d24",
               itemStyle: {
                 borderWidth: 0.5,
                 borderColor: "#000000",
