@@ -5,7 +5,7 @@ export default {
   namespaced: true,
   state: {
     currentGraphDataset: null,
-    graphData: [],
+    graphData: null,
   },
   getters: {
     currentGraphDataset(state) {
@@ -22,8 +22,14 @@ export default {
     ADD_GRAPH_DATA(state, data) {
       state.graphData = data;
     },
+    EMPTY_GRAPH_DATA(state) {
+      state.graphData = null;
+    },
   },
   actions: {
+    emptyGraphData({ commit }) {
+      commit("EMPTY_GRAPH_DATA");
+    },
     addCurrentGraphDataset({ commit }, dataset) {
       commit("ADD_CURRENT_GRAPH_DATASET", dataset);
     },
@@ -71,7 +77,6 @@ export default {
         Promise.all(promises)
           .then(() => {
             commit("ADD_GRAPH_DATA", seaLevelRiseData);
-            console.log(JSON.stringify(seaLevelRiseData, null, 2)); // Final result
           })
           .catch((error) => {
             console.error("Error in Promise.all:", error);

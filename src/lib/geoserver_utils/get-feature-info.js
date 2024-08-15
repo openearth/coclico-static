@@ -49,7 +49,6 @@ export default async function getFeatureInfo({
     bbox,
     feature_count: 50,
   });
-  console.log("geoserverUrl", geoServerUrl);
 
   return (
     fetch(geoServerUrl)
