@@ -110,7 +110,21 @@ export default {
       }
     },
     saveGraphOnDashboard() {
-      this.addGraphToDashboard(this.graphData);
+      const firstActiveDataset = this.activeDatasets[0];
+
+      if (firstActiveDataset.title === "Global Sea Level Projections") {
+        // Save SeaLevelGraph data
+        this.addGraphToDashboard({
+          type: "seaLevelGraph",
+          data: this.graphData, // Sea level rise data
+        });
+      } else if (firstActiveDataset.title === "Extreme surge level") {
+        // Save FloodExtentGraph data
+        this.addGraphToDashboard({
+          type: "floodExtentGraph",
+          data: {}, // If you have any specific data for the flood extent, include it here
+        });
+      }
     },
     closePopup() {
       this.isOpen = false;

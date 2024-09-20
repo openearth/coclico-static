@@ -146,10 +146,14 @@ export default {
   },
   mounted() {
     console.log("graphData", this.seaLevelRiseData);
-    nextTick(() => {
-      this.renderChart();
-    });
-    window.addEventListener("resize", this.renderChart);
+    if (this.seaLevelRiseData && this.seaLevelRiseData.time) {
+      nextTick(() => {
+        this.renderChart();
+      });
+      window.addEventListener("resize", this.renderChart);
+    } else {
+      console.error("No valid sea level rise data provided.");
+    }
   },
 };
 </script>
