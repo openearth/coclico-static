@@ -28,9 +28,8 @@
         :closeButton="false"
       >
         <pre style="width: 800px; height: 650px">
-          <generic-graph
-            :sea-level-rise-data="graphData"
-          />
+          <sea-level-graph v-if="firstActiveDataset && firstActiveDataset.title === 'Global Sea Level Projections'" :sea-level-rise-data="graphData" />
+          <flood-extent-graph v-else-if="firstActiveDataset && firstActiveDataset.title === 'Extreme surge level'" />
           <div class="buttons-container">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
             <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
@@ -54,7 +53,8 @@ import {
 
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
-import GenericGraph from "@/components/GenericGraph.vue";
+import SeaLevelGraph from "@/components/SeaLevelGraph.vue";
+import FloodExtentGraph from "@/components/FloodExtentGraph.vue";
 import MapLayer from "@/components/MapLayer.vue";
 import { nextTick } from "vue";
 
@@ -73,7 +73,8 @@ export default {
     MapboxPopup,
     AppSidebar,
     DatasetCard,
-    GenericGraph,
+    SeaLevelGraph,
+    FloodExtentGraph,
   },
   methods: {
     ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
@@ -95,9 +96,16 @@ export default {
         await nextTick();
 
         this.isOpen = true;
+      } else if (
+        firstActiveDataset &&
+        firstActiveDataset.title === "Extreme surge level"
+      ) {
+        // For "Extreme surge level", we don't fetch sea-level data, but we can process accordingly
+        console.log("Extreme surge level dataset clicked");
+        this.isOpen = true;
       } else {
         console.log(
-          "Clicked feature does not belong to the 'Global Sea Level Projections' dataset"
+          "Clicked feature does not belong to the 'Global Sea Level Projections' or 'Extreme surge level' datasets"
         );
       }
     },
@@ -119,6 +127,12 @@ export default {
         this.position = [lng, lat];
 
         this.getGraphData({ lng, lat });
+      } else if (
+        firstActiveDataset &&
+        firstActiveDataset.title === "Extreme surge level"
+      ) {
+        this.position = [e.lngLat.lng, e.lngLat.lat];
+        console.log("Map clicked on Extreme surge level dataset");
       } else {
         console.log("Map clicked, but the active dataset is not interactive.");
       }
@@ -139,6 +153,9 @@ export default {
       "activeDatasets",
     ]),
     ...mapGetters("graphs", ["graphData"]),
+    firstActiveDataset() {
+      return this.activeDatasets[0] || null;
+    },
   },
   created() {
     this.setSeaLevelRiseData(this.seaLevelRiseData);

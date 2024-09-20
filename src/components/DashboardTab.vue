@@ -12,7 +12,7 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-col>
-      <generic-graph style="z-index: -1" :sea-level-rise-data="graphData" />
+      <sea-level-graph style="z-index: -1" :sea-level-rise-data="graphData" />
     </v-card>
     <v-card flat> </v-card>
   </v-card>
@@ -20,11 +20,11 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import GenericGraph from "@/components/GenericGraph.vue";
+import SeaLevelGraph from "@/components/SeaLevelGraph.vue";
 
 export default {
   components: {
-    GenericGraph,
+    SeaLevelGraph,
   },
   computed: {
     ...mapGetters("map", ["graphsInDashboard"]),
