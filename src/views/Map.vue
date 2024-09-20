@@ -3,7 +3,7 @@
     <mapbox-map
       id="map"
       ref="map"
-      @mb-click="onMapcClicked"
+      @mb-click="onMapClicked"
       :access-token="accessToken"
       :preserve-drawing-buffer="true"
       :zoom="4"
@@ -79,16 +79,27 @@ export default {
     ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
     async onFeatureClick(feature) {
-      const { geometry, properties } = feature;
-      console.log("properties", properties);
-      this.position = [...geometry.coordinates];
-      //TODO: here I want to have if point layer the zarr call.
-      // if raster layer the getFeatureInfo better to make the calls in the store.
-      //this.getGraphData();
+      const firstActiveDataset = this.activeDatasets[0];
 
-      await nextTick();
+      if (
+        firstActiveDataset &&
+        firstActiveDataset.title === "Global Sea Level Projections"
+      ) {
+        const { geometry, properties } = feature;
+        console.log("properties", properties);
+        this.position = [...geometry.coordinates];
+        //TODO: here I want to have if point layer the zarr call.
+        // if raster layer the getFeatureInfo better to make the calls in the store.
+        //this.getGraphData();
 
-      this.isOpen = true;
+        await nextTick();
+
+        this.isOpen = true;
+      } else {
+        console.log(
+          "Clicked feature does not belong to the 'Global Sea Level Projections' dataset"
+        );
+      }
     },
     saveGraphOnDashboard() {
       this.addGraphToDashboard(this.graphData);
@@ -97,10 +108,20 @@ export default {
       this.isOpen = false;
       this.emptyGraphData();
     },
-    onMapcClicked(e) {
-      const { lng, lat } = e.lngLat;
-      this.position = [lng, lat];
-      this.getGraphData({ lng, lat });
+    onMapClicked(e) {
+      const firstActiveDataset = this.activeDatasets[0];
+
+      if (
+        firstActiveDataset &&
+        firstActiveDataset.title === "Global Sea Level Projections"
+      ) {
+        const { lng, lat } = e.lngLat;
+        this.position = [lng, lat];
+
+        this.getGraphData({ lng, lat });
+      } else {
+        console.log("Map clicked, but the active dataset is not interactive.");
+      }
     },
   },
   watch: {
@@ -115,6 +136,7 @@ export default {
       "mapboxLayers",
       "graphsInDashboard",
       "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
+      "activeDatasets",
     ]),
     ...mapGetters("graphs", ["graphData"]),
   },
