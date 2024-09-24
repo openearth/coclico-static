@@ -57,6 +57,10 @@ import DatasetCard from "@/components/DatasetCard.vue";
 import GenericGraph from "@/components/GenericGraph.vue";
 import MapLayer from "@/components/MapLayer.vue";
 import { nextTick } from "vue";
+import wasmInit, { readParquet } from "parquet-wasm";
+import { tableFromIPC } from "apache-arrow";
+import { WKBLoader } from "@loaders.gl/wkt";
+import { parseSync } from "@loaders.gl/core";
 
 export default {
   data() {
@@ -65,6 +69,76 @@ export default {
       isOpen: false,
       position: [],
     };
+  },
+  async mounted() {
+    await wasmInit();
+
+    const url =
+      "https://storage.googleapis.com/coclico-data-public/coclico/CFHP_LAU_stats/LAU_NUTS_CFHP.parquet";
+
+    fetch(url)
+      .then((response) => response.arrayBuffer())
+      .then((buffer) => {
+        console.log("buffer", buffer);
+        const parquetData = new Uint8Array(buffer);
+
+        // Use parquet-wasm to read the Parquet data into an Arrow table
+        const arrowWasmTable = readParquet(parquetData);
+
+        // Convert Wasm memory Arrow table to JS Arrow table
+        const arrowTable = tableFromIPC(arrowWasmTable.intoIPCStream());
+        console.log("arrowTable", arrowTable);
+        // Get all field names in the schema
+        const fieldNames = [];
+        arrowTable.schema.fields.forEach((field) => {
+          fieldNames.push(field.name);
+        });
+        const geometryColumn = arrowTable.getChild("geometry");
+        const propertiesColumns = {};
+
+        // Access all properties dynamically based on field names, excluding "geometry"
+        fieldNames.forEach((fieldName) => {
+          if (fieldName !== "geometry") {
+            propertiesColumns[fieldName] = arrowTable.getChild(fieldName);
+          }
+        });
+
+        // Extract features for GeoJSON
+        const features = [];
+        //console.log("arrowTable.length", arrowTable.numRows);
+        for (let i = 0; i < arrowTable.numRows; i++) {
+          /* --Read geometry-- */
+          const geometryBinary = geometryColumn.get(i); // This is the binary Uint8Array
+
+          const geometryGeoJSON = parseSync(geometryBinary, WKBLoader);
+
+          const geometry = {
+            type: geometryGeoJSON.type,
+            coordinates: geometryGeoJSON.positions.value,
+          };
+
+          const properties = {};
+
+          // Dynamically retrieve all property values for each row
+          Object.keys(propertiesColumns).forEach((prop) => {
+            properties[prop] = propertiesColumns[prop].get(i);
+          });
+
+          // Create a GeoJSON feature for each row
+          features.push({
+            type: "Feature",
+            geometry: geometry, // Ensure geometry is in valid GeoJSON format
+            properties: properties,
+          });
+        }
+        // Create the final GeoJSON object
+        const geojson = {
+          type: "FeatureCollection",
+          features: features,
+        };
+
+        console.log("GeoJSON:", geojson);
+      });
   },
   components: {
     MapboxMap,
