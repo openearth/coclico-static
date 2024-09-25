@@ -13,6 +13,7 @@ export default createVuetify({
         dark: false,
         colors: {
           primary: "#068b95",
+          terciary: "#b8e5f0",
           black100: "#000000",
           black80: "#293a45",
           white100: "#ffffff",
