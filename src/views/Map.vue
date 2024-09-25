@@ -24,10 +24,15 @@
         :lng-lat="position"
         anchor="bottom"
         @mb-close="() => (isOpen = false)"
-        style="width: 900px; height: 750px"
+        style="
+          width: 25vw;
+          height: 30vh;
+          display: flex;
+          justify-content: center;
+        "
         :closeButton="false"
       >
-        <pre style="width: 800px; height: 650px">
+        <pre style="width: 20vw; height: 20vh">
           <sea-level-graph v-if="firstActiveDataset && firstActiveDataset.title === 'Global Sea Level Projections'" :sea-level-rise-data="graphData" />
           <flood-extent-graph v-else-if="firstActiveDataset && firstActiveDataset.title === 'Extreme surge level'" />
           <div class="buttons-container">
@@ -189,7 +194,7 @@ export default {
 .buttons-container {
   display: flex;
   justify-content: center;
-  /* gap: 20px; */
+  gap: 20px;
 }
 
 .add-to-dashboard-button-popup {
@@ -199,7 +204,8 @@ export default {
   text-transform: none;
   font-weight: 100 !important;
   border-radius: 8px;
-  min-width: 180px;
+  max-width: 10vw;
+  min-width: 10vw;
 }
 .close-button-popup {
   background-color: white;
@@ -209,6 +215,6 @@ export default {
   font-weight: 100 !important;
   border-radius: 8px;
   border: 1px solid #293a45;
-  min-width: 180px;
+  min-width: 10vw;
 }
 </style>

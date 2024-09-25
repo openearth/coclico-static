@@ -15,7 +15,7 @@ export default {
   },
   data: function () {
     return {
-      colors: ["blue", "green", "red", "black"], // Standard colors
+      colors: ["blue", "#173c66", "#f79320", "#951b1e"], // Standard colors
     };
   },
   methods: {
