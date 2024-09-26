@@ -16,7 +16,8 @@
         :key="layer.id"
         :layer="layer"
         @click="onFeatureClick"
-      />
+      />sampleLayer
+      <MapLayer v-if="sampleLayer" :key="sampleLayer.id" :layer="sampleLayer" />
 
       <MapboxPopup
         v-if="isOpen"
@@ -61,6 +62,7 @@ import wasmInit, { readParquet } from "parquet-wasm";
 import { tableFromIPC } from "apache-arrow";
 import { WKBLoader } from "@loaders.gl/wkt";
 import { parseSync } from "@loaders.gl/core";
+import buildGeojsonFromData from "@/lib/mapbox/build-geojson-from-data";
 
 export default {
   data() {
@@ -68,26 +70,22 @@ export default {
       accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
       isOpen: false,
       position: [],
+      sampleLayer: null,
     };
   },
   async mounted() {
     await wasmInit();
 
     const url =
-      "https://storage.googleapis.com/coclico-data-public/coclico/CFHP_LAU_stats/LAU_NUTS_CFHP.parquet";
+      "https://storage.googleapis.com/coclico-data-public/coclico/CFHP_LAU_stats/LAU_NUTS_CFHP_EPSG4326.parquet";
 
     fetch(url)
       .then((response) => response.arrayBuffer())
       .then((buffer) => {
-        console.log("buffer", buffer);
         const parquetData = new Uint8Array(buffer);
-
-        // Use parquet-wasm to read the Parquet data into an Arrow table
         const arrowWasmTable = readParquet(parquetData);
-
-        // Convert Wasm memory Arrow table to JS Arrow table
         const arrowTable = tableFromIPC(arrowWasmTable.intoIPCStream());
-        console.log("arrowTable", arrowTable);
+
         // Get all field names in the schema
         const fieldNames = [];
         arrowTable.schema.fields.forEach((field) => {
@@ -105,16 +103,17 @@ export default {
 
         // Extract features for GeoJSON
         const features = [];
-        //console.log("arrowTable.length", arrowTable.numRows);
-        for (let i = 0; i < arrowTable.numRows; i++) {
-          /* --Read geometry-- */
+
+        //for (let i = 0; i < arrowTable.numRows; i++) {
+        for (let i = 0; i < 2; i++) {
           const geometryBinary = geometryColumn.get(i); // This is the binary Uint8Array
+          const geometry = parseSync(geometryBinary, WKBLoader);
+          //convert to geojson format with loaders
 
-          const geometryGeoJSON = parseSync(geometryBinary, WKBLoader);
-
-          const geometry = {
-            type: geometryGeoJSON.type,
-            coordinates: geometryGeoJSON.positions.value,
+          console.log("geometry", geometry);
+          const geometryGeoJSON = {
+            type: geometry.type,
+            coordinates: Array.from(geometry.positions.value),
           };
 
           const properties = {};
@@ -127,8 +126,8 @@ export default {
           // Create a GeoJSON feature for each row
           features.push({
             type: "Feature",
-            geometry: geometry, // Ensure geometry is in valid GeoJSON format
-            properties: properties,
+            geometry: geometryGeoJSON,
+            properties: {},
           });
         }
         // Create the final GeoJSON object
@@ -137,7 +136,10 @@ export default {
           features: features,
         };
 
-        console.log("GeoJSON:", geojson);
+        //console.log("GeoJSON:", JSON.stringify(geojson));
+
+        this.sampleLayer = buildGeojsonFromData(geojson);
+        //console.log("sampleLayer", this.sampleLayer);
       });
   },
   components: {
@@ -164,6 +166,7 @@ export default {
 
       this.isOpen = true;
     },
+
     saveGraphOnDashboard() {
       this.addGraphToDashboard(this.graphData);
     },
