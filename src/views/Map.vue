@@ -25,16 +25,16 @@
         anchor="bottom"
         @mb-close="() => (isOpen = false)"
         style="
-          width: 25vw;
-          height: 30vh;
+          width: 30vw;
+          height: 38vh;
           display: flex;
           justify-content: center;
         "
         :closeButton="false"
       >
-        <pre style="width: 20vw; height: 20vh">
-          <sea-level-graph v-if="firstActiveDataset && firstActiveDataset.title === 'Global Sea Level Projections'" :sea-level-rise-data="graphData" />
-          <flood-extent-graph v-else-if="firstActiveDataset && firstActiveDataset.title === 'Extreme surge level'" />
+        <pre style="width: 25vw; height: 25vh">
+            <sea-level-graph v-if="firstActiveDataset && firstActiveDataset.title === 'Global Sea Level Projections'" :sea-level-rise-data="graphData" />
+            <flood-extent-graph v-else-if="firstActiveDataset && firstActiveDataset.title === 'Extreme surge level'" />
           <div class="buttons-container">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
             <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
@@ -195,6 +195,7 @@ export default {
   display: flex;
   justify-content: center;
   gap: 20px;
+  margin-bottom: 5px;
 }
 
 .add-to-dashboard-button-popup {
