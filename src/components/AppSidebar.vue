@@ -52,7 +52,7 @@
           </v-list-img>
           <v-list-item-title class="list-item-title">Search</v-list-item-title>
         </v-list-item>
-        <v-list-item class="list-item-more" @click="openLayersCard()">
+        <v-list-item class="list-item-more" @click="expandMenu = !expandMenu">
           <v-list-img class="list-item-img">
             <custom-icon
               name="More"
@@ -64,6 +64,38 @@
         </v-list-item>
       </v-list>
     </v-list>
+    <template #append>
+      <div v-show="expandMenu">
+        <v-list dense class="pa-0">
+          <v-list-item @click="openLandingPage">
+            <div class="extra-list-item">
+              <v-icon color="black" size="18px">
+                mdi-information-outline
+              </v-icon>
+              <v-list-item-subtitle class="extra-list-item-text">
+                WEBSITE
+              </v-list-item-subtitle>
+            </div>
+          </v-list-item>
+          <v-list-item @click="openCatalogPage">
+            <div class="extra-list-item">
+              <v-icon color="black" size="18px"> mdi-database-search </v-icon>
+              <v-list-item-subtitle class="extra-list-item-text">
+                DATA CATALOG
+              </v-list-item-subtitle>
+            </div>
+          </v-list-item>
+          <v-list-item @click="openWorkbenchPage">
+            <div class="extra-list-item-container">
+              <v-icon color="black" size="18px"> mdi-hammer </v-icon>
+              <v-list-item-subtitle class="extra-list-item-text">
+                WORKBENCH
+              </v-list-item-subtitle>
+            </div>
+          </v-list-item>
+        </v-list>
+      </div>
+    </template>
   </v-navigation-drawer>
 
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
@@ -118,6 +150,7 @@ export default {
   data() {
     return {
       showLayersCard: false,
+      expandMenu: false,
     };
   },
   methods: {
@@ -138,6 +171,18 @@ export default {
     toggleDataset(dataset) {
       this.updateActiveDatasetsArray(dataset);
       this.updateThemeObject();
+    },
+    openLandingPage() {
+      window.open("https://coclicoservices.eu", "_blank");
+    },
+    openWorkbenchPage() {
+      window.open("https://github.com/openearth/coclico-workbench", "_blank");
+    },
+    openCatalogPage() {
+      window.open(
+        "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/dgds-data-public/coclico/coclico-stac/catalog.json?.language=en",
+        "_blank"
+      );
     },
   },
   computed: {
@@ -257,5 +302,25 @@ export default {
   color: rgb(var(--v-theme-black80));
   font-family: "Inter", sans-serif;
   font-size: 12px;
+}
+
+.extra-list-item {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  margin-top: 9px;
+}
+
+.extra-list-item-container {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  margin-top: 9px;
+  margin-bottom: 9px;
+}
+
+.extra-list-item-text {
+  font-size: 8px !important;
+  margin-top: 3px;
 }
 </style>
