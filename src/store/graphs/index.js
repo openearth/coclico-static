@@ -50,6 +50,7 @@ export default {
 
         // Loop through each scenario
         seaLevelRiseData.scenarios.forEach((scenario) => {
+          console.log("sce ", scenario);
           // Loop through each ensemble (msl_h, msl_m, msl_l)
           ["msl_h", "msl_m", "msl_l"].forEach((mslType) => {
             const layerNames = scenario[mslType].layer_names;

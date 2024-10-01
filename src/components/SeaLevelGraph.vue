@@ -137,7 +137,7 @@ export default {
             bottom: "15%",
             containLabel: true,
           },
-          series: this.generateSeries(), // Dynamically generate the series
+          series: this.generateSeries(),
         };
 
         myChart.setOption(option);
@@ -145,7 +145,6 @@ export default {
     },
   },
   mounted() {
-    console.log("graphData", this.seaLevelRiseData);
     if (this.seaLevelRiseData && this.seaLevelRiseData.time) {
       nextTick(() => {
         this.renderChart();
