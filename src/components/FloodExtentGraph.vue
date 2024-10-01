@@ -7,6 +7,11 @@ import { nextTick } from "vue";
 import * as echarts from "echarts";
 
 export default {
+  data() {
+    return {
+      colorPalette: ["#307fb6", "#5e9dc4", "#abcfe5"],
+    };
+  },
   methods: {
     renderChart() {
       const chartDom = this.$refs.chartContainer;
@@ -15,8 +20,7 @@ export default {
 
         const option = {
           title: {
-            text: "Referer of a Website",
-            subtext: "Fake Data",
+            text: "Flood Extent",
             left: "center",
           },
           tooltip: {
@@ -25,16 +29,15 @@ export default {
 
           series: [
             {
-              name: "Access From",
               type: "pie",
-              radius: "50%",
+              radius: "70%",
+              top: 30,
               data: [
-                { value: 1048, name: "Search Engine" },
-                { value: 735, name: "Direct" },
-                { value: 580, name: "Email" },
-                { value: 484, name: "Union Ads" },
-                { value: 300, name: "Video Ads" },
+                { value: 2, name: "% flood > 0.5m" },
+                { value: 4, name: "% flood < 0.5m" },
+                { value: 96, name: "% not flooded" },
               ],
+              color: this.colorPalette,
               emphasis: {
                 itemStyle: {
                   shadowBlur: 10,
