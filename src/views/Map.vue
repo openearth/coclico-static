@@ -57,6 +57,7 @@ import DatasetCard from "@/components/DatasetCard.vue";
 import GenericGraph from "@/components/GenericGraph.vue";
 import MapLayer from "@/components/MapLayer.vue";
 import { nextTick } from "vue";
+import { openArray } from "zarr";
 
 export default {
   data() {
@@ -102,6 +103,27 @@ export default {
       this.position = [lng, lat];
       this.getGraphData({ lng, lat });
     },
+    async fetchZarrData() {
+      try {
+        const url =
+          "https://storage.googleapis.com/dgds-data-public/coclico/europe_storm_surge_level.zarr"; // Correct Zarr store URL
+        const path = "ssl"; // Correct path to the Zarr variable
+
+        const array = await openArray({
+          store: url,
+          path: path,
+          mode: "r", // Read mode
+        });
+
+        const data = await array.get(null); // Retrieve the entire data array
+        console.log("Zarr data retrieved:", data.data);
+      } catch (error) {
+        console.error("Error reading Zarr data:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchZarrData(); // Fetch data when the component is mounted
   },
   watch: {
     graphData() {
