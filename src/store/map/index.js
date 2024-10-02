@@ -104,6 +104,7 @@ export default {
           keywords.forEach((keyword) =>
             commit("ADD_THEME", { name: keyword, count: 0 })
           );
+          console.log("keywords", keywords);
           //3. get collections of the catalog
           const collections = catalog.links.filter((el) => el.rel === "child");
           collections.forEach((collection) => {
