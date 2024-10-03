@@ -1,5 +1,5 @@
 import _ from "lodash";
-import getFeatureInfo from "@/lib/geoserver_utils/get-feature-info";
+import getDataFromRaster from "@/lib/graphs/get-data-from-raster";
 
 export default {
   namespaced: true,
@@ -34,54 +34,24 @@ export default {
       commit("ADD_CURRENT_GRAPH_DATASET", dataset);
     },
     async getGraphData({ rootGetters, commit }, { lng, lat }) {
+      //Retrieve the activeClickableDataset and replace the lines below
       const activeDatasets = rootGetters["map/activeDatasets"];
       const currentGraphDataset = activeDatasets.find(
         (dataset) => dataset.id === "slp"
       );
 
-      //slpActiveDataset
+      //1. getGraphdata means populate the graphData object with the data
+      //2. cases: vector: click on the map and read the data directly.
+      //3. cases: vector: click on the map and read data from zarr. With an extra request
+      //4. cases: raster: click on the map and read the data from the geoserver with an extra getFetaureInfo request
 
       const layerType = _.has(currentGraphDataset, "cube:dimensions")
         ? "vector"
         : "raster";
       if (layerType === "raster") {
-        const seaLevelRiseData = currentGraphDataset.series;
-        const promises = [];
-
-        // Loop through each scenario
-        seaLevelRiseData.scenarios.forEach((scenario) => {
-          console.log("sce ", scenario);
-          // Loop through each ensemble (msl_h, msl_m, msl_l)
-          ["msl_h", "msl_m", "msl_l"].forEach((mslType) => {
-            const layerNames = scenario[mslType].layer_names;
-
-            // Create a Promise for each API request
-            const promise = getFeatureInfo({
-              layers: layerNames,
-              url: "https://coclico.avi.deltares.nl/geoserver/slp/wms",
-              lng,
-              lat,
-            })
-              .then((data) => {
-                // Store the result in the values array for this ensemble
-                scenario[mslType].values = data;
-              })
-              .catch((error) => {
-                console.error(`Error fetching data for ${mslType}:`, error);
-              });
-
-            promises.push(promise); // Collect the promises
-          });
+        getDataFromRaster(currentGraphDataset, lng, lat).then((graphData) => {
+          commit("ADD_GRAPH_DATA", graphData);
         });
-
-        // Wait for all promises to resolve
-        Promise.all(promises)
-          .then(() => {
-            commit("ADD_GRAPH_DATA", seaLevelRiseData);
-          })
-          .catch((error) => {
-            console.error("Error in Promise.all:", error);
-          });
       }
     },
   },

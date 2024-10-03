@@ -2,8 +2,6 @@ import getCatalog from "@/lib/request/get-catalog";
 import buildGeojsonMapboxLayer from "@/lib/mapbox/build-geojson-mapbox-layer";
 import buildRasterMapboxLayer from "@/lib/mapbox/build-raster-mapbox-layer";
 import matchLayerIdToProperties from "@/lib/match-layer-id-to-properties.js";
-import createSeriesStructure from "@/lib/raster/create-series-structure";
-import extractGeoserverUrl from "@/lib/raster/extract-geoserver-url";
 
 import _ from "lodash";
 
@@ -17,6 +15,9 @@ export default {
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
     graphsInDashboard: [],
     seaLevelRiseData: {},
+    activeClickableDataset: null,
+    clickableDatasetsIds: ["cfhp", "slp", "ssl", "eesl", "sc", "cfr", "cbca"], // Not all layers are clickable. Only the ones in user stories.
+    // perhaps we can provide that from the catalog.
   },
   getters: {
     themes(state) {
@@ -46,6 +47,9 @@ export default {
     seaLevelRiseData(state) {
       return state.seaLevelRiseData;
     },
+    activeClickableDataset(state) {
+      return state.activeClickableDataset;
+    },
   },
   mutations: {
     ADD_THEME(state, themeObject) {
@@ -69,11 +73,23 @@ export default {
     },
     ADD_ACTIVE_DATASET(state, dataset) {
       state.activeDatasets = [...state.activeDatasets, dataset];
+      // Set clickableDataset TODO: to be improved
+      if (state.clickableDatasetsIds.includes(state.activeDatasets[0].id)) {
+        state.activeClickableDataset = state.activeDatasets[0];
+      }
     },
     REMOVE_ACTIVE_DATASET(state, id) {
       state.activeDatasets = state.activeDatasets.filter(
         (activeDataset) => activeDataset.id !== id
       );
+      // Set clickableDataset
+      if (state.activeDatasets.length === 0) {
+        state.activeClickableDataset = null;
+      } else {
+        if (state.clickableDatasetsIds.includes(state.activeDatasets[0].id)) {
+          state.activeClickableDataset = state.activeDatasets[0];
+        }
+      }
     },
     ADD_MAPBOX_LAYER(state, mapboxLayer) {
       state.mapboxLayers = [...state.mapboxLayers, mapboxLayer];
@@ -127,17 +143,6 @@ export default {
                   // 4.b. add variables to the dataset
                   const variables = _.get(dataset, "cube:variables");
 
-                  // if raster dataset and create layerNames list.
-                  //
-                  const layerType = _.has(dataset, "cube:dimensions")
-                    ? "vector"
-                    : "raster";
-
-                  if (layerType === "raster" && dataset.id === "slp") {
-                    const series = createSeriesStructure(dataset);
-                    _.set(dataset, "series", series);
-                  }
-
                   if (typeof variables !== "undefined") {
                     var mappedVariables = Object.keys(variables).map((id) => {
                       const variable = _.get(variables, id);
@@ -186,9 +191,6 @@ export default {
           commit("ADD_MAPBOX_LAYER", buildGeojsonMapboxLayer(layerInfo));
         } else {
           const rasterMapboxLayer = buildRasterMapboxLayer(layerInfo);
-
-          // see how will it be used
-          console.log(extractGeoserverUrl(rasterMapboxLayer));
           commit("ADD_MAPBOX_LAYER", rasterMapboxLayer);
         }
       });

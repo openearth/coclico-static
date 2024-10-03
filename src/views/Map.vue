@@ -11,12 +11,7 @@
       map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
     >
       <MapboxNavigationControl :visualizePitch="true" />
-      <MapLayer
-        v-for="layer in mapboxLayers"
-        :key="layer.id"
-        :layer="layer"
-        @click="onFeatureClick"
-      />
+      <MapLayer v-for="layer in mapboxLayers" :key="layer.id" :layer="layer" />
 
       <MapboxPopup
         v-if="isOpen"
@@ -33,8 +28,15 @@
         :closeButton="false"
       >
         <pre style="width: 25vw; height: 25vh">
-            <sea-level-graph v-if="firstActiveDataset && firstActiveDataset.title === 'Global Sea Level Projections'" :sea-level-rise-data="graphData" />
-            <flood-extent-graph v-else-if="firstActiveDataset && firstActiveDataset.title === 'Extreme surge level'" />
+            <!-- General component like GraphComponent -->
+            <!-- In this component I could call the other graph components -->
+             <!--  -->
+              <!-- pass in this component chartData?  -->
+               <!-- How do I have the graph data in the sea-level-graph component -->
+                <!-- Format them for the flood extent graph -->
+                 <!-- Read and pass the data to the extreme surge level -->
+            <sea-level-graph v-if="this.activeClickableDataset && this.activeClickableDataset.title === 'Global Sea Level Projections'" :sea-level-rise-data="graphData" />
+            <flood-extent-graph v-else-if="this.activeClickableDataset && this.activeClickableDataset.title === 'Extreme surge level'" />
           <div class="buttons-container">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
             <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
@@ -84,46 +86,16 @@ export default {
   methods: {
     ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
-    async onFeatureClick(feature) {
-      const firstActiveDataset = this.activeDatasets[0];
-
-      if (
-        firstActiveDataset &&
-        firstActiveDataset.title === "Global Sea Level Projections"
-      ) {
-        const { geometry, properties } = feature;
-        console.log("properties", properties);
-        this.position = [...geometry.coordinates];
-        //TODO: here I want to have if point layer the zarr call.
-        // if raster layer the getFeatureInfo better to make the calls in the store.
-        //this.getGraphData();
-
-        await nextTick();
-
-        this.isOpen = true;
-      } else if (
-        firstActiveDataset &&
-        firstActiveDataset.title === "Extreme surge level"
-      ) {
-        // For "Extreme surge level", we don't fetch sea-level data, but we can process accordingly
-        console.log("Extreme surge level dataset clicked");
-        this.isOpen = true;
-      } else {
-        console.log(
-          "Clicked feature does not belong to the 'Global Sea Level Projections' or 'Extreme surge level' datasets"
-        );
-      }
-    },
     saveGraphOnDashboard() {
-      const firstActiveDataset = this.activeDatasets[0];
-
-      if (firstActiveDataset.title === "Global Sea Level Projections") {
+      if (
+        this.activeClickableDataset.title === "Global Sea Level Projections"
+      ) {
         // Save SeaLevelGraph data
         this.addGraphToDashboard({
           type: "seaLevelGraph",
           data: this.graphData, // Sea level rise data
         });
-      } else if (firstActiveDataset.title === "Extreme surge level") {
+      } else if (this.activeClickableDataset.title === "Extreme surge level") {
         // Save FloodExtentGraph data
         this.addGraphToDashboard({
           type: "floodExtentGraph",
@@ -135,25 +107,18 @@ export default {
       this.isOpen = false;
       this.emptyGraphData();
     },
-    onMapClicked(e) {
-      const firstActiveDataset = this.activeDatasets[0];
+    async onMapClicked(e) {
+      this.map = this.$refs.map.map;
 
-      if (
-        firstActiveDataset &&
-        firstActiveDataset.title === "Global Sea Level Projections"
-      ) {
+      if (this.activeClickableDataset) {
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
-
+        const features = this.map.queryRenderedFeatures(e.point);
+        // TODO: Pass in the lng, lat also the features.
+        console.log("features", features[0]);
         this.getGraphData({ lng, lat });
-      } else if (
-        firstActiveDataset &&
-        firstActiveDataset.title === "Extreme surge level"
-      ) {
-        this.position = [e.lngLat.lng, e.lngLat.lat];
-        console.log("Map clicked on Extreme surge level dataset");
-      } else {
-        console.log("Map clicked, but the active dataset is not interactive.");
+        await nextTick();
+        this.isOpen = true;
       }
     },
   },
@@ -170,11 +135,9 @@ export default {
       "graphsInDashboard",
       "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
       "activeDatasets",
+      "activeClickableDataset",
     ]),
     ...mapGetters("graphs", ["graphData"]),
-    firstActiveDataset() {
-      return this.activeDatasets[0] || null;
-    },
   },
   created() {
     this.setSeaLevelRiseData(this.seaLevelRiseData);
