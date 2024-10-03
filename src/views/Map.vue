@@ -27,16 +27,9 @@
         "
         :closeButton="false"
       >
-        <pre style="width: 25vw; height: 25vh">
-            <!-- General component like GraphComponent -->
-            <!-- In this component I could call the other graph components -->
-             <!--  -->
-              <!-- pass in this component chartData?  -->
-               <!-- How do I have the graph data in the sea-level-graph component -->
-                <!-- Format them for the flood extent graph -->
-                 <!-- Read and pass the data to the extreme surge level -->
-            <sea-level-graph v-if="this.activeClickableDataset && this.activeClickableDataset.title === 'Global Sea Level Projections'" :sea-level-rise-data="graphData" />
-            <flood-extent-graph v-else-if="this.activeClickableDataset && this.activeClickableDataset.title === 'Extreme surge level'" />
+        <pre style="width: 50vw; height: 50vh">
+          
+          <app-chart />
           <div class="buttons-container">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
             <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
@@ -60,9 +53,8 @@ import {
 
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
-import SeaLevelGraph from "@/components/SeaLevelGraph.vue";
-import FloodExtentGraph from "@/components/FloodExtentGraph.vue";
 import MapLayer from "@/components/MapLayer.vue";
+import AppChart from "@/components/AppChart.vue";
 import { nextTick } from "vue";
 
 export default {
@@ -80,8 +72,7 @@ export default {
     MapboxPopup,
     AppSidebar,
     DatasetCard,
-    SeaLevelGraph,
-    FloodExtentGraph,
+    AppChart,
   },
   methods: {
     ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
@@ -111,6 +102,7 @@ export default {
       this.map = this.$refs.map.map;
 
       if (this.activeClickableDataset) {
+        this.emptyGraphData();
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
         const features = this.map.queryRenderedFeatures(e.point);
