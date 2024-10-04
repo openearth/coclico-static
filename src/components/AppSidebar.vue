@@ -101,9 +101,7 @@
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
     <v-row style="width: 100%; max-height: 60px">
       <v-col>
-        <v-card-title class="layer-card-title">
-          {{ numberOfDatasetsInTheme }} data layers
-        </v-card-title>
+        <v-card-title class="layer-card-title"> Data layers </v-card-title>
       </v-col>
       <v-col class="column-right">
         <v-btn icon @click="close" flat class="close-button">
@@ -118,7 +116,33 @@
           <v-col style="min-width: 80%">
             <v-list class="layer-list">
               <v-list-item
-                v-for="dataset in datasetsInActiveTheme"
+                v-for="dataset in datasetsInActiveTheme.filter(
+                  (dataset) => dataset.id !== 'slp' && dataset.id !== 'cfhp'
+                )"
+                :key="dataset.id"
+                :title="dataset.title"
+              >
+                <template v-slot:prepend>
+                  <v-switch
+                    v-model="dataset.active"
+                    hide-details
+                    class="mr-5"
+                    color="primary"
+                    @change="toggleDataset(dataset)"
+                  ></v-switch>
+                </template>
+              </v-list-item>
+            </v-list>
+
+            <v-card-title
+              class="layer-card-title"
+              v-if="filteredDatasets.length"
+            >
+              User stories
+            </v-card-title>
+            <v-list class="layer-list" v-if="filteredDatasets.length">
+              <v-list-item
+                v-for="dataset in filteredDatasets"
                 :key="dataset.id"
                 :title="dataset.title"
               >
@@ -200,6 +224,11 @@ export default {
     },
     numberOfDatasetsInTheme() {
       return this.datasetsInActiveTheme.length;
+    },
+    filteredDatasets() {
+      return this.datasetsInActiveTheme.filter(
+        (dataset) => dataset.id === "slp" || dataset.id === "cfhp"
+      );
     },
   },
 };
