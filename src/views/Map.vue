@@ -30,7 +30,7 @@
         <pre style="width: 50vw; height: 50vh">
           
           <app-chart />
-          <div class="buttons-container">
+          <div class="buttons-container" v-if="graphData">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
             <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
           </div>
