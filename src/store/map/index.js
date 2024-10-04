@@ -13,7 +13,7 @@ export default {
     activeTheme: null,
     activeDatasets: [],
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
-    graphsInDashboard: [],
+    graphsInDashboard: [], //TODO: this should be moved to the graphs/index.js
     seaLevelRiseData: {},
     activeClickableDataset: null,
     clickableDatasetsIds: ["cfhp", "slp", "ssl", "eesl", "sc", "cfr", "cbca"], // Not all layers are clickable. Only the ones in user stories.

@@ -22,6 +22,10 @@
         v-else-if="graph.type === 'floodExtentGraph'"
         style="z-index: -1"
       />
+      <line-chart-zarr
+        v-else-if="graph.type === 'lineChartZarr'"
+        style="z-index: -1"
+      />
     </v-card>
     <v-card flat> </v-card>
   </v-card>
@@ -31,11 +35,13 @@
 import { mapGetters, mapActions } from "vuex";
 import SeaLevelGraph from "./ChartComponents/SeaLevelGraph.vue";
 import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue";
+import LineChartZarr from "./ChartComponents/LineChartZarr.vue";
 
 export default {
   components: {
     SeaLevelGraph,
     FloodExtentGraph,
+    LineChartZarr,
   },
   computed: {
     ...mapGetters("map", ["graphsInDashboard"]),

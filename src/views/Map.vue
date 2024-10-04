@@ -77,6 +77,7 @@ export default {
   methods: {
     ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
+    //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
       if (
         this.activeClickableDataset.title === "Global Sea Level Projections"
