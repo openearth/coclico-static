@@ -29,8 +29,8 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import SeaLevelGraph from "@/components/SeaLevelGraph.vue";
-import FloodExtentGraph from "@/components/FloodExtentGraph.vue";
+import SeaLevelGraph from "./ChartComponents/SeaLevelGraph.vue";
+import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue";
 
 export default {
   components: {

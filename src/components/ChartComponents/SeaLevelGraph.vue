@@ -79,7 +79,10 @@ export default {
           barWidth: 3,
         });
       });
-
+      // Move the first three items to the end
+      // TODO: Etienne should provide them in the right order instead
+      const firstThreeItems = series.splice(0, 3);
+      series.push(...firstThreeItems);
       return series;
     },
     renderChart() {
