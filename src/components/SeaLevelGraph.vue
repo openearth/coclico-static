@@ -15,7 +15,7 @@ export default {
   },
   data: function () {
     return {
-      colors: ["blue", "green", "red", "black"], // Standard colors
+      colors: ["#000000", "#173c66", "#f79320", "#951b1e"], // Standard colors
     };
   },
   methods: {
@@ -44,7 +44,7 @@ export default {
           data: scenario.msl_l.values,
           animation: false,
           silent: true,
-          barWidth: 10,
+          barWidth: 3,
         });
 
         // Add medium sea level rise data
@@ -54,13 +54,13 @@ export default {
           stack: scenario.name,
           color: color, // Use one of the standard colors
           itemStyle: {
-            borderWidth: 0.5,
+            borderWidth: 0.2,
             borderColor: "#000000",
           },
           data: scenario.msl_m.values,
           animation: false,
           silent: true,
-          barWidth: 10,
+          barWidth: 3,
         });
 
         // Add high sea level rise data (top)
@@ -70,13 +70,13 @@ export default {
           stack: scenario.name,
           color: color, // Use the same color as medium
           itemStyle: {
-            borderWidth: 0.5,
+            borderWidth: 0.2,
             borderColor: "#000000",
           },
           data: scenario.msl_h.values,
           animation: false,
           silent: true,
-          barWidth: 10,
+          barWidth: 3,
         });
       });
 
@@ -107,7 +107,7 @@ export default {
           },
           tooltip: {
             trigger: "axis",
-            confine: true,
+            confine: false,
             formatter: function (params) {
               const formatValue = (value) => parseFloat(value).toFixed(2);
               let tooltip = params[0].axisValue.bold() + "<br/>";
@@ -137,7 +137,7 @@ export default {
             bottom: "15%",
             containLabel: true,
           },
-          series: this.generateSeries(), // Dynamically generate the series
+          series: this.generateSeries(),
         };
 
         myChart.setOption(option);
@@ -145,11 +145,16 @@ export default {
     },
   },
   mounted() {
-    console.log("graphData", this.seaLevelRiseData);
-    nextTick(() => {
-      this.renderChart();
-    });
-    window.addEventListener("resize", this.renderChart);
+    console.log("component mounted", this.seaLevelRiseData);
+    if (this.seaLevelRiseData && this.seaLevelRiseData.time) {
+      nextTick(() => {
+        console.log("rendering chart");
+        this.renderChart();
+      });
+      window.addEventListener("resize", this.renderChart);
+    } else {
+      console.error("No valid sea level rise data provided.");
+    }
   },
 };
 </script>

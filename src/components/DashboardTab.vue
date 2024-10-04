@@ -2,7 +2,7 @@
   <v-card flat class="scrollable-card">
     <v-card
       flat
-      v-for="(graphData, index) in graphsInDashboard"
+      v-for="(graph, index) in graphsInDashboard"
       :key="index"
       class="ma-3"
       style="height: 350px"
@@ -12,7 +12,16 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-col>
-      <generic-graph style="z-index: -1" :sea-level-rise-data="graphData" />
+      <sea-level-graph
+        v-if="graph.type === 'seaLevelGraph'"
+        style="z-index: -1"
+        :sea-level-rise-data="graph.data"
+      />
+
+      <flood-extent-graph
+        v-else-if="graph.type === 'floodExtentGraph'"
+        style="z-index: -1"
+      />
     </v-card>
     <v-card flat> </v-card>
   </v-card>
@@ -20,11 +29,13 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import GenericGraph from "@/components/GenericGraph.vue";
+import SeaLevelGraph from "@/components/SeaLevelGraph.vue";
+import FloodExtentGraph from "@/components/FloodExtentGraph.vue";
 
 export default {
   components: {
-    GenericGraph,
+    SeaLevelGraph,
+    FloodExtentGraph,
   },
   computed: {
     ...mapGetters("map", ["graphsInDashboard"]),
