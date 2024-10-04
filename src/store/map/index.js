@@ -72,7 +72,7 @@ export default {
       state.activeTheme = theme;
     },
     ADD_ACTIVE_DATASET(state, dataset) {
-      state.activeDatasets = [...state.activeDatasets, dataset];
+      state.activeDatasets = [dataset, ...state.activeDatasets];
       // Set clickableDataset TODO: to be improved
       if (state.clickableDatasetsIds.includes(state.activeDatasets[0].id)) {
         state.activeClickableDataset = state.activeDatasets[0];
