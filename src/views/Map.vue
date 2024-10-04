@@ -105,9 +105,9 @@ export default {
         this.emptyGraphData();
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
-        const features = this.map.queryRenderedFeatures(e.point);
+        const features = this.map.queryRenderedFeatures(e.point)[0];
 
-        this.getGraphData({ lng, lat }, features[0]);
+        this.getGraphData({ lng, lat, features });
 
         await nextTick();
         this.isOpen = true;

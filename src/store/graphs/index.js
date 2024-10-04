@@ -26,7 +26,8 @@ export default {
       commit("EMPTY_GRAPH_DATA");
     },
 
-    async getGraphData({ rootGetters, commit }, { lng, lat }, features) {
+    async getGraphData({ rootGetters, commit }, { lng, lat, features }) {
+      console.log("features in index.js", features);
       const currentGraphDataset = rootGetters["map/activeClickableDataset"];
       if (!currentGraphDataset) {
         return;

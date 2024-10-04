@@ -2,6 +2,8 @@ import _ from "lodash";
 import { openArray } from "zarr";
 
 export default async function (dataset, features) {
+  console.log("dataset", dataset);
+  console.log("features", features);
   const url = _.get(dataset, "assets.data.href");
   const datasetName = _.get(dataset, "id");
 
@@ -74,7 +76,6 @@ export default async function (dataset, features) {
       });
 
       const data = await res.get(slice);
-      console.log("getSlicedata start processing", data);
 
       if (data.data.length > data.data[0].length || datasetName === "sc") {
         data.data = _.unzip(data.data);
