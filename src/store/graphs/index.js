@@ -1,25 +1,20 @@
 import _ from "lodash";
 import getDataFromRaster from "@/lib/graphs/get-data-from-raster";
+import getDataFromZarr from "@/lib/graphs/get-data-from-zarr";
 
 export default {
   namespaced: true,
   state: {
-    currentGraphDataset: null,
     graphData: null,
   },
   getters: {
-    currentGraphDataset(state) {
-      return state.currentGraphDataset;
-    },
     graphData(state) {
       return state.graphData;
     },
   },
   mutations: {
-    ADD_CURRENT_GRAPH_DATASET(state, dataset) {
-      state.currentGraphDataset = dataset;
-    },
     ADD_GRAPH_DATA(state, data) {
+      console.log("graphData in mutation", data);
       state.graphData = data;
     },
     EMPTY_GRAPH_DATA(state) {
@@ -30,28 +25,51 @@ export default {
     emptyGraphData({ commit }) {
       commit("EMPTY_GRAPH_DATA");
     },
-    addCurrentGraphDataset({ commit }, dataset) {
-      commit("ADD_CURRENT_GRAPH_DATASET", dataset);
-    },
-    async getGraphData({ rootGetters, commit }, { lng, lat }) {
-      //Retrieve the activeClickableDataset and replace the lines below
-      const activeDatasets = rootGetters["map/activeDatasets"];
-      const currentGraphDataset = activeDatasets.find(
-        (dataset) => dataset.id === "slp"
-      );
 
-      //1. getGraphdata means populate the graphData object with the data
-      //2. cases: vector: click on the map and read the data directly.
-      //3. cases: vector: click on the map and read data from zarr. With an extra request
-      //4. cases: raster: click on the map and read the data from the geoserver with an extra getFetaureInfo request
+    async getGraphData({ rootGetters, commit }, { lng, lat, features }) {
+      console.log("features in index.js", features);
+      const currentGraphDataset = rootGetters["map/activeClickableDataset"];
+      if (!currentGraphDataset) {
+        return;
+      }
 
       const layerType = _.has(currentGraphDataset, "cube:dimensions")
         ? "vector"
         : "raster";
+
       if (layerType === "raster") {
-        getDataFromRaster(currentGraphDataset, lng, lat).then((graphData) => {
+        try {
+          const graphData = await getDataFromRaster(
+            currentGraphDataset,
+            lng,
+            lat
+          );
+          console.log("graphData in action", graphData);
           commit("ADD_GRAPH_DATA", graphData);
-        });
+        } catch (error) {
+          console.error("Error getting raster data:", error);
+        }
+      } else {
+        const type = _.get(currentGraphDataset, "assets.data.roles").includes(
+          "zarr-root"
+        )
+          ? "zarr"
+          : "mapbox";
+
+        if (type === "zarr") {
+          try {
+            const graphData = await getDataFromZarr(
+              currentGraphDataset,
+              features
+            );
+            console.log("graphData in action", graphData);
+            commit("ADD_GRAPH_DATA", graphData);
+          } catch (error) {
+            console.error("Error getting zarr data:", error);
+          }
+        } else {
+          console.log("Mapbox data not implemented yet");
+        }
       }
     },
   },

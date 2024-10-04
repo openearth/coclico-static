@@ -4,6 +4,10 @@
       v-if="activeClickableDataset.id === 'slp'"
       :sea-level-rise-data="graphData"
     />
+    <line-chart-zarr
+      v-if="zarrLayers.includes(activeClickableDataset.id)"
+      :graph-data="graphData"
+    />
     <!--   <flood-extent-graph v-else /> -->
   </div>
   <div v-else class="app-chart__loader">
@@ -17,12 +21,19 @@
 <script>
 /* import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue"; */
 import SeaLevelGraph from "./ChartComponents/SeaLevelGraph.vue";
+import LineChartZarr from "./ChartComponents/LineChartZarr.vue";
 import { mapGetters } from "vuex";
 
 export default {
   components: {
     /*  FloodExtentGraph, */
     SeaLevelGraph,
+    LineChartZarr,
+  },
+  data() {
+    return {
+      zarrLayers: ["ssl", "eesl", "sc"],
+    };
   },
   computed: {
     ...mapGetters("graphs", ["graphData"]),
