@@ -87,11 +87,25 @@ export default {
           type: "seaLevelGraph",
           data: this.graphData, // Sea level rise data
         });
-      } else if (this.activeClickableDataset.title === "Extreme surge level") {
+        // TODO: the else if below is for the Coastal Hazard Flood Projection user story
+      } else if (this.activeClickableDataset.title === "BLA") {
         // Save FloodExtentGraph data
         this.addGraphToDashboard({
           type: "floodExtentGraph",
           data: {}, // If you have any specific data for the flood extent, include it here
+        });
+      } else if (
+        this.activeClickableDataset.title === "Extreme surge level" ||
+        this.activeClickableDataset.title === "Extreme sea level" ||
+        this.activeClickableDataset.title === "Shoreline change" ||
+        this.activeClickableDataset.title ===
+          "Cost benefit coastal adaptation" ||
+        this.activeClickableDataset.title === "Coastal flood risk"
+      ) {
+        // Save FloodExtentGraph data
+        this.addGraphToDashboard({
+          type: "lineChartZarr",
+          data: this.graphData, // If you have any specific data for the flood extent, include it here
         });
       }
     },

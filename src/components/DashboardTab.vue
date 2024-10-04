@@ -25,6 +25,7 @@
       <line-chart-zarr
         v-else-if="graph.type === 'lineChartZarr'"
         style="z-index: -1"
+        :graph-data="graph.data"
       />
     </v-card>
     <v-card flat> </v-card>
