@@ -2,8 +2,6 @@ import _ from "lodash";
 import { openArray } from "zarr";
 
 export default async function (dataset, features) {
-  console.log("dataset", dataset);
-  console.log("features", features);
   const url = _.get(dataset, "assets.data.href");
   const datasetName = _.get(dataset, "id");
 
@@ -195,6 +193,5 @@ export default async function (dataset, features) {
       }
     }
   }
-  console.log("graphData that is returned", graphData);
   return graphData;
 }

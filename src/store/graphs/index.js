@@ -14,7 +14,6 @@ export default {
   },
   mutations: {
     ADD_GRAPH_DATA(state, data) {
-      console.log("graphData in mutation", data);
       state.graphData = data;
     },
     EMPTY_GRAPH_DATA(state) {
@@ -27,7 +26,6 @@ export default {
     },
 
     async getGraphData({ rootGetters, commit }, { lng, lat, features }) {
-      console.log("features in index.js", features);
       const currentGraphDataset = rootGetters["map/activeClickableDataset"];
       if (!currentGraphDataset) {
         return;
@@ -44,7 +42,6 @@ export default {
             lng,
             lat
           );
-          console.log("graphData in action", graphData);
           commit("ADD_GRAPH_DATA", graphData);
         } catch (error) {
           console.error("Error getting raster data:", error);
@@ -62,7 +59,6 @@ export default {
               currentGraphDataset,
               features
             );
-            console.log("graphData in action", graphData);
             commit("ADD_GRAPH_DATA", graphData);
           } catch (error) {
             console.error("Error getting zarr data:", error);

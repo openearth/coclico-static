@@ -148,10 +148,8 @@ export default {
     },
   },
   mounted() {
-    console.log("component mounted", this.seaLevelRiseData);
     if (this.seaLevelRiseData && this.seaLevelRiseData.time) {
       nextTick(() => {
-        console.log("rendering chart");
         this.renderChart();
       });
       window.addEventListener("resize", this.renderChart);

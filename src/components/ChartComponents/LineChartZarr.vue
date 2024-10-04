@@ -21,7 +21,6 @@ export default {
     this.getBaseOption();
     // this.options will be a combination of baseOptions and graphData
     this.options = Object.assign({}, this.baseOptions, this.graphData);
-    console.log("options", this.options);
     nextTick(() => {
       this.renderChart(this.options);
     });
