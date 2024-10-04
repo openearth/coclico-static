@@ -181,11 +181,14 @@ export default {
     },
     loadDatasetOnMap({ commit }, dataset) {
       const layer = matchLayerIdToProperties(dataset);
-
+      if (!layer) {
+        return;
+      }
       //Check if the layer is vector or a raster
       const layerType = _.has(dataset, "cube:dimensions") ? "vector" : "raster";
 
       getCatalog(layer.href).then((layerInfo) => {
+        console.log("layerInfo", layerInfo);
         layerInfo.id = dataset.id; // I will use the dataset id
         if (layerType === "vector") {
           commit("ADD_MAPBOX_LAYER", buildGeojsonMapboxLayer(layerInfo));
