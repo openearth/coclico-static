@@ -101,7 +101,9 @@
   <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
     <v-row style="width: 100%; max-height: 60px">
       <v-col>
-        <v-card-title class="layer-card-title"> Data layers </v-card-title>
+        <v-card-title class="dataset-card-theme-title">
+          {{ activeTheme }}
+        </v-card-title>
       </v-col>
       <v-col class="column-right">
         <v-btn icon @click="close" flat class="close-button">
@@ -114,11 +116,15 @@
       <v-col>
         <v-row>
           <v-col style="min-width: 80%">
-            <v-list class="layer-list">
+            <v-card-title
+              class="layer-card-title"
+              v-if="filteredDatasets.length"
+            >
+              User stories
+            </v-card-title>
+            <v-list class="layer-list" v-if="filteredDatasets.length">
               <v-list-item
-                v-for="dataset in datasetsInActiveTheme.filter(
-                  (dataset) => dataset.id !== 'slp' && dataset.id !== 'cfhp'
-                )"
+                v-for="dataset in filteredDatasets"
                 :key="dataset.id"
                 :title="dataset.title"
               >
@@ -134,15 +140,12 @@
               </v-list-item>
             </v-list>
 
-            <v-card-title
-              class="layer-card-title"
-              v-if="filteredDatasets.length"
-            >
-              User stories
-            </v-card-title>
-            <v-list class="layer-list" v-if="filteredDatasets.length">
+            <v-card-title class="layer-card-title"> Data layers </v-card-title>
+            <v-list class="layer-list">
               <v-list-item
-                v-for="dataset in filteredDatasets"
+                v-for="dataset in datasetsInActiveTheme.filter(
+                  (dataset) => dataset.id !== 'slp' && dataset.id !== 'cfhp'
+                )"
                 :key="dataset.id"
                 :title="dataset.title"
               >
@@ -210,7 +213,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("map", ["themes", "datasetsInActiveTheme"]),
+    ...mapGetters("map", ["themes", "datasetsInActiveTheme", "activeTheme"]),
 
     sidebarStyle() {
       return {
@@ -309,7 +312,7 @@ export default {
 }
 .layer-card-title {
   margin-top: 10px;
-  color: rgb(var(--v-theme-grey80));
+  color: rgb(var(--v-theme-primary));
   font-family: "Inter", sans-serif;
   text-transform: uppercase;
   font-size: 12px;
@@ -331,6 +334,7 @@ export default {
   color: rgb(var(--v-theme-black80));
   font-family: "Inter", sans-serif;
   font-size: 12px;
+  margin-top: -15px;
 }
 
 .extra-list-item {
@@ -351,5 +355,13 @@ export default {
 .extra-list-item-text {
   font-size: 8px !important;
   margin-top: 3px;
+}
+
+.dataset-card-theme-title {
+  margin-top: 10px;
+  color: black;
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
 }
 </style>
