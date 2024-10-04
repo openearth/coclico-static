@@ -75,11 +75,7 @@ export default {
     AppChart,
   },
   methods: {
-    ...mapActions("map", [
-      "addGraphToDashboard",
-      "setSeaLevelRiseData",
-      "loadPointDataForLocation",
-    ]),
+    ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
     saveGraphOnDashboard() {
       if (
@@ -110,10 +106,9 @@ export default {
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
         const features = this.map.queryRenderedFeatures(e.point);
-        // TODO: Pass in the lng, lat also the features.
-        console.log("features", features[0]);
-        this.getGraphData({ lng, lat });
-      this.loadPointDataForLocation();
+
+        this.getGraphData({ lng, lat }, features[0]);
+
         await nextTick();
         this.isOpen = true;
       }

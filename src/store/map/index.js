@@ -2,7 +2,6 @@ import getCatalog from "@/lib/request/get-catalog";
 import buildGeojsonMapboxLayer from "@/lib/mapbox/build-geojson-mapbox-layer";
 import buildRasterMapboxLayer from "@/lib/mapbox/build-raster-mapbox-layer";
 import matchLayerIdToProperties from "@/lib/match-layer-id-to-properties.js";
-import { openArray } from "zarr";
 
 import _ from "lodash";
 
@@ -224,67 +223,6 @@ export default {
     },
     setSeaLevelRiseData({ commit }, graph) {
       commit("SET_SEA_LEVEL_RISE_DATA", graph);
-    },
-    async loadPointDataForLocation({ state }) {
-      try {
-        const url = _.get(state.activeDatasets[0], "assets.data.href"); //Note: it only reads the first dataset in the activeDatasets
-        console.log(
-          "state.activeDatasets[0].assets.data.href",
-          state.activeDatasets[0].assets.data.href
-        );
-
-        // check which variable is of "data" type, and set path to this
-        const variables = Object.entries(
-          _.get(state.activeDatasets[0], "cube:variables")
-        );
-
-        console.log("variables", variables);
-
-        let path = [];
-        variables.forEach((dim) => {
-          if (dim[1].type === "data") {
-            path.push(dim[0]);
-          }
-        });
-
-        console.log("path", path);
-
-        var dimensions = [];
-        if (_.get(state.activeDatasets[0], "deltares:plotType") !== "bar") {
-          path = path.filter((x) => x)[0];
-          dimensions = Object.entries(
-            _.get(
-              state.activeDatasets[0],
-              `["cube:variables"].${path}.dimensions`
-            )
-          );
-        } else if (
-          _.get(state.activeDatasets[0], "deltares:plotType") === "bar"
-        ) {
-          dimensions = Object.entries(
-            _.get(
-              state.activeDatasets[0],
-              `["cube:variables"].${path[0]}.dimensions`
-            )
-          );
-        }
-
-        console.log("dimensions", dimensions);
-
-        // IOANNA pick it up from here, we are missing slicing (see legacy) to only get the data for the current dropdown selction combination
-
-        const array = await openArray({
-          store: url,
-          path: path,
-          mode: "r", // Read mode
-        });
-
-        console.log("array", array);
-        const data = await array.get(null); // Retrieve the entire data array
-        console.log("Zarr data retrieved:", data.data);
-      } catch (error) {
-        console.error("Error reading Zarr data:", error);
-      }
     },
   },
 };

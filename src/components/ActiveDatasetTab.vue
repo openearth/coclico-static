@@ -91,6 +91,7 @@ export default {
       this.reloadDatasetOnMap(dataset);
     },
     checkLayerType(dataset) {
+      console.log("dataset", dataset);
       //Assumption: if layer has cube:dimensions then it is a vector
       //TODO: add in the stacCatalogue structure a file format parameter somehow better so
       return _.has(dataset, "cube:dimensions") ? "vector" : "raster";

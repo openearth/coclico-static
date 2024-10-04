@@ -71,7 +71,7 @@ export default {
     max: 60,
     axisLabel: {
       fontSize: 14,
-      formatter: function (value, index) {
+      formatter: function (value) {
         return value / 1;
       },
     },
