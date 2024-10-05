@@ -8,7 +8,10 @@
       v-if="zarrLayers.includes(activeClickableDataset.id)"
       :graph-data="graphData"
     />
-    <!--   <flood-extent-graph v-else /> -->
+    <flood-extent-graph
+      v-if="activeClickableDataset.id === 'cfhp'"
+      :graph-data="graphData"
+    />
   </div>
   <div v-else class="app-chart__loader">
     <v-progress-circular
@@ -19,14 +22,14 @@
   </div>
 </template>
 <script>
-/* import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue"; */
+import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue";
 import SeaLevelGraph from "./ChartComponents/SeaLevelGraph.vue";
 import LineChartZarr from "./ChartComponents/LineChartZarr.vue";
 import { mapGetters } from "vuex";
 
 export default {
   components: {
-    /*  FloodExtentGraph, */
+    FloodExtentGraph,
     SeaLevelGraph,
     LineChartZarr,
   },

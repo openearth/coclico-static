@@ -2,7 +2,7 @@ import getCatalog from "@/lib/request/get-catalog";
 import buildGeojsonMapboxLayer from "@/lib/mapbox/build-geojson-mapbox-layer";
 import buildRasterMapboxLayer from "@/lib/mapbox/build-raster-mapbox-layer";
 import matchLayerIdToProperties from "@/lib/match-layer-id-to-properties.js";
-
+import buildVectorTilesMapboxLayer from "@/lib/mapbox/build-vector-tiles-mapbox-layer";
 import _ from "lodash";
 
 export default {
@@ -110,6 +110,12 @@ export default {
     },
   },
   actions: {
+    addMapboxLayer({ commit }, mapboxLayer) {
+      commit("ADD_MAPBOX_LAYER", mapboxLayer);
+    },
+    removeMapboxLayer({ commit }, id) {
+      commit("REMOVE_MAPBOX_LAYER", id);
+    },
     loadDatasets({ commit }) {
       //Get STAC collection
       getCatalog(process.env.VUE_APP_CATALOG_URL)
@@ -161,6 +167,14 @@ export default {
                       _.set(dataset, "variables", mappedVariablesArray);
                     }
                   }
+                  // add transparent layer item to dataset if exists
+                  const transparentLayer = _.get(
+                    dataset,
+                    "assets.geoserver_link"
+                  );
+                  if (transparentLayer) {
+                    _.set(dataset, "transparentLayer", transparentLayer);
+                  }
                   commit("ADD_DATASET", dataset);
                 }
               });
@@ -183,6 +197,14 @@ export default {
       const layer = matchLayerIdToProperties(dataset);
       if (!layer) {
         return;
+      }
+      //Sometimes like in the case of cfhp we have to add two layer on the map. The one for visualization and the one for the click event
+      // if transparent layer add it to the map
+      if (dataset.transparentLayer) {
+        const transparentLayer = buildVectorTilesMapboxLayer(
+          dataset.transparentLayer.href
+        );
+        commit("ADD_MAPBOX_LAYER", transparentLayer);
       }
       //Check if the layer is vector or a raster
       const layerType = _.has(dataset, "cube:dimensions") ? "vector" : "raster";
@@ -209,6 +231,12 @@ export default {
       if (datasetExist) {
         commit("REMOVE_ACTIVE_DATASET", dataset.id);
         commit("REMOVE_MAPBOX_LAYER", dataset.id);
+
+        // if transparent layer remove also this one
+        if (dataset.transparentLayer) {
+          commit("REMOVE_MAPBOX_LAYER", "lau_nuts_cfhp");
+          commit("REMOVE_MAPBOX_LAYER", "cfhp_focused");
+        }
       } else {
         commit("ADD_ACTIVE_DATASET", dataset);
         dispatch("loadDatasetOnMap", dataset);

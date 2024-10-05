@@ -7,9 +7,16 @@ import { nextTick } from "vue";
 import * as echarts from "echarts";
 
 export default {
+  props: {
+    graphData: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       colorPalette: ["#307fb6", "#5e9dc4", "#abcfe5"],
+      formattedGraphData: [],
     };
   },
   methods: {
@@ -32,11 +39,7 @@ export default {
               type: "pie",
               radius: "70%",
               top: 30,
-              data: [
-                { value: 2, name: "% flood > 0.5m" },
-                { value: 4, name: "% flood < 0.5m" },
-                { value: 96, name: "% not flooded" },
-              ],
+              data: this.formattedGraphData,
               color: this.colorPalette,
               emphasis: {
                 itemStyle: {
@@ -52,8 +55,29 @@ export default {
         myChart.setOption(option);
       }
     },
+    formatGraphData() {
+      for (const key in this.graphData) {
+        if (key.includes("more05")) {
+          this.formattedGraphData.push({
+            value: this.graphData[key],
+            name: "% flood > 0.5m",
+          });
+        } else if (key.includes("less05")) {
+          this.formattedGraphData.push({
+            value: this.graphData[key],
+            name: "% flood < 0.5m",
+          });
+        } else if (key.includes("nans")) {
+          this.formattedGraphData.push({
+            value: this.graphData[key],
+            name: "% not flooded",
+          });
+        }
+      }
+    },
   },
   mounted() {
+    this.formatGraphData();
     nextTick(() => {
       this.renderChart();
     });

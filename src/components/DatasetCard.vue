@@ -1,9 +1,4 @@
 <template>
-  <!-- TODO:
-        * Add colors based on the color library
-        * Replace option-1 or 2 in values
-        * Add no data has been selected text
- -->
   <v-card width="450px" height="397px" class="custom-dataset-card">
     <v-tabs v-model="tab" grow hide-slider class="pa-2" height="35px">
       <v-tab
