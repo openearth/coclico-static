@@ -56,7 +56,7 @@ import DatasetCard from "@/components/DatasetCard.vue";
 import MapLayer from "@/components/MapLayer.vue";
 import AppChart from "@/components/AppChart.vue";
 import { nextTick } from "vue";
-
+import mapboxgl from "mapbox-gl";
 export default {
   data() {
     return {
@@ -75,7 +75,12 @@ export default {
     AppChart,
   },
   methods: {
-    ...mapActions("map", ["addGraphToDashboard", "setSeaLevelRiseData"]),
+    ...mapActions("map", [
+      "addGraphToDashboard",
+      "setSeaLevelRiseData",
+      "addMapboxLayer",
+      "removeMapboxLayer",
+    ]),
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
     //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
@@ -121,9 +126,51 @@ export default {
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
         const features = this.map.queryRenderedFeatures(e.point)[0];
+        //TODO: after Demo make this implementation more generic
+        if (this.activeClickableDataset.id === "cfhp") {
+          if (this.map.getLayer("cfhp_focused")) {
+            this.map.removeLayer("cfhp_focused");
+            this.map.removeSource("cfhp_focused");
+          }
+
+          //when click load on the map a new layer from the features
+          //fly to its extent
+          const coordinates = features.geometry.coordinates;
+          const bounds = new mapboxgl.LngLatBounds();
+
+          coordinates[0].forEach((coord) => {
+            bounds.extend(coord);
+          });
+          console.log("bounds", bounds);
+          const center = bounds.getCenter();
+          // get bounds of the feature
+
+          this.map.flyTo({
+            center: center,
+            zoom: 10,
+            essential: true,
+          });
+          //add a new layer to the map
+          // TODO: check if there is a better way. FOR NOW DO IT LIKE THIS
+          const mapboxLayer = {
+            id: "cfhp_focused",
+            type: "fill",
+            source: {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                geometry: features.geometry,
+              },
+            },
+            paint: {
+              "fill-color": "#088",
+              "fill-opacity": 0.8,
+            },
+          };
+          this.addMapboxLayer(mapboxLayer);
+        }
 
         this.getGraphData({ lng, lat, features });
-
         await nextTick();
         this.isOpen = true;
       }
