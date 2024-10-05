@@ -87,17 +87,17 @@ export default {
       if (
         this.activeClickableDataset.title === "Global Sea Level Projections"
       ) {
-        // Save SeaLevelGraph data
         this.addGraphToDashboard({
           type: "seaLevelGraph",
           data: this.graphData, // Sea level rise data
         });
         // TODO: the else if below is for the Coastal Hazard Flood Projection user story
-      } else if (this.activeClickableDataset.title === "BLA") {
-        // Save FloodExtentGraph data
+      } else if (
+        this.activeClickableDataset.title === "Coastal Hazard Flood Projections"
+      ) {
         this.addGraphToDashboard({
           type: "floodExtentGraph",
-          data: {}, // If you have any specific data for the flood extent, include it here
+          data: this.graphData,
         });
       } else if (
         this.activeClickableDataset.title === "Extreme surge level" ||

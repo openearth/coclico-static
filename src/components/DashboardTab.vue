@@ -21,6 +21,7 @@
       <flood-extent-graph
         v-else-if="graph.type === 'floodExtentGraph'"
         style="z-index: -1"
+        :graph-data="graph.data"
       />
       <line-chart-zarr
         v-else-if="graph.type === 'lineChartZarr'"
