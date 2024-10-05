@@ -20,7 +20,21 @@ export default {
   mounted() {
     this.getBaseOption();
     // this.options will be a combination of baseOptions and graphData
-    this.options = Object.assign({}, this.baseOptions, this.graphData);
+    this.options = {
+      ...this.baseOptions,
+      ...this.graphData,
+      xAxis: {
+        ...this.baseOptions.xAxis,
+        ...this.graphData.xAxis,
+      },
+      yAxis: {
+        ...this.baseOptions.yAxis,
+        ...this.graphData.yAxis,
+      },
+    };
+    console.log("this.baseOptions", this.baseOptions);
+    console.log("this.graphData", this.graphData);
+    console.log("this.options", this.options);
     nextTick(() => {
       this.renderChart(this.options);
     });

@@ -36,6 +36,9 @@ export default {
     axisLabel: {
       fontSize: 14,
     },
+    axisLine: {
+      lineStyle: { color: "#000000" },
+    },
     nameLocation: "center",
     nameGap: 30,
     nameTextStyle: {
