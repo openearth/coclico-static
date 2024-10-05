@@ -57,19 +57,27 @@ export default {
     },
     formatGraphData() {
       for (const key in this.graphData) {
+        console.log("this.graphData", this.graphData);
+        let total = null;
+        if (key.includes("total")) {
+          total = this.graphData[key];
+        }
         if (key.includes("more05")) {
+          const value = (this.graphData[key] / total) * 100;
           this.formattedGraphData.push({
-            value: this.graphData[key],
+            value: value,
             name: "% flood > 0.5m",
           });
         } else if (key.includes("less05")) {
+          const value = (this.graphData[key] / total) * 100;
           this.formattedGraphData.push({
-            value: this.graphData[key],
+            value: value,
             name: "% flood < 0.5m",
           });
         } else if (key.includes("nans")) {
+          const value = (this.graphData[key] / total) * 100;
           this.formattedGraphData.push({
-            value: this.graphData[key],
+            value: value,
             name: "% not flooded",
           });
         }
