@@ -56,28 +56,40 @@ export default {
       }
     },
     formatGraphData() {
+      let total = null;
+
+      // First, find the total in the graphData
       for (const key in this.graphData) {
-        console.log("this.graphData", this.graphData);
-        let total = null;
         if (key.includes("total")) {
           total = this.graphData[key];
+          break; // Exit the loop once total is found
         }
+      }
+
+      // If total is not found, handle the error or return early
+      if (total === null) {
+        console.error("Total value not found in graphData");
+        return;
+      }
+
+      // Now proceed with the rest of the graphData processing
+      for (const key in this.graphData) {
         if (key.includes("more05")) {
           const value = (this.graphData[key] / total) * 100;
           this.formattedGraphData.push({
-            value: value,
+            value: parseFloat(value.toFixed(2)),
             name: "% flood > 0.5m",
           });
         } else if (key.includes("less05")) {
           const value = (this.graphData[key] / total) * 100;
           this.formattedGraphData.push({
-            value: value,
+            value: parseFloat(value.toFixed(2)),
             name: "% flood < 0.5m",
           });
         } else if (key.includes("nans")) {
           const value = (this.graphData[key] / total) * 100;
           this.formattedGraphData.push({
-            value: value,
+            value: parseFloat(value.toFixed(2)),
             name: "% not flooded",
           });
         }
