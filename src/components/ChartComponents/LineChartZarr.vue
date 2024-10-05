@@ -32,9 +32,6 @@ export default {
         ...this.graphData.yAxis,
       },
     };
-    console.log("this.baseOptions", this.baseOptions);
-    console.log("this.graphData", this.graphData);
-    console.log("this.options", this.options);
     nextTick(() => {
       this.renderChart(this.options);
     });
