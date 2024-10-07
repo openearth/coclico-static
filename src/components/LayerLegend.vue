@@ -1,10 +1,7 @@
 <template>
   <v-container class="ma-0 pa-0">
     <v-row>
-      <v-col
-        cols="9"
-        class="ma-0 pa-0 pl-2"
-      >
+      <v-col cols="9" class="ma-0 pa-0 pl-2">
         <svg viewBox="0 0 100 3">
           <defs>
             <linearGradient
@@ -35,26 +32,13 @@
         </svg>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col
-        v-if="!editingRange"
-        cols="1"
-        class="ma-0 pa-0"
-      >
-        <v-btn
-          small
-          plain
-          icon
-          @click="editRange"
-        >
+    <v-row style="margin-top: 0px">
+      <v-col v-if="!editingRange" cols="1" class="ma-0 pa-0">
+        <v-btn variant="plain" icon @click="editRange">
           {{ minValue }}
         </v-btn>
       </v-col>
-      <v-col
-        v-else
-        cols="4"
-        class="ma-0"
-      >
+      <v-col v-else cols="4" class="ma-0">
         <v-text-field
           id="range-min"
           v-model="minValue"
@@ -62,27 +46,12 @@
           placeholder="Min value"
         />
       </v-col>
-      <v-col
-        v-if="!editingRange"
-        cols="1"
-        offset="7"
-        class="pa-0"
-      >
-        <v-btn
-          @click="editRange"
-          small
-          plain
-          icon
-        >
+      <v-col v-if="!editingRange" cols="1" offset="7" class="pa-0">
+        <v-btn @click="editRange" small variant="plain" icon>
           {{ maxValue }}
         </v-btn>
       </v-col>
-      <v-col
-        v-else
-        cols="4"
-        offset="1"
-        class="ma-0"
-      >
+      <v-col v-else cols="4" offset="1" class="ma-0">
         <v-text-field
           id="range-max"
           v-model="maxValue"
@@ -90,105 +59,83 @@
           placeholder="Max value"
         />
       </v-col>
-      <v-col
-        cols="3"
-        class="my-auto pa-0 unit-text bodytext-s"
-      >
+      <v-col cols="3" class="my-auto pa-0 unit-text bodytext-s">
         [{{ unit }}]
       </v-col>
     </v-row>
-    <v-row
-      v-if="editingRange"
-      justify="space-between"
-    >
+    <v-row v-if="editingRange" justify="space-between">
       <v-col>
-        <v-btn
-          dense
-          @click="cancelEditRange"
-        >
-          Cancel
-        </v-btn>
+        <v-btn dense @click="cancelEditRange"> Cancel </v-btn>
       </v-col>
       <v-col>
-        <v-btn
-          dense
-          @click="resetRange"
-        >
-          Reset
-        </v-btn>
+        <v-btn dense @click="resetRange"> Reset </v-btn>
       </v-col>
       <v-col>
-        <v-btn
-          dense
-          @click="saveRange"
-        >
-          Save
-        </v-btn>
+        <v-btn dense @click="saveRange"> Save </v-btn>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-  import _ from 'lodash'
-  import {mapActions} from 'vuex'
+import _ from "lodash";
+import { mapActions } from "vuex";
 
-  export default {
-    props: {
-      dataset: {
-        type: Object,
-        required: true
-      }
+export default {
+  props: {
+    dataset: {
+      type: Object,
+      required: true,
     },
-    data () {
-      return {
-        editingRange: false,
-        defaultMinValue: '',
-        minValue: '', //at the beginning equal to defaultMinValues. Same when reset. 
-        defaultMaxValue: '',
-        maxValue: '',
-        unit: '',
-        linearGradient: {},
-        datasetId: ''
-      }
+  },
+  data() {
+    return {
+      editingRange: false,
+      defaultMinValue: "",
+      minValue: "", //at the beginning equal to defaultMinValues. Same when reset.
+      defaultMaxValue: "",
+      maxValue: "",
+      unit: "",
+      linearGradient: {},
+      datasetId: "",
+    };
+  },
+  mounted() {
+    this.datasetId = _.get(this.dataset, "id");
+    this.unit = _.get(this.dataset, "deltares:units");
+    this.updateMinMax();
+    this.linearGradient = _.get(this.dataset, "deltares:linearGradient");
+  },
+  methods: {
+    ...mapActions(["reclassifyMapboxLayer"]),
+    updateMinMax() {
+      const min = _.get(this.dataset, "deltares:min", "");
+      const max = _.get(this.dataset, "deltares:max", "");
+      this.minValue = min.toString();
+      this.maxValue = max.toString();
+      this.defaultMinValue = min.toString();
+      this.defaultMaxValue = max.toString();
     },
-    mounted () {
-      
-      this.datasetId = _.get(this.dataset, 'id')
-      this.unit = _.get(this.dataset, 'deltares:units')
-      this.updateMinMax()
-      this.linearGradient =  _.get(this.dataset, 'deltares:linearGradient')
+    cancelEditRange() {
+      this.minValue = this.defaultMinValue;
+      this.maxValue = this.defaultMaxValue;
+      this.editingRange = false;
     },
-    methods: {
-      ...mapActions([ 'reclassifyMapboxLayer' ]),
-      updateMinMax () {
-        const min = _.get(this.dataset, 'deltares:min', '')
-        const max =  _.get(this.dataset, 'deltares:max', '')
-        this.minValue = min.toString()
-        this.maxValue = max.toString()
-        this.defaultMinValue = min.toString()
-        this.defaultMaxValue = max.toString()
-      },
-      cancelEditRange () {
-        this.minValue = this.defaultMinValue
-        this.maxValue = this.defaultMaxValue
-        this.editingRange = false
-      },
-      editRange () {
-        this.editingRange = true
-      },
-      saveRange () {
-        this.editingRange = false
-        _.set(this.dataset, 'deltares:min', this.minValue)
-        _.set(this.dataset, 'deltares:max', this.maxValue)
-        this.reclassifyMapboxLayer(this.dataset)
-      },
-      resetRange () {
-        this.minValue = this.defaultMinValue
-        this.maxValue = this.defaultMaxValue
-      }
-    }
-  }
+    editRange() {
+      this.editingRange = true;
+    },
+    saveRange() {
+      this.editingRange = false;
+      _.set(this.dataset, "deltares:min", this.minValue);
+      _.set(this.dataset, "deltares:max", this.maxValue);
+      this.reclassifyMapboxLayer(this.dataset);
+    },
+    resetRange() {
+      this.minValue = this.defaultMinValue;
+      this.maxValue = this.defaultMaxValue;
+    },
+  },
+};
 </script>
 
 <style>

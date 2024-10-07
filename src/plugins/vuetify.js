@@ -1,27 +1,26 @@
-import Vue from 'vue'
-import Vuetify from 'vuetify/lib/framework'
-import getColors from '@/lib/styling/colors'
+// Styles
+import "@mdi/font/css/materialdesignicons.css";
+import "vuetify/styles";
 
-import '@mdi/font/css/materialdesignicons.css'
+// Vuetify
+import { createVuetify } from "vuetify";
 
-Vue.use(Vuetify)
-
-const colors = getColors('coclico')
-
-
-export default new Vuetify({
-    icons: {
-        iconfont: 'mdi'
+export default createVuetify({
+  theme: {
+    defaultTheme: "rwsTheme",
+    themes: {
+      rwsTheme: {
+        dark: false,
+        colors: {
+          primary: "#068b95",
+          terciary: "#b8e5f0",
+          black100: "#000000",
+          black80: "#293a45",
+          white100: "#ffffff",
+          grey80: "#a9b0b5",
+        },
+      },
     },
-    customVariables: [ '@/assets/variables.scss' ],
-    treeShake: true,
-    theme: {
-        options: {
-            customProperties: true
-        },
-        themes: {
-            light: colors,
-        },
-        
-    }
+  },
 });
+// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides

@@ -1,233 +1,340 @@
 <template>
-    <v-navigation-drawer
-      v-model="drawer"
-      mini-variant
-      mini-variant-width="200"
-      stateless
-      fixed
-      color="white"
-      floating
-      class="app-sidebar"
-      style="border-right: 1px solid rgba(0, 0, 0, 0.12) !important"
-      v-show="!shouldHideDrawer"
-    >
-      <v-list 
-        dense
-        class="pa-0"
-        dark
+  <v-navigation-drawer
+    permanent
+    floating
+    width="200"
+    class="custom-navigation-drawer"
+    :style="sidebarStyle"
+  >
+    <div class="image-container">
+      <custom-icon name="coclico-full" class="coclico-image" />
+    </div>
+    <v-list>
+      <v-list-item
+        class="list-item"
+        @click="
+          openLayersCard();
+          setTheme(theme.name);
+        "
+        v-for="(theme, i) in themes"
+        :key="i"
+        color="primary"
+        :value="theme.name"
       >
-        <v-list-item
-          class="px-2"
-          @click="$router.push({ name: 'home' })"
-          data-v-step="1"
-        >
-          <!-- TODO: add routing -->
-          <custom-icon name="coclico-full" class="icon--large" />
-          <v-list-item-content
-            style="color: black"
-          >
-            <v-list-item-title>
-              CoCliCo
-            </v-list-item-title>
-          </v-list-item-content>
+        <v-list-img class="pa-2 list-item-img">
+          <v-badge color="primary" v-if="theme.count" :content="theme.count">
+            <custom-icon
+              :name="theme.name"
+              icon-folder="themes"
+              class="item-image"
+            />
+          </v-badge>
+
+          <custom-icon
+            v-else
+            :name="theme.name"
+            icon-folder="themes"
+            class="item-image"
+          />
+        </v-list-img>
+        <v-list-item-title class="list-item-title">{{
+          theme.name
+        }}</v-list-item-title>
+      </v-list-item>
+      <v-list>
+        <v-list-item class="list-item" @click="openLayersCard()">
+          <v-list-img class="list-item-img">
+            <custom-icon
+              name="Search"
+              icon-folder="themes"
+              class="item-image"
+            />
+          </v-list-img>
+          <v-list-item-title class="list-item-title">Search</v-list-item-title>
         </v-list-item>
-        <v-divider />
-        <v-list-item-group
-          color="secondary"
-          active-class="active-theme"
-        >
-          <v-list-item
-            class="list-elements"
-            style="color: black"
-            v-for="item in getThemes" 
-            :key="item"
-            @click="toggleTheme(item); openLayersCard()" 
-            :active="isActive(item)"
-          >
-          <div class="list-item">
-            <v-list-item-icon>
-              <custom-icon
-                class="ml-8"
-                :name="item"
-                icon-folder="themes"
-              />
-            </v-list-item-icon>
-            <v-list-item-title>{{ item }}</v-list-item-title>
-          </div>
-            <v-list-item-content>
-              <v-list-item-title>{{ item }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
+        <v-list-item class="list-item-more" @click="expandMenu = !expandMenu">
+          <v-list-img class="list-item-img">
+            <custom-icon
+              name="More"
+              icon-folder="themes"
+              class="item-image-more"
+            />
+          </v-list-img>
+          <v-list-item-title class="list-item-title"></v-list-item-title>
+        </v-list-item>
       </v-list>
-      <v-row
-        class="mt-10"
-        :align="align"
-        no-gutters
-      >
-        <v-col>
-          <div class="list-item">
-            <v-btn
-              icon
-              color="black"
+    </v-list>
+    <template #append>
+      <div v-show="expandMenu">
+        <v-list dense class="pa-0">
+          <v-list-item @click="openLandingPage">
+            <div class="extra-list-item">
+              <v-icon color="black" size="18px">
+                mdi-information-outline
+              </v-icon>
+              <v-list-item-subtitle class="extra-list-item-text">
+                WEBSITE
+              </v-list-item-subtitle>
+            </div>
+          </v-list-item>
+          <v-list-item @click="openCatalogPage">
+            <div class="extra-list-item">
+              <v-icon color="black" size="18px"> mdi-database-search </v-icon>
+              <v-list-item-subtitle class="extra-list-item-text">
+                DATA CATALOG
+              </v-list-item-subtitle>
+            </div>
+          </v-list-item>
+          <v-list-item @click="openWorkbenchPage">
+            <div class="extra-list-item-container">
+              <v-icon color="black" size="18px"> mdi-hammer </v-icon>
+              <v-list-item-subtitle class="extra-list-item-text">
+                WORKBENCH
+              </v-list-item-subtitle>
+            </div>
+          </v-list-item>
+        </v-list>
+      </div>
+    </template>
+  </v-navigation-drawer>
+
+  <v-card raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
+    <v-row style="width: 100%; max-height: 60px">
+      <v-col>
+        <v-card-title class="dataset-card-theme-title">
+          {{ activeTheme }}
+        </v-card-title>
+      </v-col>
+      <v-col class="column-right">
+        <v-btn icon @click="close" flat class="close-button">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <v-row style="width: 100%">
+      <v-col>
+        <v-row>
+          <v-col style="min-width: 80%">
+            <v-card-title
+              class="layer-card-title"
+              v-if="filteredDatasets.length"
             >
-              <v-icon>mdi-magnify</v-icon>
-            </v-btn>
-            <v-subtitle
-              class="text-caption"
-            > Search </v-subtitle>
-          </div>
-        </v-col>
-        <v-col>
-          <div class="list-item">
-            <v-btn
-              icon
-              color="black"
-              @click="expandMenu = !expandMenu"
-            >
-              <v-icon>mdi-dots-horizontal</v-icon>
-            </v-btn>
-            <v-subtitle
-              v-show="expandMenu"
-              class="text-caption"
-            > Less </v-subtitle>
-            <v-subtitle
-              v-show="!expandMenu"
-              class="text-caption"
-            > More </v-subtitle>
-          </div>
-        </v-col>
-      </v-row>
-      <template #append>
-        <div v-show="expandMenu">
-          <v-list
-            dense
-            class="pa-0"
-            color="terciary"
-          >
-            <v-list-item @click="openLandingPage">
-              <div class="extra-list-item">
-                  <v-icon color="black" size="18px">mdi-information-outline</v-icon>
-                  <v-list-item-subtitle class="extra-list-item-text">WEBSITE</v-list-item-subtitle>
-              </div>
-              <v-list-item-content>
-                <v-list-item-title>Landing page</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item @click="openStoriesPage">
-              <div class="extra-list-item">
-                <v-icon color="black" size="18px">mdi-account-details</v-icon>
-                <v-list-item-subtitle class="extra-list-item-text">STORIES</v-list-item-subtitle>
-              </div>
-              <v-list-item-content>
-                <v-list-item-title>Stories</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-              <v-list-item @click="openCatalogPage">
-                <div class="extra-list-item">
-                  <v-icon color="black" size="18px"> mdi-database-search </v-icon>
-                  <v-list-item-subtitle class="extra-list-item-text">DATA CATALOG</v-list-item-subtitle>
-                </div>
-                <v-list-item-content>
-                  <v-list-item-title>Platform</v-list-item-title>
-                </v-list-item-content>
+              User stories
+            </v-card-title>
+            <v-list class="layer-list" v-if="filteredDatasets.length">
+              <v-list-item
+                v-for="dataset in filteredDatasets"
+                :key="dataset.id"
+                :title="dataset.title"
+              >
+                <template v-slot:prepend>
+                  <v-switch
+                    v-model="dataset.active"
+                    hide-details
+                    class="mr-5"
+                    color="primary"
+                    @change="toggleDataset(dataset)"
+                  ></v-switch>
+                </template>
               </v-list-item>
-              <v-list-item @click="openWorkbenchPage">
-                <div class="extra-list-item-container">
-                  <v-icon color="black" size="18px"> mdi-hammer </v-icon>
-                  <v-list-item-subtitle class="extra-list-item-text">WORKBENCH</v-list-item-subtitle>
-                </div>
-                <v-list-item-content>
-                  <v-list-item-title>Workbench</v-list-item-title>
-                </v-list-item-content>
+            </v-list>
+
+            <v-card-title class="layer-card-title"> Data layers </v-card-title>
+            <v-list class="layer-list">
+              <v-list-item
+                v-for="dataset in datasetsInActiveTheme.filter(
+                  (dataset) => dataset.id !== 'slp' && dataset.id !== 'cfhp'
+                )"
+                :key="dataset.id"
+                :title="dataset.title"
+              >
+                <template v-slot:prepend>
+                  <v-switch
+                    v-model="dataset.active"
+                    hide-details
+                    class="mr-5"
+                    color="primary"
+                    @change="toggleDataset(dataset)"
+                  ></v-switch>
+                </template>
               </v-list-item>
-          </v-list>
-        </div>
-      </template>
-    </v-navigation-drawer>
+            </v-list>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
+
 <script>
-  import CustomIcon from '@/components/CustomIcon'
-  import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapActions } from "vuex";
+import CustomIcon from "@/components/CustomIcon.vue";
+export default {
+  components: {
+    CustomIcon,
+  },
+  data() {
+    return {
+      showLayersCard: false,
+      expandMenu: false,
+    };
+  },
+  methods: {
+    ...mapActions("map", [
+      "setActiveTheme",
+      "updateActiveDatasetsArray",
+      "updateThemeObject",
+    ]),
+    openLayersCard() {
+      this.showLayersCard = true;
+    },
+    setTheme(theme) {
+      this.setActiveTheme(theme);
+    },
+    close() {
+      this.showLayersCard = false;
+    },
+    toggleDataset(dataset) {
+      this.updateActiveDatasetsArray(dataset);
+      this.updateThemeObject();
+    },
+    openLandingPage() {
+      window.open("https://coclicoservices.eu", "_blank");
+    },
+    openWorkbenchPage() {
+      window.open("https://github.com/openearth/coclico-workbench", "_blank");
+    },
+    openCatalogPage() {
+      window.open(
+        "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/dgds-data-public/coclico/coclico-stac/catalog.json?.language=en",
+        "_blank"
+      );
+    },
+  },
+  computed: {
+    ...mapGetters("map", ["themes", "datasetsInActiveTheme", "activeTheme"]),
 
-  export default {
-    components: {
-      CustomIcon
+    sidebarStyle() {
+      return {
+        borderRadius: this.showLayersCard
+          ? "28px 0px 0px 28px"
+          : "28px 28px 28px 28px",
+        borderRight: this.showLayersCard
+          ? "2px solid #e4e4e4"
+          : "2px solid white",
+      };
     },
-    computed: {
-      ...mapGetters([ 'getThemes', 'getActiveTheme' ]),
+    numberOfDatasetsInTheme() {
+      return this.datasetsInActiveTheme.length;
     },
-    data() { 
-      return { 
-        drawer: true,
-        mini: true,
-        activeTheme: null,
-        expandMenu: false,
-        shouldHideDrawer: false
-      }
+    filteredDatasets() {
+      return this.datasetsInActiveTheme.filter(
+        (dataset) => dataset.id === "slp" || dataset.id === "cfhp"
+      );
     },
-    methods: {
-      ...mapMutations(['toggleActiveTheme', 'setShowLayersCardOpen' ]),
-      openLayersCard (event) {
-        this.setShowLayersCardOpen()
-      },
-      openLandingPage() {
-        window.open('https://coclicoservices.eu', '_blank')
-      },
-      openWorkbenchPage() {
-        window.open('https://github.com/openearth/coclico-workbench', '_blank')
-      },
-      openStoriesPage() {
-        window.open(this.$router.resolve({ name: 'stories' }).href, '_blank');
-      },
-      openCatalogPage() {
-        window.open('https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/dgds-data-public/coclico/coclico-stac/catalog.json?.language=en', '_blank')
-      },
-      toggleTheme (id) {
-        this.toggleActiveTheme(id)
-
-        if (this.activeTheme === id) {
-          this.activeTheme = null
-        } else {
-          this.activeTheme = id
-        }
-
-        this.$emit('change-theme')
-      },
-      isActive (id) {
-        return this.activeTheme === id
-      },
-      checkRoute() {
-        this.shouldHideDrawer = this.$route.path.endsWith('/stories');
-      },
-    },
-    created() {
-      this.checkRoute();
-    },
-    watch: {
-      $route(to) {
-        this.checkRoute();
-      },
-    }
-  }
+  },
+};
 </script>
 
-<style>
-.app-sidebar {
-  margin-top: var(--spacing-default);
-  margin-left: var(--spacing-default);
-  height: 100%;
-  max-height: calc(100% - 2*(var(--spacing-default)));
+<style scoped>
+.custom-navigation-drawer {
+  margin-top: 30px;
+  margin-left: 50px;
+  max-height: calc(100% - 2 * (30px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
-.list-elements {
+.image-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.coclico-image {
+  width: 8rem;
+  height: 4rem;
+}
+.list-item {
+  display: flex;
+  justify-content: center;
+  margin: auto;
   margin-top: 20px;
 }
-
-.list-item {
-  display: grid;
-  place-items: center;
+.list-item-more {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  margin-top: 100px;
+}
+.list-item-img {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+.list-item-title {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  white-space: normal;
   text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+}
+.item-image {
+  width: 2.5rem;
+  height: 1.5rem;
+}
+.item-image-more {
+  width: 1.5rem;
+  height: 0.5rem;
+}
+.custom-data-layers-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  top: 30px;
+  left: 250px;
+  z-index: 5;
+  width: 40vw;
+  max-width: 500px;
+  min-width: 250px;
+  border-radius: 0px 28px 28px 0px;
+  box-shadow: none;
+  height: 100%;
+  max-height: calc(100% - 2 * (30px));
+}
+.close-button {
+  margin-top: 10px;
+  color: rgb(var(--v-theme-grey80));
+}
+.layer-card-title {
+  margin-top: 10px;
+  color: rgb(var(--v-theme-primary));
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+.column-right {
+  display: flex;
+  justify-content: flex-end;
+}
+.layer-category-title {
+  margin-top: 10px;
+  color: rgb(var(--v-theme-primary));
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+.layer-list {
+  color: rgb(var(--v-theme-black80));
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  margin-top: -15px;
 }
 
 .extra-list-item {
@@ -248,5 +355,13 @@
 .extra-list-item-text {
   font-size: 8px !important;
   margin-top: 3px;
+}
+
+.dataset-card-theme-title {
+  margin-top: 10px;
+  color: black;
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
 }
 </style>

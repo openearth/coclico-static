@@ -9,32 +9,33 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      name: {
-        type: String,
-        default: ''
-      },
-      iconFolder: {
-        type: String,
-        default: null
-      },
-      size: {
-        type: String,
-        default: null
+export default {
+  props: {
+    name: {
+      type: String,
+      default: "",
+    },
+    iconFolder: {
+      type: String,
+      default: null,
+    },
+    size: {
+      type: String,
+      default: null,
+    },
+  },
+  computed: {
+    icon() {
+      try {
+        const subFolder = this.iconFolder ? `${this.iconFolder}/` : "";
+
+        return require(`..//assets/icons/${subFolder}icon-${this.name}.svg`);
+      } catch {
+        return require("../assets/icons/icon-placeholder.svg");
       }
     },
-    computed: {
-      icon () {
-        try {
-          const subFolder = this.iconFolder ? `${this.iconFolder}/` : ''
-          return require(`..//assets/icons/${subFolder}icon-${this.name}.svg`)
-        } catch {
-          return require('../assets/icons/icon-placeholder.svg')
-        }
-      }
-    }
-  }
+  },
+};
 </script>
 
 <style>

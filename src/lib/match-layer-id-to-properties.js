@@ -1,29 +1,29 @@
 /**
  * Function that has as input the dataset
  * and based on the selected properties
- * returns the layer of the dataset
- * 
- * 
+ * returns one layer from the dataset object
+ *
+ *
  */
-import _ from 'lodash'
+import _ from "lodash";
 
-export default function(dataset) {
+export default function (dataset) {
   if (!dataset) {
-    return 
+    return;
   }
-  const {links,  summaries } = dataset
-  const filterByProperty = ({properties})=> {
+  const { links, summaries } = dataset;
+  const filterByProperty = ({ properties }) => {
     if (properties) {
-      const array =  summaries.map(({id, chosenValue }) => {
-        const propVal = _.get(properties, id)
-      return propVal === chosenValue
-    })
-    return array.every(Boolean)
+      const array = summaries.map(({ id, chosenValue }) => {
+        const propVal = _.get(properties, id);
+        return propVal === chosenValue;
+      });
+      return array.every(Boolean);
+    }
+  };
+  const layer = links.find(filterByProperty);
+  if (!layer) {
+    return;
   }
-  }
-  const layer = links.find(filterByProperty)
-        if (!layer) {
-      return
-  }
-  return layer
+  return layer;
 }

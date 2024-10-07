@@ -1,15 +1,11 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import map from './map'
-import preferences from './preferences'
-import stories from './stories'
+import map from "./map";
+import graphs from "./graphs";
 
-Vue.use(Vuex)
+import { createStore } from "vuex";
 
-export default new Vuex.Store({
+export default createStore({
   modules: {
     map,
-    stories,
-    preferences
-  }
-})
+    graphs,
+  },
+});
