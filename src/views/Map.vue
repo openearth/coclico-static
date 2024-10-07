@@ -93,7 +93,8 @@ export default {
         });
         // TODO: the else if below is for the Coastal Hazard Flood Projection user story
       } else if (
-        this.activeClickableDataset.title === "Coastal Hazard Flood Projections"
+        this.activeClickableDataset.title ===
+        "Inundation distribution during flood events"
       ) {
         this.addGraphToDashboard({
           type: "floodExtentGraph",
