@@ -207,7 +207,7 @@ export default {
     },
     openCatalogPage() {
       window.open(
-        "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/dgds-data-public/coclico/coclico-stac/catalog.json?.language=en",
+        "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/coclico-data-public/coclico/coclico-stac-4oct/catalog.json?.language=en",
         "_blank"
       );
     },
