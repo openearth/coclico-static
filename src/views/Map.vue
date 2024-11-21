@@ -223,8 +223,8 @@ export default {
   text-transform: none;
   font-weight: 100 !important;
   border-radius: 8px;
-  max-width: 10vw;
-  min-width: 10vw;
+  max-width: 15vw;
+  min-width: 15vw;
 }
 .close-button-popup {
   background-color: white;
