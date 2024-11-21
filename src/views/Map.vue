@@ -27,7 +27,7 @@
         "
         :closeButton="false"
       >
-        <pre style="width: 50vw; height: 50vh">
+        <pre style="width: auto; height: auto; overflow: hidden">
           
           <app-chart />
           <div class="buttons-container" v-if="graphData">
