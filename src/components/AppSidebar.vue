@@ -144,7 +144,10 @@
             <v-list class="layer-list">
               <v-list-item
                 v-for="dataset in datasetsInActiveTheme.filter(
-                  (dataset) => dataset.id !== 'slp' && dataset.id !== 'cfhp'
+                  (dataset) =>
+                    dataset.id !== 'slp' &&
+                    dataset.id !== 'cfhp' &&
+                    dataset.id !== 'cba'
                 )"
                 :key="dataset.id"
                 :title="dataset.title"
@@ -230,7 +233,8 @@ export default {
     },
     filteredDatasets() {
       return this.datasetsInActiveTheme.filter(
-        (dataset) => dataset.id === "slp" || dataset.id === "cfhp"
+        (dataset) =>
+          dataset.id === "slp" || dataset.id === "cfhp" || dataset.id === "cba"
       );
     },
   },
