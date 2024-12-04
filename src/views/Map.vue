@@ -168,6 +168,7 @@ export default {
               "fill-opacity": 0.8,
             },
           };
+          console.log("mapboxLayer", mapboxLayer);
           this.addMapboxLayer(mapboxLayer);
         }
 

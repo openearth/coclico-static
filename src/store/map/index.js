@@ -16,7 +16,16 @@ export default {
     graphsInDashboard: [], //TODO: this should be moved to the graphs/index.js
     seaLevelRiseData: {},
     activeClickableDataset: null,
-    clickableDatasetsIds: ["cfhp", "slp", "ssl", "eesl", "sc", "cfr", "cbca"], // Not all layers are clickable. Only the ones in user stories.
+    clickableDatasetsIds: [
+      "cfhp",
+      "slp",
+      "ssl",
+      "eesl",
+      "sc",
+      "cfr",
+      "cbca",
+      "cba",
+    ], // Not all layers are clickable. Only the ones in user stories.
     // perhaps we can provide that from the catalog.
   },
   getters: {
