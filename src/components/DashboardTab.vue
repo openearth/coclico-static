@@ -15,7 +15,7 @@
       <sea-level-graph
         v-if="graph.type === 'seaLevelGraph'"
         style="z-index: -1"
-        :sea-level-rise-data="graph.data"
+        :graph-data="graph.data"
       />
 
       <flood-extent-graph

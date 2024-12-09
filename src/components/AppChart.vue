@@ -2,7 +2,7 @@
   <div class="app-chart__container" v-if="graphData">
     <sea-level-graph
       v-if="activeClickableDataset.id === 'slp'"
-      :sea-level-rise-data="graphData"
+      :graph-data="graphData"
     />
     <line-chart-zarr
       v-if="zarrLayers.includes(activeClickableDataset.id)"
