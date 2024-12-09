@@ -47,6 +47,7 @@ export default {
       //TODO: after demo refactor the if statements
       const currentGraphDataset = rootGetters["map/activeClickableDataset"];
       const mapboxLayers = rootGetters["map/mapboxLayers"];
+      const coords = { lat, lng };
       if (!currentGraphDataset) {
         return;
       }
@@ -57,7 +58,7 @@ export default {
         );
 
         const graphData = getDataFromMapbox(mapboxLayer, features.properties);
-        commit("ADD_GRAPH_DATA", { ...graphData, graphType });
+        commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
       } else {
         const layerType = _.has(currentGraphDataset, "cube:dimensions")
           ? "vector"
@@ -70,7 +71,7 @@ export default {
               lng,
               lat
             );
-            commit("ADD_GRAPH_DATA", { ...graphData, graphType });
+            commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
           } catch (error) {
             console.error("Error getting raster data:", error);
           }
@@ -87,7 +88,7 @@ export default {
                 currentGraphDataset,
                 features
               );
-              commit("ADD_GRAPH_DATA", { ...graphData, graphType });
+              commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
             } catch (error) {
               console.error("Error getting zarr data:", error);
             }

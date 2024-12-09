@@ -2,7 +2,7 @@
   <v-card flat class="scrollable-card">
     <v-card
       flat
-      v-for="(graphData, index) in graphs"
+      v-for="({ graphData, title }, index) in graphs"
       :key="index"
       class="ma-3"
       style="height: 350px"
@@ -12,6 +12,10 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-col>
+      <v-card-title>
+        {{ title }}<br />
+        <small>({{ graphData.coords.lat }}, {{ graphData.coords.lng }})</small>
+      </v-card-title>
       <component
         :is="graphComponents[graphData.graphType]"
         :graph-data="graphData"

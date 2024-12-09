@@ -84,7 +84,9 @@ export default {
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
     //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
-      this.addGraph(this.graphData);
+      const { title } = this.activeClickableDataset;
+      const graphData = this.graphData;
+      this.addGraph({ graphData, title });
     },
     closePopup() {
       this.isOpen = false;
