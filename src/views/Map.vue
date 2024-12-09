@@ -28,7 +28,7 @@
         :closeButton="false"
       >
         <pre style="width: auto; height: auto; overflow: hidden">
-          
+
           <app-chart />
           <div class="buttons-container" v-if="graphData">
             <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
@@ -75,8 +75,8 @@ export default {
     AppChart,
   },
   methods: {
+    ...mapActions("dashboard", ["addGraph"]),
     ...mapActions("map", [
-      "addGraphToDashboard",
       "setSeaLevelRiseData",
       "addMapboxLayer",
       "removeMapboxLayer",
@@ -87,7 +87,7 @@ export default {
       if (
         this.activeClickableDataset.title === "Global Sea Level Projections"
       ) {
-        this.addGraphToDashboard({
+        this.addGraph({
           type: "seaLevelGraph",
           data: this.graphData, // Sea level rise data
         });
@@ -96,7 +96,7 @@ export default {
         this.activeClickableDataset.title ===
         "Inundation distribution during flood events"
       ) {
-        this.addGraphToDashboard({
+        this.addGraph({
           type: "floodExtentGraph",
           data: this.graphData,
         });
@@ -109,7 +109,7 @@ export default {
         this.activeClickableDataset.title === "Coastal flood risk"
       ) {
         // Save FloodExtentGraph data
-        this.addGraphToDashboard({
+        this.addGraph({
           type: "lineChartZarr",
           data: this.graphData, // If you have any specific data for the flood extent, include it here
         });

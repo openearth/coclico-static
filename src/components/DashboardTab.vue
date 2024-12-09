@@ -2,7 +2,7 @@
   <v-card flat class="scrollable-card">
     <v-card
       flat
-      v-for="(graph, index) in graphsInDashboard"
+      v-for="(graph, index) in graphs"
       :key="index"
       class="ma-3"
       style="height: 350px"
@@ -46,13 +46,10 @@ export default {
     LineChartZarr,
   },
   computed: {
-    ...mapGetters("map", ["graphsInDashboard"]),
+    ...mapGetters("dashboard", ["graphs"]),
   },
   methods: {
-    ...mapActions("map", ["removeGraphFromDashboard"]),
-    removeGraph(index) {
-      this.removeGraphFromDashboard(index);
-    },
+    ...mapActions("dashboard", ["removeGraph"]),
   },
 };
 </script>

@@ -13,7 +13,6 @@ export default {
     activeTheme: null,
     activeDatasets: [],
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
-    graphsInDashboard: [], //TODO: this should be moved to the graphs/index.js
     seaLevelRiseData: {},
     activeClickableDataset: null,
     clickableDatasetsIds: ["cfhp", "slp", "ssl", "eesl", "sc", "cfr", "cbca"], // Not all layers are clickable. Only the ones in user stories.
@@ -40,9 +39,6 @@ export default {
     },
     mapboxLayers(state) {
       return state.mapboxLayers;
-    },
-    graphsInDashboard(state) {
-      return state.graphsInDashboard;
     },
     seaLevelRiseData(state) {
       return state.seaLevelRiseData;
@@ -98,12 +94,6 @@ export default {
       state.mapboxLayers = state.mapboxLayers.filter(
         (mapboxLayer) => mapboxLayer.id !== id
       );
-    },
-    ADD_GRAPH_TO_DASHBOARD(state, graph) {
-      state.graphsInDashboard.push(graph);
-    },
-    REMOVE_GRAPH_FROM_DASHBOARD(state, index) {
-      state.graphsInDashboard.splice(index, 1);
     },
     SET_SEA_LEVEL_RISE_DATA(state, data) {
       state.seaLevelRiseData = data;
@@ -242,12 +232,7 @@ export default {
         dispatch("loadDatasetOnMap", dataset);
       }
     },
-    addGraphToDashboard({ commit }, graph) {
-      commit("ADD_GRAPH_TO_DASHBOARD", graph);
-    },
-    removeGraphFromDashboard({ commit }, index) {
-      commit("REMOVE_GRAPH_FROM_DASHBOARD", index);
-    },
+
     setSeaLevelRiseData({ commit }, graph) {
       commit("SET_SEA_LEVEL_RISE_DATA", graph);
     },
