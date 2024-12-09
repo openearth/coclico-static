@@ -2,7 +2,7 @@
   <v-card flat class="scrollable-card">
     <v-card
       flat
-      v-for="(graph, index) in graphs"
+      v-for="(graphData, index) in graphs"
       :key="index"
       class="ma-3"
       style="height: 350px"
@@ -12,21 +12,9 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-col>
-      <sea-level-graph
-        v-if="graph.type === 'seaLevelGraph'"
-        style="z-index: -1"
-        :graph-data="graph.data"
-      />
-
-      <flood-extent-graph
-        v-else-if="graph.type === 'floodExtentGraph'"
-        style="z-index: -1"
-        :graph-data="graph.data"
-      />
-      <line-chart-zarr
-        v-else-if="graph.type === 'lineChartZarr'"
-        style="z-index: -1"
-        :graph-data="graph.data"
+      <component
+        :is="graphComponents[graphData.graphType]"
+        :graph-data="graphData"
       />
     </v-card>
     <v-card flat> </v-card>
@@ -34,7 +22,9 @@
 </template>
 
 <script>
+import { markRaw } from "vue";
 import { mapGetters, mapActions } from "vuex";
+import { graphTypes } from "../store/graphs";
 import SeaLevelGraph from "./ChartComponents/SeaLevelGraph.vue";
 import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue";
 import LineChartZarr from "./ChartComponents/LineChartZarr.vue";
@@ -44,6 +34,16 @@ export default {
     SeaLevelGraph,
     FloodExtentGraph,
     LineChartZarr,
+  },
+  data() {
+    return {
+      graphTypes,
+      graphComponents: {
+        [graphTypes.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
+        [graphTypes.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
+        [graphTypes.LINE_CHART]: markRaw(LineChartZarr),
+      },
+    };
   },
   computed: {
     ...mapGetters("dashboard", ["graphs"]),

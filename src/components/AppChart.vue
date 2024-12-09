@@ -1,15 +1,7 @@
 <template>
   <div class="app-chart__container" v-if="graphData">
-    <sea-level-graph
-      v-if="activeClickableDataset.id === 'slp'"
-      :graph-data="graphData"
-    />
-    <line-chart-zarr
-      v-if="zarrLayers.includes(activeClickableDataset.id)"
-      :graph-data="graphData"
-    />
-    <flood-extent-graph
-      v-if="activeClickableDataset.id === 'cfhp'"
+    <component
+      :is="graphComponents[graphData.graphType]"
       :graph-data="graphData"
     />
   </div>
@@ -22,10 +14,12 @@
   </div>
 </template>
 <script>
+import { markRaw } from "vue";
+import { mapGetters } from "vuex";
+import { graphTypes } from "../store/graphs";
 import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue";
 import SeaLevelGraph from "./ChartComponents/SeaLevelGraph.vue";
 import LineChartZarr from "./ChartComponents/LineChartZarr.vue";
-import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -35,7 +29,11 @@ export default {
   },
   data() {
     return {
-      zarrLayers: ["ssl", "eesl", "sc"],
+      graphComponents: {
+        [graphTypes.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
+        [graphTypes.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
+        [graphTypes.LINE_CHART]: markRaw(LineChartZarr),
+      },
     };
   },
   computed: {

@@ -84,36 +84,7 @@ export default {
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
     //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
-      if (
-        this.activeClickableDataset.title === "Global Sea Level Projections"
-      ) {
-        this.addGraph({
-          type: "seaLevelGraph",
-          data: this.graphData, // Sea level rise data
-        });
-        // TODO: the else if below is for the Coastal Hazard Flood Projection user story
-      } else if (
-        this.activeClickableDataset.title ===
-        "Inundation distribution during flood events"
-      ) {
-        this.addGraph({
-          type: "floodExtentGraph",
-          data: this.graphData,
-        });
-      } else if (
-        this.activeClickableDataset.title === "Extreme surge level" ||
-        this.activeClickableDataset.title === "Extreme sea level" ||
-        this.activeClickableDataset.title === "Shoreline change" ||
-        this.activeClickableDataset.title ===
-          "Cost benefit coastal adaptation" ||
-        this.activeClickableDataset.title === "Coastal flood risk"
-      ) {
-        // Save FloodExtentGraph data
-        this.addGraph({
-          type: "lineChartZarr",
-          data: this.graphData, // If you have any specific data for the flood extent, include it here
-        });
-      }
+      this.addGraph(this.graphData);
     },
     closePopup() {
       this.isOpen = false;
