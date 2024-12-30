@@ -5,7 +5,6 @@
       v-for="({ graphData, title }, index) in graphs"
       :key="index"
       class="ma-3"
-      style="height: 350px"
     >
       <v-col class="column-right">
         <v-btn icon flat class="close-button" @click="removeGraph(index)">
@@ -24,6 +23,7 @@
       <component
         :is="graphComponents[graphData.graphType]"
         :graph-data="graphData"
+        style="height: 300px"
       />
     </v-card>
     <v-card flat> </v-card>
