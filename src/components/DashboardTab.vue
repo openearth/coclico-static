@@ -6,20 +6,20 @@
       :key="index"
       class="ma-3"
     >
-      <v-col class="column-right">
+      <div class="graph-title">
+        <v-card-title>
+          {{ title }}<br />
+          <small>
+            (
+            {{ roundCoords(graphData.coords.lat) }},
+            {{ roundCoords(graphData.coords.lng) }}
+            )
+          </small>
+        </v-card-title>
         <v-btn icon flat class="close-button" @click="removeGraph(index)">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-      </v-col>
-      <v-card-title>
-        {{ title }}<br />
-        <small>
-          (
-          {{ roundCoords(graphData.coords.lat) }},
-          {{ roundCoords(graphData.coords.lng) }}
-          )
-        </small>
-      </v-card-title>
+      </div>
       <component
         :is="graphComponents[graphData.graphType]"
         :graph-data="graphData"
@@ -74,10 +74,11 @@ export default {
 .close-button {
   color: rgb(var(--v-theme-grey80));
 }
-.column-right {
+.graph-title {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: -47px;
-  z-index: 0;
+  justify-content: space-between;
+}
+.graph-title > .v-card-title {
+  flex: 0 1 auto;
 }
 </style>
