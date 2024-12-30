@@ -51,14 +51,20 @@ export default {
       if (!currentGraphDataset) {
         return;
       }
-      const graphType = getGraphType(currentGraphDataset.id);
+      const datasetId = currentGraphDataset.id;
+      const graphType = getGraphType(datasetId);
       if (_.has(currentGraphDataset, "transparentLayer")) {
         const mapboxLayer = mapboxLayers.find(
           (layer) => layer.id === currentGraphDataset.id
         );
 
         const graphData = getDataFromMapbox(mapboxLayer, features.properties);
-        commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
+        commit("ADD_GRAPH_DATA", {
+          ...graphData,
+          datasetId,
+          graphType,
+          coords,
+        });
       } else {
         const layerType = _.has(currentGraphDataset, "cube:dimensions")
           ? "vector"
@@ -71,7 +77,12 @@ export default {
               lng,
               lat
             );
-            commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
+            commit("ADD_GRAPH_DATA", {
+              ...graphData,
+              datasetId,
+              graphType,
+              coords,
+            });
           } catch (error) {
             console.error("Error getting raster data:", error);
           }
@@ -88,7 +99,12 @@ export default {
                 currentGraphDataset,
                 features
               );
-              commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
+              commit("ADD_GRAPH_DATA", {
+                ...graphData,
+                datasetId,
+                graphType,
+                coords,
+              });
             } catch (error) {
               console.error("Error getting zarr data:", error);
             }

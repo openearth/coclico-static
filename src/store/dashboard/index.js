@@ -6,7 +6,15 @@ export default {
   },
 
   getters: {
-    graphs: (state) => state.graphs,
+    graphs: (state) => {
+      return state.graphs;
+    },
+    activeGraphs: (state, getters, rootState, rootGetters) => {
+      const datasetIds = rootGetters["map/activeDatasetIds"];
+      return state.graphs.filter(({ graphData: { datasetId } }) =>
+        datasetIds.includes(datasetId)
+      );
+    },
   },
 
   mutations: {

@@ -2,7 +2,7 @@
   <v-card flat class="scrollable-card">
     <v-card
       flat
-      v-for="({ graphData, title }, index) in graphs"
+      v-for="({ graphData, title }, index) in activeGraphs"
       :key="index"
       class="ma-3"
     >
@@ -55,7 +55,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("dashboard", ["graphs"]),
+    ...mapGetters("dashboard", ["activeGraphs"]),
   },
   methods: {
     ...mapActions("dashboard", ["removeGraph"]),

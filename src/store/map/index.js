@@ -37,6 +37,9 @@ export default {
     activeDatasets(state) {
       return state.activeDatasets;
     },
+    activeDatasetIds(state) {
+      return state.activeDatasets.map(({ id }) => id);
+    },
     mapboxLayers(state) {
       return state.mapboxLayers;
     },
