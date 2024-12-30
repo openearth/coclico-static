@@ -14,7 +14,12 @@
       </v-col>
       <v-card-title>
         {{ title }}<br />
-        <small>({{ graphData.coords.lat }}, {{ graphData.coords.lng }})</small>
+        <small>
+          (
+          {{ roundCoords(graphData.coords.lat) }},
+          {{ roundCoords(graphData.coords.lng) }}
+          )
+        </small>
       </v-card-title>
       <component
         :is="graphComponents[graphData.graphType]"
@@ -54,6 +59,9 @@ export default {
   },
   methods: {
     ...mapActions("dashboard", ["removeGraph"]),
+    roundCoords(number) {
+      return Number(number).toFixed(3);
+    },
   },
 };
 </script>
