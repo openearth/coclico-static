@@ -166,13 +166,21 @@ export default {
         this.isOpen = true;
       }
     },
+    activeDatasetIds() {
+      const isGraphInActiveDatasets = this.activeDatasetIds.includes(
+        this.graphData?.datasetId
+      );
+      if (!isGraphInActiveDatasets) {
+        this.isOpen = false;
+      }
+    },
   },
   computed: {
     ...mapGetters("map", [
       "mapboxLayers",
       "graphsInDashboard",
       "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
-      "activeDatasets",
+      "activeDatasetIds",
       "activeClickableDataset",
     ]),
     ...mapGetters("graphs", ["graphData"]),
