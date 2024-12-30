@@ -27,14 +27,24 @@
         "
         :closeButton="false"
       >
-        <pre style="width: auto; height: auto; overflow: hidden">
-
+        <div style="width: auto; height: auto; overflow: hidden">
+          <v-card-title>
+            {{ activeClickableDataset.title }}
+          </v-card-title>
           <app-chart />
           <div class="buttons-container" v-if="graphData">
-            <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
-            <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
+            <v-btn
+              flat
+              @click="saveGraphOnDashboard"
+              class="add-to-dashboard-button-popup"
+            >
+              Add to dashboard
+            </v-btn>
+            <v-btn flat @click="closePopup" class="close-button-popup">
+              Close
+            </v-btn>
           </div>
-        </pre>
+        </div>
       </MapboxPopup>
       <dataset-card />
     </mapbox-map>
