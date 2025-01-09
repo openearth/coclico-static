@@ -130,10 +130,15 @@ export default {
                   // 4.a add allowedValues and chosenValue to the dataset
                   const summaries =
                     _.get(dataset, "summaries") || _.get(catalog, "summaries");
+                  const summaryDescriptions =
+                    _.get(dataset, "summary_descriptions") ||
+                    _.get(catalog, "summary_descriptions") ||
+                    {};
                   const mappedSummaries = Object.keys(summaries).map((id) => {
                     const summary = _.get(summaries, id);
                     return {
                       id: id,
+                      description: summaryDescriptions[id],
                       allowedValues: summary,
                       chosenValue: summary[0],
                     };

@@ -26,10 +26,18 @@
             <v-col cols="9" class="mr-0">
               <span class="summary-info">{{ summary.id }}</span>
             </v-col>
-            <v-col cols="3" class="pa-4">
-              <v-icon small class="summary-info"
-                >mdi-information-outline</v-icon
+            <v-col v-if="summary.description" cols="3" class="pa-4">
+              <v-tooltip
+                location="bottom"
+                max-width="450px"
+                :text="summary.description"
               >
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props" small class="summary-info, ml-4"
+                    >mdi-information-outline</v-icon
+                  >
+                </template>
+              </v-tooltip>
             </v-col>
           </v-row>
           <v-select
