@@ -27,14 +27,24 @@
         "
         :closeButton="false"
       >
-        <pre style="width: auto; height: auto; overflow: hidden">
-          
+        <div style="width: auto; height: auto; overflow: hidden">
+          <v-card-title>
+            {{ activeClickableDataset.title }}
+          </v-card-title>
           <app-chart />
           <div class="buttons-container" v-if="graphData">
-            <v-btn flat @click="saveGraphOnDashboard" class="add-to-dashboard-button-popup"> Add to dashboard </v-btn>
-            <v-btn flat @click="closePopup" class="close-button-popup"> Close </v-btn>
+            <v-btn
+              flat
+              @click="saveGraphOnDashboard"
+              class="add-to-dashboard-button-popup"
+            >
+              Add to dashboard
+            </v-btn>
+            <v-btn flat @click="closePopup" class="close-button-popup">
+              Close
+            </v-btn>
           </div>
-        </pre>
+        </div>
       </MapboxPopup>
       <dataset-card />
     </mapbox-map>
@@ -75,8 +85,8 @@ export default {
     AppChart,
   },
   methods: {
+    ...mapActions("dashboard", ["addGraph"]),
     ...mapActions("map", [
-      "addGraphToDashboard",
       "setSeaLevelRiseData",
       "addMapboxLayer",
       "removeMapboxLayer",
@@ -84,36 +94,9 @@ export default {
     ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
     //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
-      if (
-        this.activeClickableDataset.title === "Global Sea Level Projections"
-      ) {
-        this.addGraphToDashboard({
-          type: "seaLevelGraph",
-          data: this.graphData, // Sea level rise data
-        });
-        // TODO: the else if below is for the Coastal Hazard Flood Projection user story
-      } else if (
-        this.activeClickableDataset.title ===
-        "Inundation distribution during flood events"
-      ) {
-        this.addGraphToDashboard({
-          type: "floodExtentGraph",
-          data: this.graphData,
-        });
-      } else if (
-        this.activeClickableDataset.title === "Extreme surge level" ||
-        this.activeClickableDataset.title === "Extreme sea level" ||
-        this.activeClickableDataset.title === "Shoreline change" ||
-        this.activeClickableDataset.title ===
-          "Cost benefit coastal adaptation" ||
-        this.activeClickableDataset.title === "Coastal flood risk"
-      ) {
-        // Save FloodExtentGraph data
-        this.addGraphToDashboard({
-          type: "lineChartZarr",
-          data: this.graphData, // If you have any specific data for the flood extent, include it here
-        });
-      }
+      const { title } = this.activeClickableDataset;
+      const graphData = this.graphData;
+      this.addGraph({ graphData, title });
     },
     closePopup() {
       this.isOpen = false;
@@ -183,13 +166,21 @@ export default {
         this.isOpen = true;
       }
     },
+    activeDatasetIds() {
+      const isGraphInActiveDatasets = this.activeDatasetIds.includes(
+        this.graphData?.datasetId
+      );
+      if (!isGraphInActiveDatasets) {
+        this.isOpen = false;
+      }
+    },
   },
   computed: {
     ...mapGetters("map", [
       "mapboxLayers",
       "graphsInDashboard",
       "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
-      "activeDatasets",
+      "activeDatasetIds",
       "activeClickableDataset",
     ]),
     ...mapGetters("graphs", ["graphData"]),

@@ -8,7 +8,7 @@ import * as echarts from "echarts";
 
 export default {
   props: {
-    seaLevelRiseData: {
+    graphData: {
       type: Object,
       required: true,
     },
@@ -23,7 +23,7 @@ export default {
       const series = [];
 
       // Loop through each scenario in the data and generate the series
-      this.seaLevelRiseData.scenarios.forEach((scenario, index) => {
+      this.graphData.scenarios.forEach((scenario, index) => {
         const color = this.colors[index % this.colors.length]; // Use standard colors in a cycle
 
         // Add low data as a transparent placeholder (baseline)
@@ -97,7 +97,7 @@ export default {
           },
           xAxis: {
             type: "category",
-            data: this.seaLevelRiseData.time, // Use time for x-axis
+            data: this.graphData.time, // Use time for x-axis
             name: "Year",
             nameLocation: "middle",
             nameGap: 25,
@@ -123,7 +123,7 @@ export default {
             },
           },
           legend: {
-            data: this.seaLevelRiseData.scenarios.map(
+            data: this.graphData.scenarios.map(
               (scenario) => `${scenario.name}`
             ),
             selectedMode: false,
@@ -148,7 +148,7 @@ export default {
     },
   },
   mounted() {
-    if (this.seaLevelRiseData && this.seaLevelRiseData.time) {
+    if (this.graphData && this.graphData.time) {
       nextTick(() => {
         this.renderChart();
       });
