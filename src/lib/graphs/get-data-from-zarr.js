@@ -1,11 +1,11 @@
-import _ from "lodash";
+import { get, unzip } from "lodash-es";
 import { openArray } from "zarr";
 
 export default async function (dataset, features) {
-  const url = _.get(dataset, "assets.data.href");
-  const datasetName = _.get(dataset, "id");
+  const url = get(dataset, "assets.data.href");
+  const datasetName = get(dataset, "id");
 
-  const variables = Object.entries(_.get(dataset, "cube:variables"));
+  const variables = Object.entries(get(dataset, "cube:variables"));
 
   let path = [];
   variables.forEach((dim) => {
@@ -15,25 +15,25 @@ export default async function (dataset, features) {
   });
 
   var dimensions = [];
-  if (_.get(dataset, "deltares:plotType") !== "bar") {
+  if (get(dataset, "deltares:plotType") !== "bar") {
     path = path.filter((x) => x)[0];
     dimensions = Object.entries(
-      _.get(dataset, `["cube:variables"].${path}.dimensions`)
+      get(dataset, `["cube:variables"].${path}.dimensions`)
     );
-  } else if (_.get(dataset, "deltares:plotType") === "bar") {
+  } else if (get(dataset, "deltares:plotType") === "bar") {
     dimensions = Object.entries(
-      _.get(dataset, `["cube:variables"].${path[0]}.dimensions`)
+      get(dataset, `["cube:variables"].${path[0]}.dimensions`)
     );
   }
 
-  const summaryList = _.get(dataset, "summaries");
+  const summaryList = get(dataset, "summaries");
 
   let slice = dimensions.map((dim) => {
     if (dim[1] === "stations") {
-      return _.get(features, "properties.locationId", 0);
+      return get(features, "properties.locationId", 0);
     } else if (
       dim[1] === "nscenarios" &&
-      _.get(dataset, "deltares:plotSeries") !== "scenarios"
+      get(dataset, "deltares:plotSeries") !== "scenarios"
     ) {
       const scenarioIndex = summaryList.find(
         (object) => object.id === "scenarios"
@@ -47,7 +47,7 @@ export default async function (dataset, features) {
       });
     } else if (
       dim[1] === "rp" &&
-      _.get(dataset, "deltares:plotSeries") !== "scenarios"
+      get(dataset, "deltares:plotSeries") !== "scenarios"
     ) {
       return summaryList
         .find((object) => object.id === "rp")
@@ -65,7 +65,7 @@ export default async function (dataset, features) {
 
   let graphData = null;
 
-  if (_.get(dataset, "deltares:plotType") !== "bar") {
+  if (get(dataset, "deltares:plotType") !== "bar") {
     try {
       const res = await openArray({
         store: url,
@@ -76,20 +76,20 @@ export default async function (dataset, features) {
       const data = await res.get(slice);
 
       if (data.data.length > data.data[0].length || datasetName === "sc") {
-        data.data = _.unzip(data.data);
+        data.data = unzip(data.data);
       }
 
       let series = [
         {
           data: [],
-          type: _.get(dataset, "deltares:plotType"),
+          type: get(dataset, "deltares:plotType"),
           name: "",
         },
       ];
 
       if (typeof data.data[0].length === "undefined") {
         series[0].data = Array.from(data.data);
-        series[0].type = _.get(dataset, "deltares:plotType");
+        series[0].type = get(dataset, "deltares:plotType");
         series[0].name = "default";
       } else {
         series = data.data.map((serie) => {
@@ -101,15 +101,15 @@ export default async function (dataset, features) {
       }
 
       const variableUnit = Object.entries(
-        _.get(dataset, `["cube:variables"].${path}.unit`)
+        get(dataset, `["cube:variables"].${path}.unit`)
       );
 
-      let cubeDimensions = _.get(dataset, "cube:dimensions");
-      const xAxis = _.get(dataset, "deltares:plotxAxis");
-      const plotSeries = _.get(dataset, "deltares:plotSeries");
+      let cubeDimensions = get(dataset, "cube:dimensions");
+      const xAxis = get(dataset, "deltares:plotxAxis");
+      const plotSeries = get(dataset, "deltares:plotSeries");
 
       const dimensionNames = Object.entries(
-        _.get(dataset, `cube:dimensions.${plotSeries}.values`)
+        get(dataset, `cube:dimensions.${plotSeries}.values`)
       );
 
       if (cubeDimensions[xAxis].description === "decade window") {
@@ -164,7 +164,7 @@ export default async function (dataset, features) {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  } else if (_.get(dataset, "deltares:plotType") === "bar") {
+  } else if (get(dataset, "deltares:plotType") === "bar") {
     const xAxisdata = [];
     const series = [];
 

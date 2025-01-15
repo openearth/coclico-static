@@ -5,13 +5,14 @@
  * layerName is constructed from the properties of each item
  * propertyNames are read from the summaries
  */
-import _ from "lodash";
+import { get } from "lodash-es";
+
 export default function (mapboxLayer) {
   // Early return if dataset is falsy
   if (!mapboxLayer) return;
 
   // Find first item
-  const tiles = _.get(mapboxLayer.source, "tiles");
+  const tiles = get(mapboxLayer.source, "tiles");
   let urlObject = new URL(tiles[0]);
 
   // Get the base URL (without query parameters)

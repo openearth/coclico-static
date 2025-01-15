@@ -81,7 +81,7 @@
 <script>
 import LayerLegend from "./LayerLegend.vue";
 import { mapActions } from "vuex";
-import _ from "lodash";
+import { has } from "lodash-es";
 
 export default {
   props: {
@@ -99,10 +99,10 @@ export default {
       this.reloadDatasetOnMap(dataset);
     },
     checkLayerType(dataset) {
-      return _.has(dataset, "cube:dimensions") ? "vector" : "raster";
+      return has(dataset, "cube:dimensions") ? "vector" : "raster";
     },
     activeLegend(dataset) {
-      return _.has(dataset, "deltares:linearGradient");
+      return has(dataset, "deltares:linearGradient");
     },
   },
 };
