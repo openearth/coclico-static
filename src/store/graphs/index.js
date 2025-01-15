@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { get, has } from "lodash-es";
 import getDataFromRaster from "@/lib/graphs/get-data-from-raster";
 import getDataFromZarr from "@/lib/graphs/get-data-from-zarr";
 import getDataFromMapbox from "@/lib/graphs/get-data-from-mapbox";
@@ -53,7 +53,7 @@ export default {
       }
       const datasetId = currentGraphDataset.id;
       const graphType = getGraphType(datasetId);
-      if (_.has(currentGraphDataset, "transparentLayer")) {
+      if (has(currentGraphDataset, "transparentLayer")) {
         const mapboxLayer = mapboxLayers.find(
           (layer) => layer.id === currentGraphDataset.id
         );
@@ -66,7 +66,7 @@ export default {
           coords,
         });
       } else {
-        const layerType = _.has(currentGraphDataset, "cube:dimensions")
+        const layerType = has(currentGraphDataset, "cube:dimensions")
           ? "vector"
           : "raster";
 
@@ -87,7 +87,7 @@ export default {
             console.error("Error getting raster data:", error);
           }
         } else {
-          const type = _.get(currentGraphDataset, "assets.data.roles").includes(
+          const type = get(currentGraphDataset, "assets.data.roles").includes(
             "zarr-root"
           )
             ? "zarr"

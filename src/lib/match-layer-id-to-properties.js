@@ -5,7 +5,7 @@
  *
  *
  */
-import _ from "lodash";
+import { get } from "lodash-es";
 
 export default function (dataset) {
   if (!dataset) {
@@ -15,7 +15,7 @@ export default function (dataset) {
   const filterByProperty = ({ properties }) => {
     if (properties) {
       const array = summaries.map(({ id, chosenValue }) => {
-        const propVal = _.get(properties, id);
+        const propVal = get(properties, id);
         return propVal === chosenValue;
       });
       return array.every(Boolean);

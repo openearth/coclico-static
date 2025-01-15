@@ -3,7 +3,7 @@ import buildGeojsonMapboxLayer from "@/lib/mapbox/build-geojson-mapbox-layer";
 import buildRasterMapboxLayer from "@/lib/mapbox/build-raster-mapbox-layer";
 import matchLayerIdToProperties from "@/lib/match-layer-id-to-properties.js";
 import buildVectorTilesMapboxLayer from "@/lib/mapbox/build-vector-tiles-mapbox-layer";
-import _ from "lodash";
+import { compact, get, has, set } from "lodash-es";
 
 export default {
   namespaced: true,
@@ -115,7 +115,7 @@ export default {
         //1. first  we get the parent catalog
         .then((catalog) => {
           //2. read themes from the main catalog
-          const keywords = _.get(catalog, "summaries.keywords");
+          const keywords = get(catalog, "summaries.keywords");
           keywords.forEach((keyword) =>
             commit("ADD_THEME", { name: keyword, count: 0 })
           );
@@ -129,13 +129,13 @@ export default {
                 if (dataset.id !== "template") {
                   // 4.a add allowedValues and chosenValue to the dataset
                   const summaries =
-                    _.get(dataset, "summaries") || _.get(catalog, "summaries");
+                    get(dataset, "summaries") || get(catalog, "summaries");
                   const summaryDescriptions =
-                    _.get(dataset, "summary_descriptions") ||
-                    _.get(catalog, "summary_descriptions") ||
+                    get(dataset, "summary_descriptions") ||
+                    get(catalog, "summary_descriptions") ||
                     {};
                   const mappedSummaries = Object.keys(summaries).map((id) => {
-                    const summary = _.get(summaries, id);
+                    const summary = get(summaries, id);
                     return {
                       id: id,
                       description: summaryDescriptions[id],
@@ -143,35 +143,35 @@ export default {
                       chosenValue: summary[0],
                     };
                   });
-                  _.set(dataset, "summaries", mappedSummaries);
+                  set(dataset, "summaries", mappedSummaries);
                   // 4.b. add variables to the dataset
-                  const variables = _.get(dataset, "cube:variables");
+                  const variables = get(dataset, "cube:variables");
 
                   if (typeof variables !== "undefined") {
                     var mappedVariables = Object.keys(variables).map((id) => {
-                      const variable = _.get(variables, id);
+                      const variable = get(variables, id);
                       if (variable.type === "data") {
                         return {
                           id: id,
                         };
                       }
                     });
-                    mappedVariables = _.compact(mappedVariables);
+                    mappedVariables = compact(mappedVariables);
 
                     const mappedVariablesArray = mappedVariables.map(
                       (a) => a.id
                     );
                     if (mappedVariablesArray.length !== 0) {
-                      _.set(dataset, "variables", mappedVariablesArray);
+                      set(dataset, "variables", mappedVariablesArray);
                     }
                   }
                   // add transparent layer item to dataset if exists
-                  const transparentLayer = _.get(
+                  const transparentLayer = get(
                     dataset,
                     "assets.geoserver_link"
                   );
                   if (transparentLayer) {
-                    _.set(dataset, "transparentLayer", transparentLayer);
+                    set(dataset, "transparentLayer", transparentLayer);
                   }
                   commit("ADD_DATASET", dataset);
                 }
@@ -205,7 +205,7 @@ export default {
         commit("ADD_MAPBOX_LAYER", transparentLayer);
       }
       //Check if the layer is vector or a raster
-      const layerType = _.has(dataset, "cube:dimensions") ? "vector" : "raster";
+      const layerType = has(dataset, "cube:dimensions") ? "vector" : "raster";
 
       getCatalog(layer.href).then((layerInfo) => {
         layerInfo.id = dataset.id; // I will use the dataset id
