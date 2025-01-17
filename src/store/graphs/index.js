@@ -109,7 +109,7 @@ export default {
               console.error("Error getting zarr data:", error);
             }
           } else {
-            console.log("Mapbox data not implemented yet");
+            console.error("Mapbox data not implemented yet");
           }
         }
       }

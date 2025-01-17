@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 import {
   MapboxMap,
@@ -67,6 +67,7 @@ import MapLayer from "@/components/MapLayer.vue";
 import AppChart from "@/components/AppChart.vue";
 import { nextTick } from "vue";
 import mapboxgl from "mapbox-gl";
+
 export default {
   data() {
     return {
@@ -125,7 +126,6 @@ export default {
           coordinates[0].forEach((coord) => {
             bounds.extend(coord);
           });
-          console.log("bounds", bounds);
           const center = bounds.getCenter();
           // get bounds of the feature
 
@@ -178,6 +178,7 @@ export default {
   computed: {
     ...mapGetters("map", [
       "mapboxLayers",
+      "mapboxSources",
       "graphsInDashboard",
       "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
       "activeDatasetIds",
