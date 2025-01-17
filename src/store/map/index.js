@@ -1,5 +1,5 @@
 import getCatalog from "@/lib/request/get-catalog";
-import { getResourceLayers } from "@/lib/layers";
+import { getLayerType, getResourceLayers } from "@/lib/layers";
 import { getCollections } from "@/lib/catalog";
 
 export default {
@@ -12,8 +12,7 @@ export default {
     mapboxSources: [],
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
     seaLevelRiseData: {},
-    activeClickableDataset: null,
-    clickableDatasetsIds: ["cfhp", "slp", "ssl", "eesl", "sc", "cfr", "cbca"], // Not all layers are clickable. Only the ones in user stories.
+    clickableDatasetsIds: [], // Not all layers are clickable. Only the ones in user stories.
     // perhaps we can provide that from the catalog.
   },
   getters: {
@@ -47,7 +46,9 @@ export default {
       return state.seaLevelRiseData;
     },
     activeClickableDataset(state) {
-      return state.activeClickableDataset;
+      return state.activeDatasets.find((dataset) =>
+        state.clickableDatasetsIds.includes(dataset.id)
+      );
     },
   },
   mutations: {
@@ -72,9 +73,11 @@ export default {
     },
     ADD_ACTIVE_DATASET(state, dataset) {
       state.activeDatasets = [dataset, ...state.activeDatasets];
-      // Set clickableDataset TODO: to be improved
-      if (state.clickableDatasetsIds.includes(state.activeDatasets[0].id)) {
-        state.activeClickableDataset = state.activeDatasets[0];
+      const activeClickableDataset = state.activeDatasets.find(({ id }) =>
+        state.clickableDatasetsIds.includes(id)
+      );
+      if (activeClickableDataset) {
+        state.activeClickableDataset = activeClickableDataset;
       }
     },
     REMOVE_ACTIVE_DATASET(state, id) {
@@ -92,6 +95,10 @@ export default {
     },
     ADD_MAPBOX_LAYER(state, mapboxLayer) {
       state.mapboxLayers = [...state.mapboxLayers, mapboxLayer];
+    },
+    ADD_CLICKABLE_LAYER(state, layer) {
+      const id = layer.id.replace("_geoserver_link", "");
+      state.clickableDatasetsIds = [...state.clickableDatasetsIds, id];
     },
     REMOVE_MAPBOX_LAYER(state, id) {
       state.mapboxLayers = state.mapboxLayers.filter(
@@ -146,7 +153,13 @@ export default {
     async loadDatasetOnMap({ commit }, dataset) {
       const layers = await getResourceLayers(dataset);
       await Promise.all(
-        layers.map((layer) => commit("ADD_MAPBOX_LAYER", layer))
+        layers.map((layer) => {
+          const layerType = getLayerType(layer);
+          if (layerType === "clickable") {
+            commit("ADD_CLICKABLE_LAYER", layer);
+          }
+          commit("ADD_MAPBOX_LAYER", layer);
+        })
       );
     },
     //Used when new selections have been made
@@ -162,7 +175,7 @@ export default {
         commit("REMOVE_ACTIVE_DATASET", dataset.id);
         commit("REMOVE_MAPBOX_LAYER", `${dataset.id}_visual`);
         commit("REMOVE_MAPBOX_LAYER", `${dataset.id}_mapbox`);
-        commit("REMOVE_MAPBOX_LAYER", `${dataset.id}_geoserver_link`);
+        commit("REMOVE_MAPBOX_LAYER", `${dataset.id}`);
         // if transparent layer remove also this one
         if (!dataset?.assets?.["geoserver_link"]) return;
         commit("REMOVE_MAPBOX_LAYER", "lau_nuts_cfhp");

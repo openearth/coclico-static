@@ -39,7 +39,7 @@ Transparent layer that is used to create clickable polygons on the map.
 ### `visual`  
 Visual layer from a geoserver, which is displayed on the map when a collection is toggled.
 Can contain Raster tiles or Vector tiles.    
-#### Vector example
+#### Raster example
 ```json
 {
   "visual": {
@@ -54,13 +54,17 @@ Can contain Raster tiles or Vector tiles.
 }
 ```
 
-#### Raster example
+#### Vector example
 ```json
 {
   "visual": {
     "href": "https://coclico.avi.deltares.nl/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=lau:coclico_LAU_CM_LAU_2020_NUTS_2021_01M_3035_CM&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/vnd.mapbox-vector-tile&TILECOL={x}&TILEROW={y}",
     "type": "application/vnd.apache.parquet",
-    "title": "Geoserver Parquet link"
+    "title": "LAU_CM Background Layer",
+    "description": "LAU_CM WMTS url",
+    "roles": [ 
+      "visual"
+    ]
   }
 }
 ```

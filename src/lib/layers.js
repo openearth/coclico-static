@@ -109,16 +109,16 @@ export function buildVectorTileMapboxLayer(dataset, assetKey) {
     "properties" in dataset && "deltares:paint" in dataset?.properties
       ? dataset.properties["deltares:paint"]
       : {
-          "fill-color": "#0080ff",
-          "fill-opacity": 0,
+          "fill-color": "rgba(0,0,0,0)",
+          ...(assetKey !== "geoserver_link"
+            ? { "fill-outline-color": "#000000" }
+            : {}),
         };
   const asset = dataset?.assets?.[assetKey];
   if (!asset) throw new Error("Asset not found in resource");
-  const layer = asset.href.match(/LAYER=([^&]*)/);
-  let id = layer ? layer[1] : null;
-  if (!id)
+  const layerName = getLayerName(asset);
+  if (!layerName)
     throw new Error(`Layer not found in resource url: \n${asset.href}\n`);
-  id = id.split(":")[1];
 
   return {
     id: `${dataset.id}_${assetKey}`,
@@ -129,7 +129,7 @@ export function buildVectorTileMapboxLayer(dataset, assetKey) {
       minZoom: 6,
       maxZoom: 20,
     },
-    "source-layer": id,
+    "source-layer": layerName,
     paint,
   };
 }
@@ -153,8 +153,39 @@ export function matchLayerIdToProperties(dataset) {
   return items.length === 1 ? items[0] : items.find(findByProperty);
 }
 
+/**
+ * Checks if the dataset has a legend
+ * @param dataset
+ * @returns {boolean}
+ */
 export function hasLegend(dataset) {
   const isVector = "geoserver_link" in dataset.assets;
   const hasGradient = "deltares:linearGradient" in dataset;
   return isVector && hasGradient;
+}
+
+/**
+ * Returns the layer name from a tile URL inside a layer or asset object
+ * @param layer
+ * @returns {*}
+ */
+export function getLayerName(layer) {
+  const href = "href" in layer ? layer.href : layer.source.tiles[0];
+  const match = href.match(/LAYER=([^&]*)/) || href.match(/layers=([^&]*)/);
+  if (!match) return;
+  const [, layerName] = match[1].split(":");
+  return layerName;
+}
+
+const transparentLayerRegex = /geoserver_link/;
+const visualLayerRegex = /visual/;
+
+/**
+ * Returns the layer type based on the layer id
+ * @param layer
+ * @returns {"clickable" | "visual"}
+ */
+export function getLayerType(layer) {
+  if (transparentLayerRegex.test(layer?.id)) return "clickable";
+  if (visualLayerRegex.test(layer?.id)) return "visual";
 }

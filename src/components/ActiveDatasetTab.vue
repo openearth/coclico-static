@@ -90,7 +90,7 @@ const datasets = computed(() =>
 );
 
 const reloadDataset = (dataset) => {
-  store.actions.reloadDatasetOnMap(dataset);
+  store.dispatch("map/reloadDatasetOnMap", dataset);
 };
 </script>
 
