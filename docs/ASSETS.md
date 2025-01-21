@@ -38,7 +38,35 @@ Transparent layer that is used to create clickable polygons on the map.
 ## Items
 ### `visual`  
 Visual layer from a geoserver, which is displayed on the map when a collection is toggled.
-Can contain Raster tiles or Vector tiles.    
+Can contain Raster tiles or Vector tiles.
+
+#### Vector example
+An item with a vector visual should contain a `"deltares:paint"` property (as seen on mapbox resources).
+It is used to style the vector tiles.
+The following example shows the fallback paint that is used when `"deltares:paint"` is not present.
+```json
+{
+  "properties": {
+    "deltares:paint": {
+      "fill-color": "rgba(0,0,0,0)",
+      "fill-outline-color": "#000000"
+    }
+  }
+}
+```
+```json
+{
+  "visual": {
+    "href": "https://<base>/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=<workspace>:<layer>&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/vnd.mapbox-vector-tile&TILECOL={x}&TILEROW={y}",
+    "type": "application/vnd.apache.parquet",
+    "title": "Title",
+    "description": "Description",
+    "roles": [ 
+      "visual"
+    ]
+  }
+}
+```
 #### Raster example
 ```json
 {
@@ -48,21 +76,6 @@ Can contain Raster tiles or Vector tiles.
     "title": "Title",
     "description": "Description",
     "roles": [
-      "visual"
-    ]
-  }
-}
-```
-
-#### Vector example
-```json
-{
-  "visual": {
-    "href": "https://<base>/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=<workspace>:<layer>&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/vnd.mapbox-vector-tile&TILECOL={x}&TILEROW={y}",
-    "type": "application/vnd.apache.parquet",
-    "title": "Title",
-    "description": "Description",
-    "roles": [ 
       "visual"
     ]
   }
