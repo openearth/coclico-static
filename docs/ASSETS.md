@@ -43,7 +43,7 @@ Can contain Raster tiles or Vector tiles.
 ```json
 {
   "visual": {
-    "href": "https://<base>/wms?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.1&request=GetMap&srs=EPSG:3857&transparent=true&width=256&height=256&layers=cfhp:HIGH_DEFENDED_MAPS_SLR_High_end_2150",
+    "href": "https://<base>/wms?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.1&request=GetMap&srs=EPSG:3857&transparent=true&width=256&height=256&layers=<workspace>:<layer>",
     "type": "application/png",
     "title": "Title",
     "description": "Description",
@@ -58,7 +58,7 @@ Can contain Raster tiles or Vector tiles.
 ```json
 {
   "visual": {
-    "href": "https://<base>/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=lau:coclico_LAU_CM_LAU_2020_NUTS_2021_01M_3035_CM&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/vnd.mapbox-vector-tile&TILECOL={x}&TILEROW={y}",
+    "href": "https://<base>/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=<workspace>:<layer>&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/vnd.mapbox-vector-tile&TILECOL={x}&TILEROW={y}",
     "type": "application/vnd.apache.parquet",
     "title": "Title",
     "description": "Description",
