@@ -168,8 +168,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import CustomIcon from "@/components/CustomIcon.vue";
+
 export default {
   components: {
     CustomIcon,
@@ -183,7 +184,7 @@ export default {
   methods: {
     ...mapActions("map", [
       "setActiveTheme",
-      "updateActiveDatasetsArray",
+      "toggleActiveDataset",
       "updateThemeObject",
     ]),
     openLayersCard() {
@@ -196,7 +197,7 @@ export default {
       this.showLayersCard = false;
     },
     toggleDataset(dataset) {
-      this.updateActiveDatasetsArray(dataset);
+      this.toggleActiveDataset(dataset.id);
       this.updateThemeObject();
     },
     openLandingPage() {

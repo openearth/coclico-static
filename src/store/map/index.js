@@ -8,12 +8,12 @@ export default {
     themes: [],
     datasets: [],
     activeTheme: null,
-    activeDatasets: [],
+    activeDatasetIds: [],
     mapboxSources: [],
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
     seaLevelRiseData: {},
     clickableDatasetsIds: [], // Not all layers are clickable. Only the ones in user stories.
-    // perhaps we can provide that from the catalog.
+    properties: [],
   },
   getters: {
     themes(state) {
@@ -31,10 +31,12 @@ export default {
       );
     },
     activeDatasets(state) {
-      return state.activeDatasets;
+      return state.activeDatasetIds.map((id) => {
+        return state.datasets.find((dataset) => dataset.id === id);
+      });
     },
     activeDatasetIds(state) {
-      return state.activeDatasets.map(({ id }) => id);
+      return state.activeDatasetIds;
     },
     mapboxLayers(state) {
       return state.mapboxLayers;
@@ -46,9 +48,24 @@ export default {
       return state.seaLevelRiseData;
     },
     activeClickableDataset(state) {
-      return state.activeDatasets.find((dataset) =>
+      return state.datasets.find((dataset) =>
         state.clickableDatasetsIds.includes(dataset.id)
       );
+    },
+    activeDatasetProperties(state) {
+      return (id) =>
+        state.properties.find(({ id: datasetId }) => datasetId === id)
+          ?.properties;
+    },
+    activeDatasetValues(state) {
+      return (id) =>
+        Object.fromEntries(
+          state.properties
+            .find(({ id: datasetId }) => datasetId === id)
+            .properties.map((property) => {
+              return [property.id, property.value];
+            })
+        );
     },
   },
   mutations: {
@@ -68,41 +85,55 @@ export default {
     ADD_DATASET(state, dataset) {
       state.datasets = [...state.datasets, dataset];
     },
+    ADD_DATASET_PROPERTIES(state, payload) {
+      state.properties = [
+        ...state.properties.filter(({ id }) => id !== payload.id),
+        {
+          id: payload.id,
+          properties: payload.properties.map((property) => ({
+            ...property,
+            value: property.values[0],
+          })),
+        },
+      ];
+    },
+    UPDATE_DATASET_PROPERTIES(state, { id, properties }) {
+      const index = state.properties.findIndex((prop) => prop.id === id);
+      state.properties[index] = { id, properties };
+    },
+    REMOVE_DATASET_PROPERTIES(state, id) {
+      state.properties = [...state.properties.filter((prop) => prop.id !== id)];
+    },
     SET_ACTIVE_THEME(state, theme) {
       state.activeTheme = theme;
     },
-    ADD_ACTIVE_DATASET(state, dataset) {
-      state.activeDatasets = [dataset, ...state.activeDatasets];
-      const activeClickableDataset = state.activeDatasets.find(({ id }) =>
-        state.clickableDatasetsIds.includes(id)
+    ADD_ACTIVE_DATASET(state, id) {
+      state.activeDatasetIds = Array.from(
+        new Set([id, ...state.activeDatasetIds])
       );
-      if (activeClickableDataset) {
-        state.activeClickableDataset = activeClickableDataset;
-      }
     },
     REMOVE_ACTIVE_DATASET(state, id) {
-      state.activeDatasets = state.activeDatasets.filter(
-        (activeDataset) => activeDataset.id !== id
+      state.activeDatasetIds = state.activeDatasetIds.filter(
+        (activeDatasetId) => activeDatasetId !== id
       );
-      // Set clickableDataset
-      if (state.activeDatasets.length === 0) {
-        state.activeClickableDataset = null;
-      } else {
-        if (state.clickableDatasetsIds.includes(state.activeDatasets[0].id)) {
-          state.activeClickableDataset = state.activeDatasets[0];
-        }
-      }
     },
     ADD_MAPBOX_LAYER(state, mapboxLayer) {
-      state.mapboxLayers = [...state.mapboxLayers, mapboxLayer];
+      const layerType = getLayerType(mapboxLayer);
+      if (layerType !== "clickable") {
+        state.mapboxLayers = [...state.mapboxLayers, mapboxLayer];
+      }
     },
-    ADD_CLICKABLE_LAYER(state, layer) {
-      const id = layer.id.replace("_geoserver_link", "");
+    ADD_CLICKABLE_LAYER(state, id) {
       state.clickableDatasetsIds = [...state.clickableDatasetsIds, id];
+    },
+    REMOVE_CLICKABLE_LAYER(state, id) {
+      state.clickableDatasetsIds = [
+        ...state.clickableDatasetsIds.filter((datasetId) => datasetId !== id),
+      ];
     },
     REMOVE_MAPBOX_LAYER(state, id) {
       state.mapboxLayers = state.mapboxLayers.filter(
-        (mapboxLayer) => mapboxLayer.id !== id
+        (mapboxLayer) => !mapboxLayer.id.startsWith(id)
       );
     },
     ADD_MAPBOX_SOURCE(state, mapboxSource) {
@@ -150,39 +181,54 @@ export default {
         count: countActiveDatasets,
       });
     },
-    async loadDatasetOnMap({ commit }, dataset) {
-      const layers = await getResourceLayers(dataset);
-      await Promise.all(
-        layers.map((layer) => {
-          const layerType = getLayerType(layer);
-          if (layerType === "clickable") {
-            commit("ADD_CLICKABLE_LAYER", layer);
-          }
-          commit("ADD_MAPBOX_LAYER", layer);
-        })
-      );
-    },
-    //Used when new selections have been made
-    reloadDatasetOnMap({ commit, dispatch }, dataset) {
-      commit("REMOVE_MAPBOX_LAYER", dataset.id);
+    updateDatasetProperty(
+      { getters, commit, dispatch },
+      { dataset, property, value }
+    ) {
+      const properties = JSON.parse(
+        JSON.stringify(getters.activeDatasetProperties(dataset))
+      ).map((prop) => (prop.id === property ? { ...prop, value } : prop));
+      commit("UPDATE_DATASET_PROPERTIES", { id: dataset, properties });
       dispatch("loadDatasetOnMap", dataset);
     },
-    updateActiveDatasetsArray({ state, commit, dispatch }, dataset) {
-      const datasetExist = state.activeDatasets.some(
-        (activeDataset) => activeDataset.id === dataset.id
+    async loadDatasetOnMap({ commit, getters, state }, id) {
+      const dataset = state.datasets.find((dataset) => dataset.id === id);
+      const properties = getters.activeDatasetValues(id);
+      const layers = await getResourceLayers(dataset, properties);
+      if (!state.clickableDatasetsIds.includes(id)) {
+        commit("ADD_CLICKABLE_LAYER", id);
+      }
+      if (layers) {
+        commit("REMOVE_MAPBOX_LAYER", dataset.id);
+        layers.forEach((layer) => {
+          commit("ADD_MAPBOX_LAYER", layer);
+        });
+      }
+    },
+    addActiveDataset({ state, commit, dispatch }, id) {
+      const dataset = state.datasets.find((dataset) => dataset.id === id);
+      const properties = dataset.summaries;
+      commit("ADD_ACTIVE_DATASET", id);
+      commit("ADD_DATASET_PROPERTIES", { id, properties });
+      dispatch("loadDatasetOnMap", id);
+    },
+    removeActiveDataset({ commit }, id) {
+      commit("REMOVE_ACTIVE_DATASET", id);
+      commit("REMOVE_MAPBOX_LAYER", id);
+      commit("REMOVE_MAPBOX_LAYER", `${id}_visual`);
+      commit("REMOVE_MAPBOX_LAYER", `${id}_mapbox`);
+      commit("REMOVE_MAPBOX_LAYER", `${id}_geoserver_link`);
+      commit("REMOVE_CLICKABLE_LAYER", id);
+      commit("REMOVE_DATASET_PROPERTIES", id);
+    },
+    toggleActiveDataset({ state, dispatch }, id) {
+      const datasetExist = state.activeDatasetIds.some(
+        (activeId) => activeId === id
       );
       if (datasetExist) {
-        commit("REMOVE_ACTIVE_DATASET", dataset.id);
-        commit("REMOVE_MAPBOX_LAYER", `${dataset.id}_visual`);
-        commit("REMOVE_MAPBOX_LAYER", `${dataset.id}_mapbox`);
-        commit("REMOVE_MAPBOX_LAYER", `${dataset.id}`);
-        // if transparent layer remove also this one
-        if (!dataset?.assets?.["geoserver_link"]) return;
-        commit("REMOVE_MAPBOX_LAYER", "lau_nuts_cfhp");
-        commit("REMOVE_MAPBOX_LAYER", "cfhp_focused");
+        dispatch("removeActiveDataset", id);
       } else {
-        commit("ADD_ACTIVE_DATASET", dataset);
-        dispatch("loadDatasetOnMap", dataset);
+        dispatch("addActiveDataset", id);
       }
     },
     setSeaLevelRiseData({ commit }, graph) {

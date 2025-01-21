@@ -20,11 +20,10 @@ export async function getCollections(catalog) {
         summaries: Object.entries(dataset?.summaries || catalog?.summaries).map(
           ([id, item]) => {
             return {
-              id: id,
+              id,
               description: (dataset?.["summary_descriptions"] ||
                 catalog?.["summary_descriptions"])?.[id],
-              allowedValues: item,
-              chosenValue: item[0],
+              values: item,
             };
           }
         ),

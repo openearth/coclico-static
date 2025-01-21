@@ -25,8 +25,8 @@ onMounted(() => {
   mapRef.value = useMap();
 });
 
-onBeforeUnmount(() => {
-  mapRef.value.map.removeLayer(props.layer.id);
+onBeforeUnmount(async () => {
+  await mapRef.value.map.removeLayer(props.layer.id);
 });
 
 const onLayerClicked = (e) => emit("click", e.features[0]);

@@ -17,12 +17,13 @@ const ResourceTypeFunctionMask = {
 /**
  * Creates a mapbox layer object of a resource.
  * It checks if the resource is a raster or vector tile or geojson object and returns the corresponding object to be added to the map as a layer.
- * @param collection
+ * @param {Object} collection
+ * @param {Object} [properties]
  * @returns {Promise<*[]>}
  */
-export async function getResourceLayers(collection) {
+export async function getResourceLayers(collection, properties) {
   if (!collection?.assets) throw new Error("Collection resource has no assets");
-  const layer = matchLayerIdToProperties(collection);
+  const layer = matchLayerIdToProperties(collection, properties);
   if (!layer) {
     return;
   }
@@ -42,7 +43,11 @@ export async function getResourceLayers(collection) {
       : null;
   const visual =
     "visual" in item.assets
-      ? ResourceTypeFunctionMask[item.assets.visual.type](item, "visual")
+      ? ResourceTypeFunctionMask[item.assets.visual.type](
+          item,
+          "visual",
+          properties
+        )
       : null;
 
   return [
@@ -80,15 +85,18 @@ export function buildGeojsonMapboxLayer({ id, properties, assets }, assetKey) {
  * @param assets
  * @param tileSize
  * @param assetKey
+ * @param {Object}props
  * @returns {{id, type: string, source: {type: string, tiles: *[], tileSize: number}}}
  */
 export function buildRasterMapboxLayer(
   { id, assets, tileSize = 256 },
-  assetKey
+  assetKey,
+  props
 ) {
   const asset = assets?.[assetKey];
+  const suffix = Object.values(props).join("_").toLowerCase().trim();
   return {
-    id: `${id}_${assetKey}`,
+    id: `${id}_${assetKey}_${suffix}`,
     type: "raster",
     source: {
       type: "raster",
@@ -104,7 +112,7 @@ export function buildRasterMapboxLayer(
  * @param assetKey
  * @returns {{id: *, type: string, source: {type: string, tiles: *[], minZoom: number, maxZoom: number}, "source-layer": *, paint: (*|{"fill-color": string, "fill-opacity": number})}}
  */
-export function buildVectorTileMapboxLayer(dataset, assetKey) {
+export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
   const paint =
     "properties" in dataset && "deltares:paint" in dataset?.properties
       ? dataset.properties["deltares:paint"]
@@ -114,14 +122,16 @@ export function buildVectorTileMapboxLayer(dataset, assetKey) {
             ? { "fill-outline-color": "#000000" }
             : {}),
         };
+
   const asset = dataset?.assets?.[assetKey];
   if (!asset) throw new Error("Asset not found in resource");
   const layerName = getLayerName(asset);
   if (!layerName)
     throw new Error(`Layer not found in resource url: \n${asset.href}\n`);
+  const suffix = Object.values(props).join("_").toLowerCase().trim();
 
   return {
-    id: `${dataset.id}_${assetKey}`,
+    id: `${dataset.id}_${assetKey}_${suffix}`,
     type: "fill",
     source: {
       type: "vector",
@@ -139,18 +149,22 @@ export function buildVectorTileMapboxLayer(dataset, assetKey) {
  * and based on the selected properties
  * returns one layer from the dataset object
  * @param dataset
+ * @param {object} [activeProperties]
  * @returns {unknown}
  */
-export function matchLayerIdToProperties(dataset) {
+export function matchLayerIdToProperties(dataset, activeProperties) {
   if (!dataset) {
     return;
   }
-  const { links, summaries } = dataset;
-  const findByProperty = ({ properties = {} }) =>
-    summaries.find(({ id, chosenValue }) => properties?.[id] === chosenValue);
+  const { links } = dataset;
   const items = links.filter(({ rel }) => rel === "item");
   if (!items.length) return;
-  return items.length === 1 ? items[0] : items.find(findByProperty);
+  return items.length === 1 || !activeProperties
+    ? items[0]
+    : items.find(
+        ({ properties = {} }) =>
+          JSON.stringify(properties) === JSON.stringify(activeProperties)
+      );
 }
 
 /**
