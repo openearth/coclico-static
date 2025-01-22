@@ -39,7 +39,11 @@ export async function getResourceLayers(collection, properties) {
       : null;
   const mapbox =
     "mapbox" in item.assets
-      ? ResourceTypeFunctionMask[item.assets.mapbox.type](item, "mapbox")
+      ? ResourceTypeFunctionMask[item.assets.mapbox.type](
+          item,
+          "mapbox",
+          properties
+        )
       : null;
   const visual =
     "visual" in item.assets
@@ -63,12 +67,21 @@ export async function getResourceLayers(collection, properties) {
  * @param properties
  * @param assets
  * @param assetKey
+ * @param {Object}[props]
  * @returns {{id, type, source: {type, url}, "source-layer", paint}}
  */
-export function buildGeojsonMapboxLayer({ id, properties, assets }, assetKey) {
+export function buildGeojsonMapboxLayer(
+  { id, properties, assets },
+  assetKey,
+  props
+) {
   const asset = assets?.[assetKey];
+  const suffix =
+    typeof props === "object"
+      ? `_${Object.values(props).join("_").toLowerCase().trim()}`
+      : "";
   return {
-    id: `${id}_${assetKey}`,
+    id: `${id}_${assetKey}${suffix}`,
     type: properties["deltares:type"],
     source: {
       type: asset.type,
@@ -94,9 +107,12 @@ export function buildRasterMapboxLayer(
   props
 ) {
   const asset = assets?.[assetKey];
-  const suffix = Object.values(props).join("_").toLowerCase().trim();
+  const suffix =
+    typeof props === "object"
+      ? `_${Object.values(props).join("_").toLowerCase().trim()}`
+      : "";
   return {
-    id: `${id}_${assetKey}_${suffix}`,
+    id: `${id}_${assetKey}${suffix}`,
     type: "raster",
     source: {
       type: "raster",
@@ -110,6 +126,7 @@ export function buildRasterMapboxLayer(
  * Build a Mapbox vector tile layer from an Item Resource
  * @param dataset
  * @param assetKey
+ * @param {Object}props
  * @returns {{id: *, type: string, source: {type: string, tiles: *[], minZoom: number, maxZoom: number}, "source-layer": *, paint: (*|{"fill-color": string, "fill-opacity": number})}}
  */
 export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
@@ -128,10 +145,13 @@ export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
   const layerName = getLayerName(asset);
   if (!layerName)
     throw new Error(`Layer not found in resource url: \n${asset.href}\n`);
-  const suffix = Object.values(props).join("_").toLowerCase().trim();
+  const suffix =
+    typeof props === "object"
+      ? `_${Object.values(props).join("_").toLowerCase().trim()}`
+      : "";
 
   return {
-    id: `${dataset.id}_${assetKey}_${suffix}`,
+    id: `${dataset.id}_${assetKey}${suffix}`,
     type: "fill",
     source: {
       type: "vector",
@@ -184,6 +204,7 @@ export function hasLegend(dataset) {
  * @returns {*}
  */
 export function getLayerName(layer) {
+  if (!layer) return;
   const href = "href" in layer ? layer.href : layer.source.tiles[0];
   const match = href.match(/LAYER=([^&]*)/) || href.match(/layers=([^&]*)/);
   if (!match) return;

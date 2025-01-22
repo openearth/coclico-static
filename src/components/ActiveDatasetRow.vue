@@ -42,15 +42,16 @@ const props = defineProps({
 const store = useStore();
 
 const properties = computed(() =>
-  store.getters["map/activeDatasetProperties"](props.datasetId)
+  store.getters["datasets/activeDatasetProperties"](props.datasetId)
 );
 
-const updateProperty = (property, value) => {
-  store.dispatch("map/updateDatasetProperty", {
+const updateProperty = async (property, value) => {
+  await store.dispatch("datasets/updateDatasetProperty", {
     dataset: props.datasetId,
     property,
     value,
   });
+  await store.dispatch("map/loadDatasetOnMap", props.datasetId);
 };
 </script>
 

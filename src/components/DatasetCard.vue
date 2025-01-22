@@ -61,7 +61,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("map", ["activeDatasets", "activeDatasetProperties"]),
+    ...mapGetters("datasets", ["activeDatasets", "activeDatasetProperties"]),
   },
   methods: {},
 };

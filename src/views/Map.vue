@@ -54,19 +54,15 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-
 import {
   MapboxMap,
   MapboxNavigationControl,
   MapboxPopup,
 } from "@studiometa/vue-mapbox-gl";
-
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
 import MapLayer from "@/components/MapLayer.vue";
 import AppChart from "@/components/AppChart.vue";
-import { nextTick } from "vue";
-import mapboxgl from "mapbox-gl";
 
 export default {
   data() {
@@ -92,7 +88,7 @@ export default {
       "addMapboxLayer",
       "removeMapboxLayer",
     ]),
-    ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
+    ...mapActions("graphs", ["setGraphFeature", "emptyGraphData"]),
     //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
       const { title } = this.activeClickableDataset;
@@ -103,62 +99,20 @@ export default {
       this.isOpen = false;
       this.emptyGraphData();
     },
-    async onMapClicked(e) {
+    onMapClicked(e) {
       this.map = this.$refs.map.map;
 
       if (this.activeClickableDataset) {
         this.emptyGraphData();
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
-        const features = this.map.queryRenderedFeatures(e.point)[0];
-        if (!features?.properties || !Object.keys(features?.properties)?.length)
-          return;
-        if (this.activeClickableDataset.id === "cfhp") {
-          //TODO: after Demo make this implementation more generic
-          if (this.map.getLayer("cfhp_focused")) {
-            this.map.removeLayer("cfhp_focused");
-            this.map.removeSource("cfhp_focused");
-          }
-
-          //when click load on the map a new layer from the features
-          //fly to its extent
-          const coordinates = features?.geometry?.coordinates;
-          const bounds = new mapboxgl.LngLatBounds();
-
-          coordinates[0].forEach((coord) => {
-            bounds.extend(coord);
-          });
-          const center = bounds.getCenter();
-          // get bounds of the feature
-
-          this.map.flyTo({
-            center: center,
-            zoom: 10,
-            essential: true,
-          });
-          //add a new layer to the map
-          // TODO: check if there is a better way. FOR NOW DO IT LIKE THIS
-          const mapboxLayer = {
-            id: "cfhp_focused",
-            type: "fill",
-            source: {
-              type: "geojson",
-              data: {
-                type: "Feature",
-                geometry: features.geometry,
-              },
-            },
-            paint: {
-              "fill-color": "#088",
-              "fill-opacity": 0.8,
-            },
-          };
-          this.addMapboxLayer(mapboxLayer);
-        }
-
-        await this.getGraphData({ lng, lat, features });
-        await nextTick();
-        this.isOpen = true;
+        const queriedFeatures = this.map.queryRenderedFeatures(e.point);
+        this.setGraphFeature({
+          queriedFeatures,
+          datasetId: this.activeClickableDataset.id,
+          ...e.lngLat,
+        });
+        if (this.graphData) this.isOpen = true;
       }
     },
   },
@@ -168,23 +122,18 @@ export default {
         this.isOpen = true;
       }
     },
-    activeDatasetIds() {
-      const isGraphInActiveDatasets = this.activeDatasetIds.includes(
-        this.graphData?.datasetId
-      );
-      if (!isGraphInActiveDatasets) {
+    activeClickableDataset() {
+      if (!this.activeClickableDataset) {
         this.isOpen = false;
       }
     },
   },
   computed: {
-    ...mapGetters("map", [
-      "mapboxLayers",
-      "mapboxSources",
-      "graphsInDashboard",
-      "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
+    ...mapGetters("map", ["mapboxLayers", "activeClickableDataset"]),
+    ...mapGetters("datasets", [
+      "activeDatasets",
       "activeDatasetIds",
-      "activeClickableDataset",
+      "activeDatasetValues",
     ]),
     ...mapGetters("graphs", ["graphData"]),
   },

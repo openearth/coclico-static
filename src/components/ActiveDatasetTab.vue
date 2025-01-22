@@ -50,7 +50,7 @@ import ActiveDatasetRow from "@/components/ActiveDatasetRow.vue";
 
 const store = useStore();
 
-const datasets = computed(() => store.getters["map/activeDatasets"]);
+const datasets = computed(() => store.getters["datasets/activeDatasets"]);
 </script>
 
 <style>

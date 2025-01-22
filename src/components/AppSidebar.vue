@@ -182,11 +182,12 @@ export default {
     };
   },
   methods: {
-    ...mapActions("map", [
+    ...mapActions("datasets", [
       "setActiveTheme",
       "toggleActiveDataset",
       "updateThemeObject",
     ]),
+    ...mapActions("map", ["loadDatasetOnMap"]),
     openLayersCard() {
       this.showLayersCard = true;
     },
@@ -196,8 +197,9 @@ export default {
     close() {
       this.showLayersCard = false;
     },
-    toggleDataset(dataset) {
+    async toggleDataset(dataset) {
       this.toggleActiveDataset(dataset.id);
+      await this.loadDatasetOnMap(dataset.id);
       this.updateThemeObject();
     },
     openLandingPage() {
@@ -214,8 +216,11 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("map", ["themes", "datasetsInActiveTheme", "activeTheme"]),
-
+    ...mapGetters("datasets", [
+      "themes",
+      "datasetsInActiveTheme",
+      "activeTheme",
+    ]),
     sidebarStyle() {
       return {
         borderRadius: this.showLayersCard

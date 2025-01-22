@@ -13,34 +13,24 @@
     ></v-progress-circular>
   </div>
 </template>
-<script>
+<script setup>
 import { markRaw } from "vue";
-import { mapGetters } from "vuex";
-import { graphTypes } from "../store/graphs";
+import { useStore } from "vuex";
 import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue";
 import SeaLevelGraph from "./ChartComponents/SeaLevelGraph.vue";
 import LineChartZarr from "./ChartComponents/LineChartZarr.vue";
+import PieChart from "@/components/ChartComponents/PieChart.vue";
+import { GRAPH_TYPES } from "@/lib/graphs";
 
-export default {
-  components: {
-    FloodExtentGraph,
-    SeaLevelGraph,
-    LineChartZarr,
-  },
-  data() {
-    return {
-      graphComponents: {
-        [graphTypes.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
-        [graphTypes.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
-        [graphTypes.LINE_CHART]: markRaw(LineChartZarr),
-      },
-    };
-  },
-  computed: {
-    ...mapGetters("graphs", ["graphData"]),
-    ...mapGetters("map", ["activeClickableDataset"]),
-  },
+const graphComponents = {
+  [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
+  [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
+  [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
+  [GRAPH_TYPES.LINE_CHART]: markRaw(LineChartZarr),
 };
+
+const store = useStore();
+const graphData = store.getters["graphs/graphData"];
 </script>
 
 <style lang="scss">
