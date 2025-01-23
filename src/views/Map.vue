@@ -99,6 +99,15 @@ export default {
       this.isOpen = false;
       this.emptyGraphData();
     },
+    setFeatures(point, lngLat) {
+      const queriedFeatures = this.map.queryRenderedFeatures(point);
+      this.setGraphFeature({
+        queriedFeatures,
+        datasetId: this.activeClickableDataset.id,
+        point: point,
+        ...lngLat,
+      });
+    },
     onMapClicked(e) {
       this.map = this.$refs.map.map;
 
@@ -106,12 +115,7 @@ export default {
         this.emptyGraphData();
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
-        const queriedFeatures = this.map.queryRenderedFeatures(e.point);
-        this.setGraphFeature({
-          queriedFeatures,
-          datasetId: this.activeClickableDataset.id,
-          ...e.lngLat,
-        });
+        this.setFeatures(e.point, e.lngLat);
         if (this.graphData) this.isOpen = true;
       }
     },
@@ -133,9 +137,9 @@ export default {
     ...mapGetters("datasets", [
       "activeDatasets",
       "activeDatasetIds",
-      "activeDatasetValues",
+      "activeDatasetProperties",
     ]),
-    ...mapGetters("graphs", ["graphData"]),
+    ...mapGetters("graphs", ["graphData", "graphFeature"]),
   },
   created() {
     this.setSeaLevelRiseData(this.seaLevelRiseData);

@@ -35,6 +35,7 @@ export default {
     activeDatasetIds(state) {
       return state.activeDatasetIds;
     },
+    properties: (state) => state.properties,
     isActiveDataset: (state) => (id) => state.activeDatasetIds.includes(id),
     activeDatasetProperties(state) {
       return (id) =>
@@ -81,7 +82,11 @@ export default {
     },
     UPDATE_DATASET_PROPERTIES(state, { id, properties }) {
       const index = state.properties.findIndex((prop) => prop.id === id);
-      state.properties[index] = { id, properties };
+      state.properties = [
+        ...state.properties.slice(0, index),
+        { id, properties },
+        ...state.properties.slice(index + 1),
+      ];
     },
     REMOVE_DATASET_PROPERTIES(state, id) {
       state.properties = [...state.properties.filter((prop) => prop.id !== id)];

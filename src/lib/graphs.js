@@ -20,18 +20,7 @@ const GRAPH_TYPE_MASK = {
   ssl: GRAPH_TYPES.LINE_CHART,
   cba: GRAPH_TYPES.PIE_CHART,
 };
-/**
- * Graph title mask
- * @type {{cfhp: string, cba: string, eesl: string, sc: string, slp: string, ssl: string}}
- */
-const GRAPH_TITLES = {
-  cfhp: "Flood extent",
-  cba: "Cost benefit analysis",
-  eesl: "eesl",
-  sc: "sc",
-  slp: "slp",
-  ssl: "ssl",
-};
+
 /**
  * Get graph type
  * @param id
@@ -39,12 +28,19 @@ const GRAPH_TITLES = {
  */
 export const getGraphType = (id) =>
   GRAPH_TYPE_MASK?.[id] || GRAPH_TYPES.LINE_CHART;
-/**
- * Get graph title
- * @param id
- * @returns {*}
- */
-export const getGraphTitle = (id) => GRAPH_TITLES?.[id] || id;
+
+// const valueLabels = {
+//   cfhp: {
+//     more05: "% flood > 0.5m",
+//     less05: "% flood < 0.5m",
+//     nans: "% not flooded",
+//   },
+// };
+// const getValueLabels = (datasetId, key) => {
+//   if (valueLabels?.[datasetId]) {
+//     Object.entries(valueLabels[datasetId]).find(([k]) => k === key)[1];
+//   }
+// };
 
 /**
  * Get data for a dataset with a WMTS geoserver_link
@@ -133,7 +129,7 @@ export async function getRasterData(dataset, lng, lat) {
  * @param features
  * @returns {Promise<null>}
  */
-export async function getZarrData(dataset, features) {
+export async function getZarrData(dataset, features, props) {
   const url = dataset?.assets?.data?.href;
   const datasetName = dataset?.id;
   const variables = Object.entries(get(dataset, "cube:variables"));
@@ -158,7 +154,6 @@ export async function getZarrData(dataset, features) {
   }
 
   const summaryList = get(dataset, "summaries");
-
   let slice = dimensions.map((dim) => {
     if (dim[1] === "stations") {
       return get(features, "properties.locationId", 0);
@@ -169,31 +164,22 @@ export async function getZarrData(dataset, features) {
       const scenarioIndex = summaryList.find(
         (object) => object.id === "scenarios"
       );
-
-      return scenarioIndex.allowedValues.findIndex((object) => {
-        return (
-          object ===
-          summaryList.find((object) => object.id === "scenarios").chosenValue
-        );
-      });
+      return scenarioIndex?.values.findIndex(
+        (scenario) => scenario === props.scenarios
+      );
     } else if (
       dim[1] === "rp" &&
       get(dataset, "deltares:plotSeries") !== "scenarios"
     ) {
       return summaryList
         .find((object) => object.id === "rp")
-        .allowedValues.findIndex((object) => {
-          return (
-            object ===
-            summaryList[summaryList.findIndex((object) => object.id === "rp")]
-              .chosenValue
-          );
+        .values.findIndex((object) => {
+          return object === props.rp;
         });
     } else {
       return null;
     }
   });
-
   let graphData = null;
 
   if (get(dataset, "deltares:plotType") !== "bar") {

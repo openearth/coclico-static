@@ -181,10 +181,13 @@ export function matchLayerIdToProperties(dataset, activeProperties) {
   if (!items.length) return;
   return items.length === 1 || !activeProperties
     ? items[0]
-    : items.find(
-        ({ properties = {} }) =>
-          JSON.stringify(properties) === JSON.stringify(activeProperties)
-      );
+    : items.find(({ properties = {} }) =>
+        Object.entries(activeProperties)
+          .map(
+            ([key, value]) => properties?.[key] === value || !properties?.[key]
+          )
+          .every(Boolean)
+      ) || items[0];
 }
 
 /**
@@ -221,6 +224,7 @@ const visualLayerRegex = /visual/;
  * @returns {"clickable" | "visual"}
  */
 export function getLayerType(layer) {
+  if (layer?.type === "circle") return "geojson";
   if (transparentLayerRegex.test(layer?.id)) return "clickable";
   if (visualLayerRegex.test(layer?.id)) return "visual";
 }

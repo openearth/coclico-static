@@ -1,4 +1,10 @@
-import { getFeatureData, getGraphTitle, getGraphType } from "@/lib/graphs";
+import {
+  getFeatureData,
+  getGraphType,
+  getRasterData,
+  getZarrData,
+} from "@/lib/graphs";
+import { getLayerType } from "@/lib/layers";
 
 export default {
   namespaced: true,
@@ -27,7 +33,7 @@ export default {
     },
     setGraphFeature(
       { commit, dispatch, rootGetters },
-      { queriedFeatures, datasetId, lat, lng }
+      { queriedFeatures, datasetId, lat, lng, point }
     ) {
       const properties = rootGetters["datasets/activeDatasetValues"](datasetId);
       switch (datasetId) {
@@ -49,12 +55,13 @@ export default {
             lng,
             lat,
             features: queriedFeatures[0],
+            point,
           });
           break;
       }
       dispatch("setGraphData");
     },
-    setGraphData({ rootGetters, getters, commit }) {
+    async setGraphData({ rootGetters, getters, commit }) {
       const graphFeature = getters.graphFeature;
       if (
         !graphFeature?.features ||
@@ -64,14 +71,16 @@ export default {
       )
         return;
       const { features, lng, lat, dataset } = graphFeature;
+      const coords = { lng, lat };
       const currentDataset = rootGetters["datasets/activeDatasets"].find(
         ({ id }) => id === dataset
       );
       if (!currentDataset) return;
       const activeProps = rootGetters["datasets/activeDatasetValues"](dataset);
       const graphType = getGraphType(dataset);
-      const title = getGraphTitle(dataset);
-      if (currentDataset?.assets?.geoserver_link) {
+      const layerType = getLayerType(graphFeature.features.layer);
+
+      if (layerType === "clickable") {
         const graphValues = getFeatureData(
           dataset,
           features.properties,
@@ -88,13 +97,46 @@ export default {
           Math.ceil(values.reduce((acc, cur) => acc + cur.value, 0));
 
         commit("ADD_GRAPH_DATA", {
-          title,
           total,
           values,
           datasetId: dataset,
           graphType,
-          coords: { lng, lat },
+          coords,
         });
+      }
+      if (layerType === "geojson") {
+        if (!currentDataset?.assets?.data?.roles?.includes("zarr-root"))
+          console.error("Mapbox data not implemented yet");
+        try {
+          const graphData = await getZarrData(
+            currentDataset,
+            features,
+            activeProps
+          );
+          commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
+          commit("ADD_GRAPH_DATA", {
+            ...graphData,
+            datasetId: dataset,
+            graphType,
+            coords,
+          });
+        } catch (error) {
+          console.error("Error getting zarr data:", error);
+        }
+      }
+
+      if (layerType === "raster") {
+        try {
+          const graphData = await getRasterData(currentDataset, lng, lat);
+          commit("ADD_GRAPH_DATA", {
+            ...graphData,
+            datasetId: dataset,
+            graphType,
+            coords,
+          });
+        } catch (error) {
+          console.error("Error getting raster data:", error);
+        }
       }
     },
   },
