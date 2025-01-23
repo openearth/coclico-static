@@ -127,8 +127,8 @@ export default {
       });
     },
     updateDatasetProperty({ getters, commit }, { dataset, property, value }) {
-      const properties = JSON.parse(
-        JSON.stringify(getters.activeDatasetProperties(dataset))
+      const properties = structuredClone(
+        getters.activeDatasetProperties(dataset)
       ).map((prop) => (prop.id === property ? { ...prop, value } : prop));
       commit("UPDATE_DATASET_PROPERTIES", { id: dataset, properties });
     },

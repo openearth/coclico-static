@@ -73,7 +73,8 @@ export function getFeatureData(dataset, properties, values) {
           return (
             key.includes(time) &&
             key.includes(scenarios) &&
-            key.includes(defenseLevel)
+            key.includes(defenseLevel) &&
+            !key.includes("flooded")
           );
         })
         .map(([_key, value]) => {

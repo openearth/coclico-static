@@ -12,7 +12,6 @@
     >
       <MapboxNavigationControl :visualizePitch="true" />
       <MapLayer v-for="layer in mapboxLayers" :key="layer.id" :layer="layer" />
-
       <MapboxPopup
         v-if="isOpen"
         :key="position.join('-')"
@@ -63,6 +62,7 @@ import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
 import MapLayer from "@/components/MapLayer.vue";
 import AppChart from "@/components/AppChart.vue";
+import { prepareHighlightSource, setHighlight } from "@/lib/layers";
 
 export default {
   data() {
@@ -98,9 +98,11 @@ export default {
     closePopup() {
       this.isOpen = false;
       this.emptyGraphData();
+      setHighlight(this.map);
     },
     setFeatures(point, lngLat) {
       const queriedFeatures = this.map.queryRenderedFeatures(point);
+      setHighlight(this.map, queriedFeatures, this.clickableDatasetsIds);
       this.setGraphFeature({
         queriedFeatures,
         datasetId: this.activeClickableDataset.id,
@@ -110,7 +112,6 @@ export default {
     },
     onMapClicked(e) {
       this.map = this.$refs.map.map;
-
       if (this.activeClickableDataset) {
         this.emptyGraphData();
         const { lng, lat } = e.lngLat;
@@ -133,13 +134,21 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("map", ["mapboxLayers", "activeClickableDataset"]),
+    ...mapGetters("map", [
+      "mapboxLayers",
+      "activeClickableDataset",
+      "clickableDatasetsIds",
+    ]),
     ...mapGetters("datasets", [
       "activeDatasets",
       "activeDatasetIds",
       "activeDatasetProperties",
     ]),
     ...mapGetters("graphs", ["graphData", "graphFeature"]),
+  },
+  mounted() {
+    this.map = this.$refs.map.map;
+    this.map.on("load", () => prepareHighlightSource(this.map));
   },
   created() {
     this.setSeaLevelRiseData(this.seaLevelRiseData);
@@ -152,6 +161,7 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .mapboxgl-popup-content {
   width: fit-content;
 }
@@ -173,6 +183,7 @@ export default {
   max-width: 15vw;
   min-width: 15vw;
 }
+
 .close-button-popup {
   background-color: white;
   color: #293a45 !important;

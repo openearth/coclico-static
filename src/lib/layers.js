@@ -228,3 +228,50 @@ export function getLayerType(layer) {
   if (transparentLayerRegex.test(layer?.id)) return "clickable";
   if (visualLayerRegex.test(layer?.id)) return "visual";
 }
+
+/**
+ * Prepare the highlight source and layer and initialize on the map
+ * @param map
+ */
+export function prepareHighlightSource(map) {
+  map.addSource("highlight", {
+    type: "geojson",
+    data: {
+      type: "FeatureCollection",
+      features: [],
+    },
+  });
+  map.addLayer({
+    id: "highlight",
+    type: "fill",
+    source: "highlight", // reference the data source
+    layout: {},
+    paint: {
+      "fill-color": "#0080ff", // blue color fill
+      "fill-opacity": 0.5,
+    },
+  });
+}
+
+/**
+ * Set the highlight source data based on the queried features
+ * @param map
+ * @param [queriedFeatures]
+ * @param [clickableDatasetIds]
+ */
+export function setHighlight(map, queriedFeatures, clickableDatasetIds) {
+  const feature = queriedFeatures?.find((feature) =>
+    clickableDatasetIds.some((id) => feature.layer.id.startsWith(id))
+  );
+  map.getSource("highlight").setData({
+    type: "FeatureCollection",
+    features: feature
+      ? [
+          {
+            type: "Feature",
+            geometry: feature.geometry,
+          },
+        ]
+      : [],
+  });
+}

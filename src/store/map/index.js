@@ -17,6 +17,9 @@ export default {
     activeClickableDataset(state, _, __, rootGetters) {
       return rootGetters["datasets/dataset"](state.clickableDatasetsIds[0]);
     },
+    clickableDatasetsIds(state) {
+      return state.clickableDatasetsIds;
+    },
   },
   mutations: {
     ADD_MAPBOX_LAYER(state, mapboxLayer) {
@@ -31,9 +34,11 @@ export default {
       ];
     },
     REMOVE_MAPBOX_LAYER(state, id) {
-      state.mapboxLayers = state.mapboxLayers.filter(
-        (mapboxLayer) => !mapboxLayer.id.startsWith(id)
-      );
+      state.mapboxLayers = [
+        ...[...state.mapboxLayers].filter(
+          (mapboxLayer) => !mapboxLayer.id.startsWith(id)
+        ),
+      ];
     },
     SET_SEA_LEVEL_RISE_DATA(state, data) {
       state.seaLevelRiseData = data;
@@ -50,7 +55,7 @@ export default {
       commit("REMOVE_MAPBOX_LAYER", `${id}_geoserver_link`);
       commit("REMOVE_CLICKABLE_LAYER", id);
     },
-    async loadDatasetOnMap({ commit, rootGetters, state }, id) {
+    async loadDatasetOnMap({ commit, dispatch, rootGetters, state }, id) {
       if (!rootGetters["datasets/isActiveDataset"](id)) return;
       const dataset = rootGetters["datasets/dataset"](id);
       const properties = rootGetters["datasets/activeDatasetValues"](id);
@@ -61,7 +66,7 @@ export default {
       if (layers) {
         commit("REMOVE_MAPBOX_LAYER", dataset.id);
         layers.forEach((layer) => {
-          commit("ADD_MAPBOX_LAYER", layer);
+          dispatch("addMapboxLayer", layer);
         });
       }
     },

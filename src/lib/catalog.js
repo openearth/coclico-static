@@ -17,16 +17,16 @@ export async function getCollections(catalog) {
                 .map(([id]) => id),
             }
           : {}),
-        summaries: Object.entries(dataset?.summaries || catalog?.summaries).map(
-          ([id, item]) => {
-            return {
-              id,
-              description: (dataset?.["summary_descriptions"] ||
-                catalog?.["summary_descriptions"])?.[id],
-              values: item,
-            };
-          }
-        ),
+        summaries:
+          "summaries" in dataset
+            ? Object.entries(dataset?.summaries).map(([id, item]) => {
+                return {
+                  id,
+                  description: dataset?.["summary_descriptions"]?.[id],
+                  values: item,
+                };
+              })
+            : [],
       };
     })
   );
