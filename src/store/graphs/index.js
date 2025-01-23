@@ -1,38 +1,27 @@
-import { get, has } from "lodash-es";
-import getDataFromRaster from "@/lib/graphs/get-data-from-raster";
-import getDataFromZarr from "@/lib/graphs/get-data-from-zarr";
-import getDataFromMapbox from "@/lib/graphs/get-data-from-mapbox";
-
-export const graphTypes = {
-  FLOOD_EXTEND: "flood-extend-graph",
-  LINE_CHART: "line-chart-zarr",
-  SEA_LEVEL_RISE: "sea-level-rise",
-};
-
-const getGraphType = (id) => {
-  const graphType = {
-    cfhp: graphTypes.FLOOD_EXTEND,
-    eesl: graphTypes.LINE_CHART,
-    sc: graphTypes.LINE_CHART,
-    slp: graphTypes.SEA_LEVEL_RISE,
-    ssl: graphTypes.LINE_CHART,
-  }[id];
-  return graphType || graphTypes.LINE_CHART;
-};
+import {
+  getFeatureData,
+  getGraphType,
+  getRasterData,
+  getZarrData,
+} from "@/lib/graphs";
+import { getLayerType } from "@/lib/layers";
 
 export default {
   namespaced: true,
   state: {
     graphData: null,
+    graphFeature: null,
   },
   getters: {
-    graphData(state) {
-      return state.graphData;
-    },
+    graphData: (state) => state.graphData,
+    graphFeature: (state) => state.graphFeature,
   },
   mutations: {
     ADD_GRAPH_DATA(state, data) {
       state.graphData = data;
+    },
+    ADD_GRAPH_FEATURE(state, data) {
+      state.graphFeature = data;
     },
     EMPTY_GRAPH_DATA(state) {
       state.graphData = null;
@@ -42,75 +31,119 @@ export default {
     emptyGraphData({ commit }) {
       commit("EMPTY_GRAPH_DATA");
     },
-
-    async getGraphData({ rootGetters, commit }, { lng, lat, features }) {
-      //TODO: after demo refactor the if statements
-      const currentGraphDataset = rootGetters["map/activeClickableDataset"];
-      const mapboxLayers = rootGetters["map/mapboxLayers"];
-      const coords = { lat, lng };
-      if (!currentGraphDataset) {
-        return;
+    setGraphFeature(
+      { commit, dispatch, rootGetters },
+      { queriedFeatures, datasetId, lat, lng, point }
+    ) {
+      const properties = rootGetters["datasets/activeDatasetValues"](datasetId);
+      switch (datasetId) {
+        case "cba":
+          commit("ADD_GRAPH_FEATURE", {
+            dataset: datasetId,
+            lng,
+            lat,
+            features:
+              queriedFeatures.find(
+                (feature) =>
+                  feature?.properties?.scenarios === properties?.scenarios
+              ) || queriedFeatures[0],
+          });
+          break;
+        default:
+          commit("ADD_GRAPH_FEATURE", {
+            dataset: datasetId,
+            lng,
+            lat,
+            features:
+              queriedFeatures?.find((feature) =>
+                feature?.layer?.id.endsWith("_geoserver_link")
+              ) ||
+              queriedFeatures?.find((feature) =>
+                rootGetters["map/clickableDatasetsIds"].some((id) =>
+                  feature.layer.id.startsWith(id)
+                )
+              ),
+            point,
+          });
+          break;
       }
-      const datasetId = currentGraphDataset.id;
-      const graphType = getGraphType(datasetId);
-      if (has(currentGraphDataset, "transparentLayer")) {
-        const mapboxLayer = mapboxLayers.find(
-          (layer) => layer.id === currentGraphDataset.id
-        );
+      dispatch("setGraphData");
+    },
+    async setGraphData({ rootGetters, getters, commit }) {
+      const graphFeature = getters.graphFeature;
+      if (
+        !graphFeature?.features ||
+        !graphFeature?.lng ||
+        !graphFeature?.lat ||
+        !graphFeature?.dataset
+      )
+        return;
+      const { features, lng, lat, dataset } = graphFeature;
+      const coords = { lng, lat };
+      const currentDataset = rootGetters["datasets/activeDatasets"].find(
+        ({ id }) => id === dataset
+      );
+      if (!currentDataset) return;
+      const activeProps = rootGetters["datasets/activeDatasetValues"](dataset);
+      const graphType = getGraphType(dataset);
+      const layerType = getLayerType(graphFeature.features.layer);
 
-        const graphData = getDataFromMapbox(mapboxLayer, features.properties);
+      if (layerType === "clickable") {
+        const graphValues = getFeatureData(
+          dataset,
+          features.properties,
+          activeProps
+        );
+        const totalInSet = graphValues.find(({ name }) =>
+          name.toLowerCase().includes("total")
+        );
+        const values = totalInSet
+          ? graphValues.filter(({ name }) => name !== totalInSet.name)
+          : graphValues;
+        const total =
+          totalInSet ||
+          Math.ceil(values.reduce((acc, cur) => acc + cur.value, 0));
+
         commit("ADD_GRAPH_DATA", {
-          ...graphData,
-          datasetId,
+          total,
+          values,
+          datasetId: dataset,
           graphType,
           coords,
         });
-      } else {
-        const layerType = has(currentGraphDataset, "cube:dimensions")
-          ? "vector"
-          : "raster";
+      }
+      if (layerType === "geojson") {
+        if (!currentDataset?.assets?.data?.roles?.includes("zarr-root"))
+          console.error("Mapbox data not implemented yet");
+        try {
+          const graphData = await getZarrData(
+            currentDataset,
+            features,
+            activeProps
+          );
+          commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
+          commit("ADD_GRAPH_DATA", {
+            ...graphData,
+            datasetId: dataset,
+            graphType,
+            coords,
+          });
+        } catch (error) {
+          console.error("Error getting zarr data:", error);
+        }
+      }
 
-        if (layerType === "raster") {
-          try {
-            const graphData = await getDataFromRaster(
-              currentGraphDataset,
-              lng,
-              lat
-            );
-            commit("ADD_GRAPH_DATA", {
-              ...graphData,
-              datasetId,
-              graphType,
-              coords,
-            });
-          } catch (error) {
-            console.error("Error getting raster data:", error);
-          }
-        } else {
-          const type = get(currentGraphDataset, "assets.data.roles").includes(
-            "zarr-root"
-          )
-            ? "zarr"
-            : "mapbox";
-
-          if (type === "zarr") {
-            try {
-              const graphData = await getDataFromZarr(
-                currentGraphDataset,
-                features
-              );
-              commit("ADD_GRAPH_DATA", {
-                ...graphData,
-                datasetId,
-                graphType,
-                coords,
-              });
-            } catch (error) {
-              console.error("Error getting zarr data:", error);
-            }
-          } else {
-            console.log("Mapbox data not implemented yet");
-          }
+      if (layerType === "raster") {
+        try {
+          const graphData = await getRasterData(currentDataset, lng, lat);
+          commit("ADD_GRAPH_DATA", {
+            ...graphData,
+            datasetId: dataset,
+            graphType,
+            coords,
+          });
+        } catch (error) {
+          console.error("Error getting raster data:", error);
         }
       }
     },

@@ -12,7 +12,6 @@
     >
       <MapboxNavigationControl :visualizePitch="true" />
       <MapLayer v-for="layer in mapboxLayers" :key="layer.id" :layer="layer" />
-
       <MapboxPopup
         v-if="isOpen"
         :key="position.join('-')"
@@ -53,20 +52,18 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-
+import { mapActions, mapGetters } from "vuex";
 import {
   MapboxMap,
   MapboxNavigationControl,
   MapboxPopup,
 } from "@studiometa/vue-mapbox-gl";
-
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
 import MapLayer from "@/components/MapLayer.vue";
 import AppChart from "@/components/AppChart.vue";
-import { nextTick } from "vue";
-import mapboxgl from "mapbox-gl";
+import { prepareHighlightSource, setHighlight } from "@/lib/layers";
+
 export default {
   data() {
     return {
@@ -91,7 +88,7 @@ export default {
       "addMapboxLayer",
       "removeMapboxLayer",
     ]),
-    ...mapActions("graphs", ["getGraphData", "emptyGraphData"]),
+    ...mapActions("graphs", ["setGraphFeature", "emptyGraphData"]),
     //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
       const { title } = this.activeClickableDataset;
@@ -101,62 +98,26 @@ export default {
     closePopup() {
       this.isOpen = false;
       this.emptyGraphData();
+      setHighlight(this.map);
     },
-    async onMapClicked(e) {
+    setFeatures(point, lngLat) {
+      const queriedFeatures = this.map.queryRenderedFeatures(point);
+      setHighlight(this.map, queriedFeatures, this.clickableDatasetsIds);
+      this.setGraphFeature({
+        queriedFeatures,
+        datasetId: this.activeClickableDataset.id,
+        point: point,
+        ...lngLat,
+      });
+    },
+    onMapClicked(e) {
       this.map = this.$refs.map.map;
-
       if (this.activeClickableDataset) {
         this.emptyGraphData();
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
-        const features = this.map.queryRenderedFeatures(e.point)[0];
-        //TODO: after Demo make this implementation more generic
-        if (this.activeClickableDataset.id === "cfhp") {
-          if (this.map.getLayer("cfhp_focused")) {
-            this.map.removeLayer("cfhp_focused");
-            this.map.removeSource("cfhp_focused");
-          }
-
-          //when click load on the map a new layer from the features
-          //fly to its extent
-          const coordinates = features.geometry.coordinates;
-          const bounds = new mapboxgl.LngLatBounds();
-
-          coordinates[0].forEach((coord) => {
-            bounds.extend(coord);
-          });
-          console.log("bounds", bounds);
-          const center = bounds.getCenter();
-          // get bounds of the feature
-
-          this.map.flyTo({
-            center: center,
-            zoom: 10,
-            essential: true,
-          });
-          //add a new layer to the map
-          // TODO: check if there is a better way. FOR NOW DO IT LIKE THIS
-          const mapboxLayer = {
-            id: "cfhp_focused",
-            type: "fill",
-            source: {
-              type: "geojson",
-              data: {
-                type: "Feature",
-                geometry: features.geometry,
-              },
-            },
-            paint: {
-              "fill-color": "#088",
-              "fill-opacity": 0.8,
-            },
-          };
-          this.addMapboxLayer(mapboxLayer);
-        }
-
-        this.getGraphData({ lng, lat, features });
-        await nextTick();
-        this.isOpen = true;
+        this.setFeatures(e.point, e.lngLat);
+        if (this.graphData) this.isOpen = true;
       }
     },
   },
@@ -166,11 +127,8 @@ export default {
         this.isOpen = true;
       }
     },
-    activeDatasetIds() {
-      const isGraphInActiveDatasets = this.activeDatasetIds.includes(
-        this.graphData?.datasetId
-      );
-      if (!isGraphInActiveDatasets) {
+    activeClickableDataset() {
+      if (!this.activeClickableDataset) {
         this.isOpen = false;
       }
     },
@@ -178,12 +136,19 @@ export default {
   computed: {
     ...mapGetters("map", [
       "mapboxLayers",
-      "graphsInDashboard",
-      "seaLevelRiseDataFromStore:seaLevelRiseData", // Renamed getter
-      "activeDatasetIds",
       "activeClickableDataset",
+      "clickableDatasetsIds",
     ]),
-    ...mapGetters("graphs", ["graphData"]),
+    ...mapGetters("datasets", [
+      "activeDatasets",
+      "activeDatasetIds",
+      "activeDatasetProperties",
+    ]),
+    ...mapGetters("graphs", ["graphData", "graphFeature"]),
+  },
+  mounted() {
+    this.map = this.$refs.map.map;
+    this.map.on("load", () => prepareHighlightSource(this.map));
   },
   created() {
     this.setSeaLevelRiseData(this.seaLevelRiseData);
@@ -196,6 +161,7 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .mapboxgl-popup-content {
   width: fit-content;
 }
@@ -217,6 +183,7 @@ export default {
   max-width: 15vw;
   min-width: 15vw;
 }
+
 .close-button-popup {
   background-color: white;
   color: #293a45 !important;
