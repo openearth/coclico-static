@@ -36,7 +36,7 @@ const graphComponent = computed(
 );
 </script>
 
-<style lang="scss">
+<style>
 .app-chart__loader {
   display: flex;
   align-items: center;

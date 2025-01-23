@@ -83,7 +83,7 @@ export default {
   color: rgb(var(--v-theme-white100));
 }
 
-::v-deep .v-slide-group {
+:deep(.v-slide-group) {
   height: auto;
 }
 </style>

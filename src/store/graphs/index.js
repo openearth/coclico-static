@@ -54,9 +54,15 @@ export default {
             dataset: datasetId,
             lng,
             lat,
-            features: queriedFeatures?.find((feature) =>
-              feature?.layer?.id.endsWith("_geoserver_link")
-            ),
+            features:
+              queriedFeatures?.find((feature) =>
+                feature?.layer?.id.endsWith("_geoserver_link")
+              ) ||
+              queriedFeatures?.find((feature) =>
+                rootGetters["map/clickableDatasetsIds"].some((id) =>
+                  feature.layer.id.startsWith(id)
+                )
+              ),
             point,
           });
           break;

@@ -340,7 +340,7 @@ export default {
   color: rgb(var(--v-theme-black80));
   font-family: "Inter", sans-serif;
   font-size: 12px;
-  margin-top: -15px;
+  margin-top: -8px;
 }
 
 .extra-list-item {
