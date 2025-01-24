@@ -1,35 +1,79 @@
-import createSeriesStructureSlp from "./create-series-structure-slp";
 import getFeatureInfo from "@/lib/geoserver_utils/get-feature-info";
 
-export default async function (dataset, lng, lat) {
-  const seaLevelRiseData = createSeriesStructureSlp(dataset);
-  const promises = [];
+const chunkArray = (arr, size) =>
+  arr.length > size
+    ? [arr.slice(0, size), ...chunkArray(arr.slice(size), size)]
+    : [arr];
 
-  seaLevelRiseData.scenarios.forEach((scenario) => {
-    ["msl_h", "msl_m", "msl_l"].forEach((mslType) => {
-      const layerNames = scenario[mslType].layer_names;
-
-      const promise = getFeatureInfo({
-        layers: layerNames,
-        url: "https://coclico.avi.deltares.nl/geoserver/slp/wms",
-        lng,
-        lat,
-      })
-        .then((data) => {
-          scenario[mslType].values = data;
+const getEnsembleLabel = (ensemble) =>
+  ({
+    msl_l: "Low",
+    msl_m: "Medium",
+    msl_h: "High",
+  }[ensemble]);
+/**
+ * Function that fetches the data for the sea level rise graph
+ * @param dataset
+ * @param lng
+ * @param lat
+ * @param props
+ * @returns {Promise<*>}
+ */
+export async function getSlpGraphData(dataset, { lng, lat }, props) {
+  const scenarios = props.find((prop) => prop.id === "scenarios").values;
+  const time = props.find((prop) => prop.id === "time").values;
+  const ensemble = props.find((prop) => prop.id === "ensemble").values;
+  const layerChunks = chunkArray(
+    scenarios.flatMap((scenario) =>
+      ensemble.flatMap((ensemble) =>
+        time.flatMap((time) => ({
+          scenario,
+          ensemble,
+          time,
+          name: `${scenario}_${ensemble}_${time}`,
+        }))
+      )
+    ),
+    5
+  );
+  const data = (
+    await Promise.all(
+      layerChunks.map((layers) =>
+        getFeatureInfo({
+          layers,
+          url: "https://coclico.avi.deltares.nl/geoserver/slp/wms",
+          lng,
+          lat,
         })
-        .catch((error) => {
-          console.error(`Error fetching data for ${mslType}:`, error);
-        });
-
-      promises.push(promise);
-    });
-  });
-
-  try {
-    await Promise.all(promises);
-    return seaLevelRiseData;
-  } catch (error) {
-    console.error(error);
-  }
+      )
+    )
+  ).flat();
+  const colors = ["#000000", "#173c66", "#f79320", "#951b1e"];
+  return scenarios.flatMap((scenario, index) =>
+    ensemble.map((ensemble) => ({
+      name: `${getEnsembleLabel(ensemble)} ${scenario}`,
+      type: "bar",
+      stack: scenario,
+      color: colors[index % colors.length],
+      itemStyle:
+        index === 0
+          ? {
+              borderWidth: "transparent",
+              borderColor: "transparent",
+            }
+          : {
+              borderWidth: 0.2,
+              borderColor: "#000000",
+            },
+      data: data
+        .filter(
+          (datum) => datum.scenario === scenario && datum.ensemble === ensemble
+        )
+        .sort((a, b) => a.time - b.time)
+        .map(({ value }) => value),
+      animation: false,
+      silent: true,
+      barWidth: 3,
+    }))
+  );
 }

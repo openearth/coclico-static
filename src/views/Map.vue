@@ -17,7 +17,6 @@
         :key="position.join('-')"
         :lng-lat="position"
         anchor="bottom"
-        @mb-close="() => (isOpen = false)"
         style="
           width: 30vw;
           height: 38vh;
@@ -117,14 +116,22 @@ export default {
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
         this.setFeatures(e.point, e.lngLat);
-        if (this.graphData) this.isOpen = true;
+        if (this.graphFeature) {
+          this.isOpen = true;
+        }
       }
     },
   },
+
   watch: {
     graphData() {
       if (this.graphData) {
         this.isOpen = true;
+      }
+    },
+    graphFeature() {
+      if (!this.graphFeature) {
+        this.isOpen = false;
       }
     },
     activeClickableDataset() {

@@ -71,14 +71,9 @@ export default {
     },
     async setGraphData({ rootGetters, getters, commit }) {
       const graphFeature = getters.graphFeature;
-      if (
-        !graphFeature?.features ||
-        !graphFeature?.lng ||
-        !graphFeature?.lat ||
-        !graphFeature?.dataset
-      )
+      if (!graphFeature?.lng || !graphFeature?.lat || !graphFeature?.dataset)
         return;
-      const { features, lng, lat, dataset } = graphFeature;
+      const { lng, lat, dataset } = graphFeature;
       const coords = { lng, lat };
       const currentDataset = rootGetters["datasets/activeDatasets"].find(
         ({ id }) => id === dataset
@@ -86,12 +81,11 @@ export default {
       if (!currentDataset) return;
       const activeProps = rootGetters["datasets/activeDatasetValues"](dataset);
       const graphType = getGraphType(dataset);
-      const layerType = getLayerType(graphFeature.features.layer);
-
-      if (layerType === "clickable") {
+      const layerType = getLayerType(graphFeature?.features?.layer);
+      if (layerType === "clickable" && graphFeature?.features) {
         const graphValues = getFeatureData(
           dataset,
-          features.properties,
+          graphFeature?.features.properties,
           activeProps
         );
         const totalInSet = graphValues.find(({ name }) =>
@@ -103,7 +97,11 @@ export default {
         const total =
           totalInSet ||
           Math.ceil(values.reduce((acc, cur) => acc + cur.value, 0));
-
+        if (!values.length) {
+          commit("EMPTY_GRAPH_DATA");
+          commit("ADD_GRAPH_FEATURE");
+          return;
+        }
         commit("ADD_GRAPH_DATA", {
           total,
           values,
@@ -112,16 +110,20 @@ export default {
           coords,
         });
       }
-      if (layerType === "geojson") {
+      if (layerType === "geojson" && graphFeature?.features) {
         if (!currentDataset?.assets?.data?.roles?.includes("zarr-root"))
           console.error("Mapbox data not implemented yet");
         try {
           const graphData = await getZarrData(
             currentDataset,
-            features,
+            graphFeature?.features,
             activeProps
           );
-          commit("ADD_GRAPH_DATA", { ...graphData, graphType, coords });
+          if (!graphData) {
+            commit("EMPTY_GRAPH_DATA");
+            commit("ADD_GRAPH_FEATURE");
+            return;
+          }
           commit("ADD_GRAPH_DATA", {
             ...graphData,
             datasetId: dataset,
@@ -133,9 +135,18 @@ export default {
         }
       }
 
-      if (layerType === "raster") {
+      if (!layerType) {
         try {
-          const graphData = await getRasterData(currentDataset, lng, lat);
+          const graphData = await getRasterData(
+            currentDataset,
+            coords,
+            rootGetters["datasets/activeDatasetProperties"](dataset)
+          );
+          if (!graphData.values[0].data[0]) {
+            commit("EMPTY_GRAPH_DATA");
+            commit("ADD_GRAPH_FEATURE");
+            return;
+          }
           commit("ADD_GRAPH_DATA", {
             ...graphData,
             datasetId: dataset,
