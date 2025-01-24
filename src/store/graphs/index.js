@@ -142,7 +142,7 @@ export default {
             coords,
             rootGetters["datasets/activeDatasetProperties"](dataset)
           );
-          if (!graphData.values[0].data[0]) {
+          if (!graphData?.values?.[0]?.data?.[0]) {
             commit("EMPTY_GRAPH_DATA");
             commit("ADD_GRAPH_FEATURE");
             return;

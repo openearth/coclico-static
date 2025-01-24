@@ -99,9 +99,7 @@ export default {
       this.emptyGraphData();
       setHighlight(this.map);
     },
-    setFeatures(point, lngLat) {
-      const queriedFeatures = this.map.queryRenderedFeatures(point);
-      setHighlight(this.map, queriedFeatures, this.clickableDatasetsIds);
+    setFeatures(queriedFeatures, point, lngLat) {
       this.setGraphFeature({
         queriedFeatures,
         datasetId: this.activeClickableDataset.id,
@@ -115,9 +113,11 @@ export default {
         this.emptyGraphData();
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
-        this.setFeatures(e.point, e.lngLat);
+        const queriedFeatures = this.map.queryRenderedFeatures(e.point);
+        this.setFeatures(queriedFeatures, e.point, e.lngLat);
         if (this.graphFeature) {
           this.isOpen = true;
+          setHighlight(this.map, queriedFeatures, this.clickableDatasetsIds);
         }
       }
     },
@@ -132,11 +132,13 @@ export default {
     graphFeature() {
       if (!this.graphFeature) {
         this.isOpen = false;
+        setHighlight(this.map);
       }
     },
     activeClickableDataset() {
       if (!this.activeClickableDataset) {
         this.isOpen = false;
+        setHighlight(this.map);
       }
     },
   },

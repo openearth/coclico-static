@@ -34,7 +34,7 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
         }))
       )
     ),
-    5
+    10
   );
   const data = (
     await Promise.all(
