@@ -33,6 +33,8 @@ export default async function getFeatureInfo({
     bbox = [lng - radius, lat - radius, lng + radius, lat + radius].join(",");
   }
 
+  const names = layers.flatMap(({ name }) => name);
+
   const geoServerUrl = await buildGeoServerUrl({
     url,
     request: "GetFeatureInfo",
@@ -40,14 +42,14 @@ export default async function getFeatureInfo({
     version: "1.1.1",
     info_format: "application/json",
     crs: "EPSG:4326",
-    layers: layers,
-    query_layers: layers,
+    layers: names,
+    query_layers: names,
     width,
     height,
     x,
     y,
     bbox,
-    feature_count: 50,
+    feature_count: names.length,
   });
 
   return (
@@ -56,7 +58,10 @@ export default async function getFeatureInfo({
       .then(({ features }) => features)
       //map and send back only the greyIndex values
       .then((features) =>
-        features.map((feature) => feature.properties.GRAY_INDEX)
+        layers.map((layer, index) => ({
+          ...layer,
+          value: features[index].properties.GRAY_INDEX,
+        }))
       )
       .catch(() => undefined)
   );

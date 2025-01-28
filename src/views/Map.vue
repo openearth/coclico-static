@@ -17,7 +17,6 @@
         :key="position.join('-')"
         :lng-lat="position"
         anchor="bottom"
-        @mb-close="() => (isOpen = false)"
         style="
           width: 30vw;
           height: 38vh;
@@ -89,7 +88,6 @@ export default {
       "removeMapboxLayer",
     ]),
     ...mapActions("graphs", ["setGraphFeature", "emptyGraphData"]),
-    //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
       const { title } = this.activeClickableDataset;
       const graphData = this.graphData;
@@ -100,9 +98,7 @@ export default {
       this.emptyGraphData();
       setHighlight(this.map);
     },
-    setFeatures(point, lngLat) {
-      const queriedFeatures = this.map.queryRenderedFeatures(point);
-      setHighlight(this.map, queriedFeatures, this.clickableDatasetsIds);
+    setFeatures(queriedFeatures, point, lngLat) {
       this.setGraphFeature({
         queriedFeatures,
         datasetId: this.activeClickableDataset.id,
@@ -116,20 +112,32 @@ export default {
         this.emptyGraphData();
         const { lng, lat } = e.lngLat;
         this.position = [lng, lat];
-        this.setFeatures(e.point, e.lngLat);
-        if (this.graphData) this.isOpen = true;
+        const queriedFeatures = this.map.queryRenderedFeatures(e.point);
+        this.setFeatures(queriedFeatures, e.point, e.lngLat);
+        if (this.graphFeature) {
+          this.isOpen = true;
+          setHighlight(this.map, queriedFeatures, this.clickableDatasetsIds);
+        }
       }
     },
   },
+
   watch: {
     graphData() {
       if (this.graphData) {
         this.isOpen = true;
       }
     },
+    graphFeature() {
+      if (!this.graphFeature) {
+        this.isOpen = false;
+        setHighlight(this.map);
+      }
+    },
     activeClickableDataset() {
       if (!this.activeClickableDataset) {
         this.isOpen = false;
+        setHighlight(this.map);
       }
     },
   },

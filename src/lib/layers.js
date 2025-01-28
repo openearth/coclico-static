@@ -27,7 +27,10 @@ export async function getResourceLayers(collection, properties) {
   if (!layer) {
     return;
   }
-  const item = { ...(await getCatalog(layer.href)), id: collection.id };
+  const item = {
+    ...(await getCatalog(encodeURI(layer.href))),
+    id: collection.id,
+  };
   if (!item) throw new Error("Item resource not found in Collection resource");
   if (!item?.assets) throw new Error("Item resource has no assets");
   const transparentLayer =

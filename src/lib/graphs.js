@@ -1,6 +1,6 @@
-import getGraphDataSlp from "@/lib/graphs/slp/get-graph-data-slp";
 import { get, unzip } from "lodash-es";
 import { openArray } from "zarr";
+import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
 
 export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
@@ -51,15 +51,20 @@ export const getGraphType = (id) =>
  */
 export function getFeatureData(dataset, properties, values) {
   switch (dataset) {
-    case "cba":
+    case "cba": {
       return Object.entries(properties)
-        .filter(([key]) => key.includes(values.time))
+        .filter(
+          ([key]) =>
+            key.toLowerCase().includes(values.time.toLowerCase()) &&
+            key.toLowerCase().includes(values.scenarios.toLowerCase())
+        )
         .map(([name, value]) => {
           return {
-            name,
+            name: name.split("\\")[0],
             value,
           };
         });
+    }
     case "cfhp": {
       const scenarios =
         values.scenarios !== "none"
@@ -103,17 +108,21 @@ export function getFeatureData(dataset, properties, values) {
 /**
  * Get data for a raster based dataset and location
  * @param dataset
- * @param lng
- * @param lat
+ * @param coords
+ * @param props
  * @returns {Promise<*|null>}
  */
-export async function getRasterData(dataset, lng, lat) {
+export async function getRasterData(dataset, coords, props) {
   const { id } = dataset;
 
   switch (id) {
     case "slp":
       try {
-        return await getGraphDataSlp(dataset, lng, lat);
+        return {
+          values: await getSlpGraphData(dataset, coords, props),
+          time: props.find(({ id }) => id === "time").values.sort(),
+          scenarios: props.find(({ id }) => id === "scenarios").values,
+        };
       } catch (error) {
         console.error("Error while fetching data from getGraphDataSlp:", error);
         throw error;
@@ -128,6 +137,7 @@ export async function getRasterData(dataset, lng, lat) {
  * Get data for a zarr based dataset
  * @param dataset
  * @param features
+ * @param props
  * @returns {Promise<null>}
  */
 export async function getZarrData(dataset, features, props) {

@@ -143,8 +143,8 @@
             <v-card-title class="layer-card-title"> Data layers </v-card-title>
             <v-list class="layer-list">
               <v-list-item
-                v-for="dataset in datasetsInActiveTheme.filter(
-                  (dataset) => dataset.id !== 'slp' && dataset.id !== 'cfhp'
+                v-for="dataset in this.datasetsInActiveTheme.filter(
+                  ({ id }) => id !== 'slp' && id !== 'cfhp'
                 )"
                 :key="dataset.id"
                 :title="dataset.title"
