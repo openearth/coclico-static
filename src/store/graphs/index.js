@@ -43,9 +43,10 @@ export default {
             lng,
             lat,
             features:
-              queriedFeatures.find(
-                (feature) =>
-                  feature?.properties?.scenarios === properties?.scenarios
+              queriedFeatures.find((feature) =>
+                Object.keys(feature).some((key) =>
+                  key.toLowerCase().includes(properties.scenarios.toLowerCase())
+                )
               ) || queriedFeatures[0],
           });
           break;

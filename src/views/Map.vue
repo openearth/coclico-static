@@ -88,7 +88,6 @@ export default {
       "removeMapboxLayer",
     ]),
     ...mapActions("graphs", ["setGraphFeature", "emptyGraphData"]),
-    //TODO: @Luis - Implement this method
     saveGraphOnDashboard() {
       const { title } = this.activeClickableDataset;
       const graphData = this.graphData;

@@ -51,15 +51,20 @@ export const getGraphType = (id) =>
  */
 export function getFeatureData(dataset, properties, values) {
   switch (dataset) {
-    case "cba":
+    case "cba": {
       return Object.entries(properties)
-        .filter(([key]) => key.includes(values.time))
+        .filter(
+          ([key]) =>
+            key.toLowerCase().includes(values.time.toLowerCase()) &&
+            key.toLowerCase().includes(values.scenarios.toLowerCase())
+        )
         .map(([name, value]) => {
           return {
-            name,
+            name: name.split("\\")[0],
             value,
           };
         });
+    }
     case "cfhp": {
       const scenarios =
         values.scenarios !== "none"

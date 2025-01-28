@@ -60,7 +60,10 @@ export default {
       const dataset = rootGetters["datasets/dataset"](id);
       const properties = rootGetters["datasets/activeDatasetValues"](id);
       const layers = await getResourceLayers(dataset, properties);
-      if (!state.clickableDatasetsIds.includes(id)) {
+      if (
+        !state.clickableDatasetsIds.includes(id) &&
+        !dataset?.keywords?.includes("Background Layers")
+      ) {
         commit("ADD_CLICKABLE_LAYER", id);
       }
       if (layers) {
