@@ -143,8 +143,8 @@
             <v-card-title class="layer-card-title"> Data layers </v-card-title>
             <v-list class="layer-list">
               <v-list-item
-                v-for="dataset in datasetsInActiveTheme.filter(
-                  (dataset) => dataset.id !== 'slp' && dataset.id !== 'cfhp'
+                v-for="dataset in this.datasetsInActiveTheme.filter(
+                  ({ id }) => id !== 'slp' && id !== 'cfhp'
                 )"
                 :key="dataset.id"
                 :title="dataset.title"
@@ -168,8 +168,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import CustomIcon from "@/components/CustomIcon.vue";
+
 export default {
   components: {
     CustomIcon,
@@ -181,11 +182,12 @@ export default {
     };
   },
   methods: {
-    ...mapActions("map", [
+    ...mapActions("datasets", [
       "setActiveTheme",
-      "updateActiveDatasetsArray",
+      "toggleActiveDataset",
       "updateThemeObject",
     ]),
+    ...mapActions("map", ["loadDatasetOnMap"]),
     openLayersCard() {
       this.showLayersCard = true;
     },
@@ -195,8 +197,9 @@ export default {
     close() {
       this.showLayersCard = false;
     },
-    toggleDataset(dataset) {
-      this.updateActiveDatasetsArray(dataset);
+    async toggleDataset(dataset) {
+      this.toggleActiveDataset(dataset.id);
+      await this.loadDatasetOnMap(dataset.id);
       this.updateThemeObject();
     },
     openLandingPage() {
@@ -213,8 +216,11 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("map", ["themes", "datasetsInActiveTheme", "activeTheme"]),
-
+    ...mapGetters("datasets", [
+      "themes",
+      "datasetsInActiveTheme",
+      "activeTheme",
+    ]),
     sidebarStyle() {
       return {
         borderRadius: this.showLayersCard
@@ -334,7 +340,7 @@ export default {
   color: rgb(var(--v-theme-black80));
   font-family: "Inter", sans-serif;
   font-size: 12px;
-  margin-top: -15px;
+  margin-top: -8px;
 }
 
 .extra-list-item {

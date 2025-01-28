@@ -20,47 +20,9 @@
         </v-tooltip>
       </v-card-text>
 
-      <v-row>
-        <v-col cols="6" v-for="summary in dataset.summaries" :key="summary.id">
-          <v-row class="align-center">
-            <v-col cols="9" class="mr-0">
-              <span class="summary-info">{{ summary.id }}</span>
-            </v-col>
-            <v-col v-if="summary.description" cols="3" class="pa-4">
-              <v-tooltip
-                location="bottom"
-                max-width="450px"
-                :text="summary.description"
-              >
-                <template v-slot:activator="{ props }">
-                  <v-icon v-bind="props" small class="summary-info, ml-4"
-                    >mdi-information-outline</v-icon
-                  >
-                </template>
-              </v-tooltip>
-            </v-col>
-          </v-row>
-          <v-select
-            v-model="summary.chosenValue"
-            :items="summary.allowedValues"
-            @update:modelValue="reloadDataset(dataset)"
-            variant="outlined"
-          ></v-select>
-        </v-col>
-      </v-row>
+      <ActiveDatasetRow :dataset-id="dataset.id" />
       <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here -->
-      <v-row
-        v-if="checkLayerType(dataset) === 'vector' && activeLegend(dataset)"
-      >
-        <v-col>
-          <layer-legend :dataset="dataset" />
-        </v-col>
-      </v-row>
-      <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here
-      TODO: check why the raster layer is not picked up. In the old live version it does not work either -->
-      <v-row
-        v-if="checkLayerType(dataset) === 'raster' && activeLegend(dataset)"
-      >
+      <v-row v-if="hasLegend(dataset)">
         <v-col>
           <layer-legend :dataset="dataset" />
         </v-col>
@@ -78,35 +40,19 @@
     </v-container>
   </v-card>
 </template>
-<script>
-import LayerLegend from "./LayerLegend.vue";
-import { mapActions } from "vuex";
-import _ from "lodash";
 
-export default {
-  props: {
-    datasets: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  components: {
-    LayerLegend,
-  },
-  methods: {
-    ...mapActions("map", ["reloadDatasetOnMap"]),
-    reloadDataset(dataset) {
-      this.reloadDatasetOnMap(dataset);
-    },
-    checkLayerType(dataset) {
-      return _.has(dataset, "cube:dimensions") ? "vector" : "raster";
-    },
-    activeLegend(dataset) {
-      return _.has(dataset, "deltares:linearGradient");
-    },
-  },
-};
+<script setup>
+import LayerLegend from "./LayerLegend.vue";
+import { useStore } from "vuex";
+import { hasLegend } from "@/lib/layers";
+import { computed } from "vue";
+import ActiveDatasetRow from "@/components/ActiveDatasetRow.vue";
+
+const store = useStore();
+
+const datasets = computed(() => store.getters["datasets/activeDatasets"]);
 </script>
+
 <style>
 .text-style {
   background: #f0f0f0;
@@ -115,9 +61,6 @@ export default {
 .scrollable-card {
   max-height: 300px;
   overflow-y: visible;
-}
-.summary-info {
-  color: #a9b0b5;
 }
 .layer-title {
   font-family: "Inter", sans-serif;

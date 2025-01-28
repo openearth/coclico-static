@@ -33,7 +33,7 @@
 
     <v-window v-model="tab" v-else>
       <v-window-item value="option-1">
-        <active-dataset-tab :datasets="activeDatasets" />
+        <active-dataset-tab />
       </v-window-item>
       <v-window-item value="option-2">
         <dashboard-tab />
@@ -61,7 +61,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("map", ["activeDatasets"]),
+    ...mapGetters("datasets", ["activeDatasets", "activeDatasetProperties"]),
   },
   methods: {},
 };
@@ -83,7 +83,7 @@ export default {
   color: rgb(var(--v-theme-white100));
 }
 
-::v-deep .v-slide-group {
+:deep(.v-slide-group) {
   height: auto;
 }
 </style>

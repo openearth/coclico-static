@@ -8,10 +8,11 @@
 
 <script>
 import { mapActions } from "vuex";
+
 export default {
   name: "App",
   methods: {
-    ...mapActions("map", ["loadDatasets"]),
+    ...mapActions("datasets", ["loadDatasets"]),
   },
 
   mounted() {

@@ -78,8 +78,8 @@
 </template>
 
 <script>
-import _ from "lodash";
 import { mapActions } from "vuex";
+import { get, set } from "lodash-es";
 
 export default {
   props: {
@@ -101,16 +101,16 @@ export default {
     };
   },
   mounted() {
-    this.datasetId = _.get(this.dataset, "id");
-    this.unit = _.get(this.dataset, "deltares:units");
+    this.datasetId = get(this.dataset, "id");
+    this.unit = get(this.dataset, "deltares:units");
     this.updateMinMax();
-    this.linearGradient = _.get(this.dataset, "deltares:linearGradient");
+    this.linearGradient = get(this.dataset, "deltares:linearGradient");
   },
   methods: {
     ...mapActions(["reclassifyMapboxLayer"]),
     updateMinMax() {
-      const min = _.get(this.dataset, "deltares:min", "");
-      const max = _.get(this.dataset, "deltares:max", "");
+      const min = get(this.dataset, "deltares:min", "");
+      const max = get(this.dataset, "deltares:max", "");
       this.minValue = min.toString();
       this.maxValue = max.toString();
       this.defaultMinValue = min.toString();
@@ -126,8 +126,8 @@ export default {
     },
     saveRange() {
       this.editingRange = false;
-      _.set(this.dataset, "deltares:min", this.minValue);
-      _.set(this.dataset, "deltares:max", this.maxValue);
+      set(this.dataset, "deltares:min", this.minValue);
+      set(this.dataset, "deltares:max", this.maxValue);
       this.reclassifyMapboxLayer(this.dataset);
     },
     resetRange() {

@@ -8,6 +8,9 @@ renderer.link = function (href, title, text) {
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  devServer: {
+    host: "localhost",
+  },
 
   pluginOptions: {
     vuetify: {
