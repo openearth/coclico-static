@@ -44,12 +44,12 @@ export const getGraphType = (id) =>
 // };
 
 /**
- * Get data for a dataset with a WMTS geoserver_link
- * @param dataset
+ * Get graph feature data for a dataset with a WMTS geoserver_link
+ * @param datasetId
  * @param feature
  * @param properties
  * @param values
- * @returns {{name: *, value: *}[]|{name: string, value: *}[]|[string, unknown][]}
+ * @returns {{id, name, xAxis: {data: *, title: string}, yAxis: {type: string, min: number, alignTicks, max: number, interval: number, axisLabel: {formatter: function(*): string}, nameTextStyle: {color: string, fontFamily: string}, name: string, nameLocation: string}[], series: *}|{name: *, value: *}[]|{name: string, value: *}[]|[string, unknown][]}
  */
 export function getFeatureData({ datasetId, feature, properties, values }) {
   switch (datasetId) {
@@ -102,7 +102,7 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
     }
     case "pp": {
       const dataColRegex =
-        /(?<defense>[a-zA-Z_-]+)\\(?<rp>\d+)\\(?<climateScenario>[a-zA-Z\d]+)\\(?<time>\d+)\\population_(?<scenario>[a-zA-Z\d]+)\\(?<type>[a-zA-Z_-]+)/;
+        /(?<defense>[\da-zA-Z_-]+)\\(?<rp>[\da-zA-Z_-]+)\\(?<climateScenario>[\da-zA-Z_-]+)\\(?<time>\d+)\\population_(?<scenario>[\da-zA-Z_-]+)\\(?<type>[\da-zA-Z_-]+)/;
       const times = properties.find(({ id }) => id === "time").values;
       const scenarios = properties.find(({ id }) => id === "scenarios").values;
       const data = Object.entries(feature)
@@ -111,6 +111,7 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
           ...key.match(dataColRegex).groups,
           value,
         }));
+
       // const colors = ["#000000", "#173c66", "#f79320", "#951b1e"];
       return {
         id: datasetId,
@@ -122,7 +123,7 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
         yAxis: ["rel_affected", "abs_affected"].flatMap((type) => ({
           type: "value",
           min: 0,
-          alignTicks: true,
+          alignTicks: !type.startsWith("rel"),
           max: Math.max(
             ...data
               .filter((datum) => datum.type === type)
@@ -159,10 +160,14 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
                 (datum) =>
                   datum.type === type &&
                   datum.scenario === scenario &&
-                  datum.defense === "UNDEFENDED_MAPS"
+                  datum.climateScenario.startsWith(datum.scenario) &&
+                  datum.defense === "UNDEFENDED_MAPS" &&
+                  datum.rp === "100"
               )
               .sort((a, b) => a.time - b.time)
-              .map(({ value }) => value),
+              .map(({ value }) => {
+                return value;
+              }),
           }))
         ),
       };

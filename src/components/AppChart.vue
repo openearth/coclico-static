@@ -7,11 +7,11 @@
     />
   </div>
   <div v-else class="app-chart__loader">
-    <v-progress-circular
+    <VProgressCircular
       indeterminate
       color="primary"
       :size="50"
-    ></v-progress-circular>
+    ></VProgressCircular>
   </div>
 </template>
 <script setup>

@@ -107,7 +107,7 @@ export default {
   },
   actions: {
     async loadDatasets({ commit }) {
-      const catalog = await getCatalog(process.env.VUE_APP_CATALOG_URL);
+      const catalog = await getCatalog(import.meta.env.VITE_CATALOG_URL);
       catalog?.summaries?.keywords.forEach((keyword) =>
         commit("ADD_THEME", { name: keyword, count: 0 })
       );

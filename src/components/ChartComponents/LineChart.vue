@@ -1,9 +1,9 @@
 <template>
-  <v-chart :option="option" autoresize />
+  <VChart :option="option" autoresize />
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, defineAsyncComponent } from "vue";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { BarChart, LineChart } from "echarts/charts";
@@ -29,17 +29,14 @@ use([
   LegendComponent,
 ]);
 
-const baseOptions = ref({});
-const getBaseOption = () => {
+const baseOptions = computed(() => {
   try {
-    baseOptions.value =
-      require(`@/assets/echart-templates/${props.graphData.id}.js`).default;
+    return defineAsyncComponent(
+      `@/assets/echart-templates/${props.graphData.id}.js`
+    );
   } catch {
-    baseOptions.value = require("@/assets/echart-templates/default.js").default;
+    return defineAsyncComponent("@/assets/echart-templates/default.js");
   }
-};
-onMounted(() => {
-  getBaseOption();
 });
 
 const option = computed(() => {

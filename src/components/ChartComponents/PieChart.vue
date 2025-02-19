@@ -1,5 +1,5 @@
 <template>
-  <v-chart :option="option" autoresize />
+  <VChart :option="option" autoresize />
 </template>
 
 <script setup>

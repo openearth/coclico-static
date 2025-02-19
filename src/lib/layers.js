@@ -134,7 +134,7 @@ export function buildRasterMapboxLayer(
  */
 export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
   const paint =
-    "properties" in dataset && "deltares:paint" in dataset?.properties
+    "properties" in dataset && "deltares:paint" in dataset.properties
       ? dataset.properties["deltares:paint"]
       : {
           "fill-color": "rgba(0,0,0,0)",
@@ -199,9 +199,9 @@ export function matchLayerIdToProperties(dataset, activeProperties) {
  * @returns {boolean}
  */
 export function hasLegend(dataset) {
-  const isVector = "geoserver_link" in dataset.assets;
+  // const isVector = "geoserver_link" in dataset.assets;
   const hasGradient = "deltares:linearGradient" in dataset;
-  return isVector && hasGradient;
+  return hasGradient;
 }
 
 /**

@@ -1,7 +1,7 @@
 <template>
-  <v-card class="custom-dataset-card" :class="{ open: isOpen }">
-    <v-tabs v-model="tab" grow hide-slider class="pa-2" height="35px">
-      <v-tab
+  <VCard class="custom-dataset-card" :class="{ open: isOpen }">
+    <VTabs v-model="tab" grow hide-slider class="pa-2" height="35px">
+      <VTab
         value="option-1"
         hide-slider
         rounded="xl"
@@ -12,8 +12,8 @@
       >
         <custom-icon name="layers" class="pr-1 mr-1"></custom-icon>
         <span class="tab-label">Active Data Layers </span>
-      </v-tab>
-      <v-tab
+      </VTab>
+      <VTab
         value="option-2"
         hide-slider
         rounded="xl"
@@ -24,8 +24,8 @@
       >
         <custom-icon name="dashboard" class="pr-1 mr-1"></custom-icon>
         <span class="tab-label">Dashboard</span>
-      </v-tab>
-    </v-tabs>
+      </VTab>
+    </VTabs>
     <div v-if="!activeDatasets.length" class="text-center mx-16 pb-4">
       <p class="font-weight-black">No data layers have been selected.</p>
       <p class="mt-4">
@@ -34,15 +34,15 @@
       </p>
     </div>
 
-    <v-window v-model="tab" v-else>
-      <v-window-item value="option-1">
+    <VWindow v-model="tab" v-else>
+      <VWindowItem value="option-1">
         <active-dataset-tab />
-      </v-window-item>
-      <v-window-item value="option-2">
+      </VWindowItem>
+      <VWindowItem value="option-2">
         <dashboard-tab />
-      </v-window-item>
-    </v-window>
-  </v-card>
+      </VWindowItem>
+    </VWindow>
+  </VCard>
 </template>
 <script>
 import ActiveDatasetTab from "./ActiveDatasetTab.vue";
