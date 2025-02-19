@@ -159,8 +159,8 @@ export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
     source: {
       type: "vector",
       tiles: [asset.href],
-      minZoom: 6,
-      maxZoom: 20,
+      minZoom: 0,
+      maxZoom: 22,
     },
     "source-layer": layerName,
     paint,

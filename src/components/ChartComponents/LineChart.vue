@@ -1,9 +1,18 @@
 <template>
-  <div ref="chartContainer" style="width: 100%; height: 100%"></div>
+  <v-chart :option="option" autoresize />
 </template>
+
 <script setup>
-import { nextTick, onMounted } from "vue";
-import * as echarts from "echarts";
+import { computed, onMounted, ref } from "vue";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { BarChart, LineChart } from "echarts/charts";
+import {
+  LegendComponent,
+  TitleComponent,
+  TooltipComponent,
+} from "echarts/components";
+import VChart from "vue-echarts";
 
 const props = defineProps({
   graphData: {
@@ -11,41 +20,43 @@ const props = defineProps({
     required: true,
   },
 });
-const options = {};
-onMounted(() => {
-  this.getBaseOption();
-  // this.options will be a combination of baseOptions and graphData
-  this.options = {
-    ...this.baseOptions,
-    ...props.graphData,
-    xAxis: {
-      ...this.baseOptions.xAxis,
-      ...props.graphData.xAxis,
-    },
-    yAxis: {
-      ...this.baseOptions.yAxis,
-      ...props.graphData.yAxis,
-    },
-  };
-  nextTick(() => {
-    this.renderChart(this.options);
-  });
-  window.addEventListener("resize", this.renderChart);
-});
+use([
+  CanvasRenderer,
+  LineChart,
+  BarChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+]);
+
+const baseOptions = ref({});
 const getBaseOption = () => {
   try {
-    this.baseOptions =
+    baseOptions.value =
       require(`@/assets/echart-templates/${props.graphData.id}.js`).default;
   } catch {
-    this.baseOptions = require("@/assets/echart-templates/default.js").default;
+    baseOptions.value = require("@/assets/echart-templates/default.js").default;
   }
 };
-const renderChart = (option) => {
-  const chartDom = this.$refs.chartContainer;
-  if (chartDom && chartDom.clientWidth && chartDom.clientHeight) {
-    const myChart = echarts.init(chartDom);
-    myChart.setOption(option);
-  }
-};
+onMounted(() => {
+  getBaseOption();
+});
+
+const option = computed(() => {
+  return {
+    ...baseOptions.value,
+    ...props.graphData,
+    xAxis: {
+      ...baseOptions.value.xAxis,
+      ...props.graphData.xAxis,
+    },
+    yAxis: Array.isArray(props.graphData.yAxis)
+      ? props.graphData.yAxis
+      : {
+          ...baseOptions.value.yAxis,
+          ...props.graphData.yAxis,
+        },
+  };
+});
 </script>
 <style></style>

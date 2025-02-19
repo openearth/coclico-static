@@ -1,6 +1,6 @@
 import {
-  getFeatureData,
   getGraphType,
+  getGraphTypeData,
   getRasterData,
   getZarrData,
 } from "@/lib/graphs";
@@ -84,32 +84,23 @@ export default {
       const graphType = getGraphType(dataset);
       const layerType = getLayerType(graphFeature?.features?.layer);
       if (layerType === "clickable" && graphFeature?.features) {
-        const graphValues = getFeatureData(
-          dataset,
-          graphFeature?.features.properties,
-          activeProps
-        );
-        const totalInSet = graphValues.find(({ name }) =>
-          name.toLowerCase().includes("total")
-        );
-        const values = totalInSet
-          ? graphValues.filter(({ name }) => name !== totalInSet.name)
-          : graphValues;
-        const total =
-          totalInSet ||
-          Math.ceil(values.reduce((acc, cur) => acc + cur.value, 0));
-        if (!values.length) {
+        const properties =
+          rootGetters["datasets/activeDatasetProperties"](dataset);
+
+        const data = getGraphTypeData({
+          datasetId: dataset,
+          feature: graphFeature?.features.properties,
+          values: activeProps,
+          properties,
+          coords,
+          graphType,
+        });
+        if (!data.values.length) {
           commit("EMPTY_GRAPH_DATA");
           commit("ADD_GRAPH_FEATURE");
           return;
         }
-        commit("ADD_GRAPH_DATA", {
-          total,
-          values,
-          datasetId: dataset,
-          graphType,
-          coords,
-        });
+        commit("ADD_GRAPH_DATA", data);
       }
       if (layerType === "geojson" && graphFeature?.features) {
         if (!currentDataset?.assets?.data?.roles?.includes("zarr-root"))

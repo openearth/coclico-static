@@ -17,12 +17,7 @@
         :key="position.join('-')"
         :lng-lat="position"
         anchor="bottom"
-        style="
-          width: 30vw;
-          height: 38vh;
-          display: flex;
-          justify-content: center;
-        "
+        style="display: flex; justify-content: center"
         :closeButton="false"
       >
         <div style="width: auto; height: auto; overflow: hidden">
@@ -171,7 +166,7 @@ export default {
 }
 
 .mapboxgl-popup-content {
-  width: fit-content;
+  width: max-content;
 }
 
 .buttons-container {

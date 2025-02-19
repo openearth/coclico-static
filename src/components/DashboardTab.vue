@@ -35,7 +35,7 @@ import { markRaw } from "vue";
 import { mapActions, mapGetters } from "vuex";
 import SeaLevelGraph from "@/components/ChartComponents/SeaLevelGraph.vue";
 import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue";
-import LineChartZarr from "@/components/ChartComponents/LineChartZarr.vue";
+import LineChart from "@/components/ChartComponents/LineChart.vue";
 import { GRAPH_TYPES } from "@/lib/graphs";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
 
@@ -43,7 +43,7 @@ export default {
   components: {
     SeaLevelGraph,
     FloodExtentGraph,
-    LineChartZarr,
+    LineChart,
   },
   data() {
     return {
@@ -51,7 +51,7 @@ export default {
       graphComponents: {
         [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
         [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
-        [GRAPH_TYPES.LINE_CHART]: markRaw(LineChartZarr),
+        [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
         [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
       },
     };

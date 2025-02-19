@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
-    "@studiometa/vue-mapbox-gl": "^2.3.3",
+    "@studiometa/vue-mapbox-gl": "^2.7.2",
     "core-js": "^3.8.3",
     "echarts": "^5.5.1",
     "html-loader": "^5.0.0",

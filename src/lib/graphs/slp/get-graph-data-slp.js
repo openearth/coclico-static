@@ -11,6 +11,7 @@ const getEnsembleLabel = (ensemble) =>
     msl_m: "Medium",
     msl_h: "High",
   }[ensemble]);
+
 /**
  * Function that fetches the data for the sea level rise graph
  * @param dataset
