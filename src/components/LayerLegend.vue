@@ -62,16 +62,16 @@ const props = defineProps({
 const gradientContainer = ref();
 const editingRange = ref(false);
 const defaultMinValue = computed(() =>
-  (props.dataset?.["deltares:min"] || 0).toString()
+  (props.dataset?.["deltares:min"] || 0).toString(),
 );
 const defaultMaxValue = computed(() =>
-  (props.dataset?.["deltares:max"] || 1).toString()
+  (props.dataset?.["deltares:max"] || 1).toString(),
 );
 const minValue = ref(defaultMinValue.value);
 const maxValue = ref(defaultMaxValue.value);
 const unit = computed(() => props.dataset?.["deltares:units"]);
 const linearGradient = computed(
-  () => props.dataset?.["deltares:linearGradient"]
+  () => props.dataset?.["deltares:linearGradient"],
 );
 watch([linearGradient, minValue, maxValue], () => {
   renderGradient();
@@ -91,8 +91,8 @@ function renderGradient() {
         }),
         {
           title: "Laagste punt (provincie)",
-        }
-      )
+        },
+      ),
     );
   }
 }

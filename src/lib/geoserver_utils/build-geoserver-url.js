@@ -13,7 +13,7 @@ export default function ({
 
   const params = new URLSearchParams(
     { service, request, width, height, ...rest },
-    { encode, sort: false }
+    { encode, sort: false },
   );
 
   return `${url}?${params}`;

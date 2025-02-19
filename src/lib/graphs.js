@@ -58,7 +58,7 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
         .filter(
           ([key]) =>
             key.toLowerCase().includes(values.time.toLowerCase()) &&
-            key.toLowerCase().includes(values.scenarios.toLowerCase())
+            key.toLowerCase().includes(values.scenarios.toLowerCase()),
         )
         .map(([name, value]) => {
           return {
@@ -89,10 +89,10 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
           const name = key.includes("more05")
             ? "% flood > 0.5m"
             : key.includes("less05")
-            ? "% flood < 0.5m"
-            : key.includes("nans")
-            ? "% not flooded"
-            : key;
+              ? "% flood < 0.5m"
+              : key.includes("nans")
+                ? "% not flooded"
+                : key;
 
           return {
             name,
@@ -127,7 +127,7 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
           max: Math.max(
             ...data
               .filter((datum) => datum.type === type)
-              .map(({ value }) => value)
+              .map(({ value }) => value),
           ),
           interval: type.startsWith("rel") ? 0.1 : 10000,
           axisLabel: {
@@ -162,13 +162,13 @@ export function getFeatureData({ datasetId, feature, properties, values }) {
                   datum.scenario === scenario &&
                   datum.climateScenario.startsWith(datum.scenario) &&
                   datum.defense === "UNDEFENDED_MAPS" &&
-                  datum.rp === "100"
+                  datum.rp === "100",
               )
               .sort((a, b) => a.time - b.time)
               .map(({ value }) => {
                 return value;
               }),
-          }))
+          })),
         ),
       };
     }
@@ -228,11 +228,11 @@ export async function getZarrData(dataset, features, props) {
   if (get(dataset, "deltares:plotType") !== "bar") {
     path = path.filter((x) => x)[0];
     dimensions = Object.entries(
-      get(dataset, `["cube:variables"].${path}.dimensions`)
+      get(dataset, `["cube:variables"].${path}.dimensions`),
     );
   } else if (get(dataset, "deltares:plotType") === "bar") {
     dimensions = Object.entries(
-      get(dataset, `["cube:variables"].${path[0]}.dimensions`)
+      get(dataset, `["cube:variables"].${path[0]}.dimensions`),
     );
   }
 
@@ -245,10 +245,10 @@ export async function getZarrData(dataset, features, props) {
       get(dataset, "deltares:plotSeries") !== "scenarios"
     ) {
       const scenarioIndex = summaryList.find(
-        (object) => object.id === "scenarios"
+        (object) => object.id === "scenarios",
       );
       return scenarioIndex?.values.findIndex(
-        (scenario) => scenario === props.scenarios
+        (scenario) => scenario === props.scenarios,
       );
     } else if (
       dim[1] === "rp" &&
@@ -301,7 +301,7 @@ export async function getZarrData(dataset, features, props) {
       }
 
       const variableUnit = Object.entries(
-        get(dataset, `["cube:variables"].${path}.unit`)
+        get(dataset, `["cube:variables"].${path}.unit`),
       );
 
       let cubeDimensions = get(dataset, "cube:dimensions");
@@ -309,7 +309,7 @@ export async function getZarrData(dataset, features, props) {
       const plotSeries = get(dataset, "deltares:plotSeries");
 
       const dimensionNames = Object.entries(
-        get(dataset, `cube:dimensions.${plotSeries}.values`)
+        get(dataset, `cube:dimensions.${plotSeries}.values`),
       );
 
       if (cubeDimensions[xAxis].description === "decade window") {
@@ -420,7 +420,7 @@ export function getGraphTypeData({
     };
   } else {
     const totalInSet = graphValues?.find?.(({ name }) =>
-      name.toLowerCase().includes("total")
+      name.toLowerCase().includes("total"),
     );
     const _values = totalInSet
       ? graphValues.filter(({ name }) => name !== totalInSet.name)

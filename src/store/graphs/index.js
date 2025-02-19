@@ -33,7 +33,7 @@ export default {
     },
     setGraphFeature(
       { commit, dispatch, rootGetters },
-      { queriedFeatures, datasetId, lat, lng, point }
+      { queriedFeatures, datasetId, lat, lng, point },
     ) {
       const properties = rootGetters["datasets/activeDatasetValues"](datasetId);
       switch (datasetId) {
@@ -45,8 +45,10 @@ export default {
             features:
               queriedFeatures.find((feature) =>
                 Object.keys(feature).some((key) =>
-                  key.toLowerCase().includes(properties.scenarios.toLowerCase())
-                )
+                  key
+                    .toLowerCase()
+                    .includes(properties.scenarios.toLowerCase()),
+                ),
               ) || queriedFeatures[0],
           });
           break;
@@ -57,12 +59,12 @@ export default {
             lat,
             features:
               queriedFeatures?.find((feature) =>
-                feature?.layer?.id.endsWith("_geoserver_link")
+                feature?.layer?.id.endsWith("_geoserver_link"),
               ) ||
               queriedFeatures?.find((feature) =>
                 rootGetters["map/clickableDatasetsIds"].some((id) =>
-                  feature.layer.id.startsWith(id)
-                )
+                  feature.layer.id.startsWith(id),
+                ),
               ),
             point,
           });
@@ -77,7 +79,7 @@ export default {
       const { lng, lat, dataset } = graphFeature;
       const coords = { lng, lat };
       const currentDataset = rootGetters["datasets/activeDatasets"].find(
-        ({ id }) => id === dataset
+        ({ id }) => id === dataset,
       );
       if (!currentDataset) return;
       const activeProps = rootGetters["datasets/activeDatasetValues"](dataset);
@@ -109,7 +111,7 @@ export default {
           const graphData = await getZarrData(
             currentDataset,
             graphFeature?.features,
-            activeProps
+            activeProps,
           );
           if (!graphData) {
             commit("EMPTY_GRAPH_DATA");
@@ -132,7 +134,7 @@ export default {
           const graphData = await getRasterData(
             currentDataset,
             coords,
-            rootGetters["datasets/activeDatasetProperties"](dataset)
+            rootGetters["datasets/activeDatasetProperties"](dataset),
           );
           if (!graphData?.values?.[0]?.data?.[0]) {
             commit("EMPTY_GRAPH_DATA");

@@ -145,7 +145,7 @@
             <VList class="layer-list">
               <VListItem
                 v-for="dataset in this.datasetsInActiveTheme.filter(
-                  ({ id }) => id !== 'slp' && id !== 'cfhp'
+                  ({ id }) => id !== 'slp' && id !== 'cfhp',
                 )"
                 :key="dataset.id"
                 :title="dataset.title"
@@ -231,7 +231,7 @@ export default {
     openCatalogPage() {
       window.open(
         "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/coclico-data-public/coclico/coclico-stac-4oct/catalog.json?.language=en",
-        "_blank"
+        "_blank",
       );
     },
   },
@@ -256,7 +256,7 @@ export default {
     },
     filteredDatasets() {
       return this.datasetsInActiveTheme.filter(
-        (dataset) => dataset.id === "slp" || dataset.id === "cfhp"
+        (dataset) => dataset.id === "slp" || dataset.id === "cfhp",
       );
     },
   },

@@ -110,7 +110,9 @@ export default {
   border-radius: 28px 28px 28px 28px;
   max-width: 450px;
   max-height: 397px;
-  transition: height 0.2s linear, width 0.2s linear 0.1s;
+  transition:
+    height 0.2s linear,
+    width 0.2s linear 0.1s;
   width: 225px;
   height: 50px;
   .tab-label {

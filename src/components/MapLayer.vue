@@ -9,31 +9,30 @@
   </MapboxLayer>
 </template>
 <script setup>
-import { MapboxLayer, useMap } from "@studiometa/vue-mapbox-gl";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { MapboxLayer } from "@studiometa/vue-mapbox-gl";
+import { inject, onBeforeUnmount, ref } from "vue";
 
 const props = defineProps({
   layer: {
     type: Object,
-    default: () => {},
+    required: true,
   },
 });
+const id = ref(props.layer.id);
 const emit = defineEmits(["click"]);
-let mapRef = ref();
-
-onMounted(() => {
-  mapRef.value = useMap();
-});
+const map = inject("map");
 
 onBeforeUnmount(async () => {
-  await mapRef.value.map.removeLayer(props.layer.id);
+  await map.value.removeLayer(id.value);
 });
 
-const onLayerClicked = (e) => emit("click", e.features[0]);
-const onMouseenter = () => {
-  mapRef.value.map.getCanvas().style.cursor = "pointer";
-};
-const onMouseleave = () => {
-  mapRef.value.map.getCanvas().style.cursor = "";
-};
+function onLayerClicked(e) {
+  emit("click", e.features[0]);
+}
+function onMouseenter() {
+  map.value.getCanvas().style.cursor = "pointer";
+}
+function onMouseleave() {
+  map.value.getCanvas().style.cursor = "";
+}
 </script>

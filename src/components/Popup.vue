@@ -7,7 +7,7 @@
     style="display: flex; justify-content: center"
     :closeButton="false"
   >
-    <div style="width: auto; height: auto; overflow: hidden">
+    <div style="width: auto; height: auto">
       <VCardTitle>
         {{ activeClickableDataset.title }}
       </VCardTitle>
@@ -38,7 +38,7 @@ defineProps({
 const emit = defineEmits(["close"]);
 const store = useStore();
 const activeClickableDataset = computed(
-  () => store.getters["map/activeClickableDataset"]
+  () => store.getters["map/activeClickableDataset"],
 );
 const graphData = computed(() => store.getters["graphs/graphData"]);
 const closePopup = () => {

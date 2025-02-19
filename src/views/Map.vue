@@ -64,11 +64,11 @@ function closePopup() {
   setHighlight(map.value);
 }
 const activeClickableDataset = computed(
-  () => store.getters["map/activeClickableDataset"]
+  () => store.getters["map/activeClickableDataset"],
 );
 const graphFeature = computed(() => store.getters["graphs/graphFeature"]);
 const clickableDatasetsIds = computed(
-  () => store.getters["map/clickableDatasetsIds"]
+  () => store.getters["map/clickableDatasetsIds"],
 );
 const seaLevelRiseData = computed(() => store.getters["map/seaLevelRiseData"]);
 const mapboxLayers = computed(() => store.getters["map/mapboxLayers"]);
@@ -78,7 +78,7 @@ watch(
     if (newVal) {
       isPopupOpen.value = true;
     }
-  }
+  },
 );
 watch(
   () => store.getters["graphs/graphFeature"],
@@ -87,7 +87,7 @@ watch(
       isPopupOpen.value = false;
       setHighlight(map.value);
     }
-  }
+  },
 );
 watch(
   () => store.getters["map/activeClickableDataset"],
@@ -96,9 +96,10 @@ watch(
       isPopupOpen.value = false;
       setHighlight(map.value);
     }
-  }
+  },
 );
 onMounted(() => {
+  store.dispatch("datasets/loadDatasets");
   map.value.on("load", () => {
     prepareHighlightSource(map.value);
   });

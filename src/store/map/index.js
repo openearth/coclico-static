@@ -36,7 +36,7 @@ export default {
     REMOVE_MAPBOX_LAYER(state, id) {
       state.mapboxLayers = [
         ...state.mapboxLayers.filter(
-          (mapboxLayer) => !mapboxLayer.id.startsWith(id)
+          (mapboxLayer) => !mapboxLayer.id.startsWith(id),
         ),
       ];
     },

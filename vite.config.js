@@ -21,8 +21,19 @@ export default defineConfig({
       google: {
         families: [
           {
+            name: "Comfortaa",
+            styles: "ital,wght@0,100..900;1,100..900",
+            defer: true,
+          },
+          {
             name: "Roboto",
-            styles: "wght@100;300;400;500;700;900",
+            styles: "ital,wght@0,100..900;1,100..900",
+            defer: true,
+          },
+          {
+            name: "Inter",
+            styles: "ital,wght@0,100..900;1,100..900",
+            defer: true,
           },
         ],
       },

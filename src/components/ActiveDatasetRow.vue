@@ -48,7 +48,7 @@ const props = defineProps({
 const store = useStore();
 
 const properties = computed(() =>
-  store.getters["datasets/activeDatasetProperties"](props.datasetId)
+  store.getters["datasets/activeDatasetProperties"](props.datasetId),
 );
 
 const updateProperty = async (property, value) => {

@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "format": "prettier .  --write"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -17,16 +18,13 @@
     "lodash-es": "^4.17.21",
     "mapbox-gl": "^3.10.0",
     "markdown-loader": "^8.0.0",
-    "ol": "^10.3.1",
     "roboto-fontface": "*",
     "unplugin-fonts": "^1.3.1",
-    "unplugin-vue-router": "^0.11.2",
     "vue": "^3.2.13",
     "vue-echarts": "^7.0.3",
     "vue-html-loader": "^1.2.4",
     "vue-router": "^4.5.0",
     "vuex": "^4.0.0",
-    "webfontloader": "^1.0.0",
     "zarr": "^0.6.3"
   },
   "devDependencies": {
@@ -36,7 +34,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.7.1",
-    "prettier": "^2.4.1",
+    "prettier": "^3.5.1",
     "sass": "^1.72.0",
     "unplugin-vue-components": "^28.4.0",
     "vite": "^6.1.1",

@@ -4,7 +4,7 @@ export function legend(domain, range, options) {
   return Legend(
     d3.scaleLinear().domain(domain).range(range),
     d3.interpolateHcl,
-    options
+    options,
   );
 }
 function Legend(
@@ -21,7 +21,7 @@ function Legend(
     ticks = width / 64,
     tickFormat,
     tickValues,
-  } = {}
+  } = {},
 ) {
   function ramp(color, n = 256) {
     const canvas = document.createElement("canvas");
@@ -54,7 +54,7 @@ function Legend(
     x = color
       .copy()
       .rangeRound(
-        d3.quantize(d3.interpolate(marginLeft, width - marginRight), n)
+        d3.quantize(d3.interpolate(marginLeft, width - marginRight), n),
       );
 
     svg
@@ -67,8 +67,8 @@ function Legend(
       .attr(
         "xlink:href",
         ramp(
-          color.copy().domain(d3.quantize(d3.interpolate(0, 1), n))
-        ).toDataURL()
+          color.copy().domain(d3.quantize(d3.interpolate(0, 1), n)),
+        ).toDataURL(),
       );
   }
 
@@ -82,7 +82,7 @@ function Legend(
         range() {
           return [marginLeft, width - marginRight];
         },
-      }
+      },
     );
 
     svg
@@ -113,15 +113,15 @@ function Legend(
     const thresholds = color.thresholds
       ? color.thresholds() // scaleQuantize
       : color.quantiles
-      ? color.quantiles() // scaleQuantile
-      : color.domain(); // scaleThreshold
+        ? color.quantiles() // scaleQuantile
+        : color.domain(); // scaleThreshold
 
     const thresholdFormat =
       tickFormat === undefined
         ? (d) => d
         : typeof tickFormat === "string"
-        ? d3.format(tickFormat)
-        : tickFormat;
+          ? d3.format(tickFormat)
+          : tickFormat;
 
     x = d3
       .scaleLinear()
@@ -173,7 +173,7 @@ function Legend(
         .ticks(ticks, typeof tickFormat === "string" ? tickFormat : undefined)
         .tickFormat(typeof tickFormat === "function" ? tickFormat : undefined)
         .tickSize(tickSize)
-        .tickValues(tickValues)
+        .tickValues(tickValues),
     )
     .call(tickAdjust)
     .call((g) => g.select(".domain").remove())
@@ -186,7 +186,7 @@ function Legend(
         .attr("text-anchor", "start")
         .attr("font-weight", "bold")
         .attr("class", "title")
-        .text(title)
+        .text(title),
     );
 
   return svg.node();

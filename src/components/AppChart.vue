@@ -32,7 +32,7 @@ const graphComponent = computed(
       [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
       [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
       [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
-    }[graphData.value?.graphType])
+    })[graphData.value?.graphType],
 );
 </script>
 

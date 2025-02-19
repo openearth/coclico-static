@@ -32,7 +32,7 @@ use([
 const baseOptions = computed(() => {
   try {
     return defineAsyncComponent(
-      `@/assets/echart-templates/${props.graphData.id}.js`
+      `@/assets/echart-templates/${props.graphData.id}.js`,
     );
   } catch {
     return defineAsyncComponent("@/assets/echart-templates/default.js");

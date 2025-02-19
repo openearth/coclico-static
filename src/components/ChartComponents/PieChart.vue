@@ -29,7 +29,7 @@ const props = defineProps({
     required: false,
   },
   graphData: {
-    type: Array,
+    type: Object,
     required: true,
   },
   colorPalette: {
@@ -43,6 +43,6 @@ const option = computed(() =>
     datasetId: props.graphData.datasetId,
     values: props.graphData.values,
     colorPalette: props.colorPalette,
-  })
+  }),
 );
 </script>
