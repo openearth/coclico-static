@@ -8,21 +8,19 @@
     :closeButton="false"
   >
     <div style="width: auto; height: auto; overflow: hidden">
-      <v-card-title>
+      <VCardTitle>
         {{ activeClickableDataset.title }}
-      </v-card-title>
+      </VCardTitle>
       <app-chart />
       <div class="buttons-container" v-if="graphData">
-        <v-btn
+        <VBtn
           flat
           @click="saveGraphOnDashboard"
           class="add-to-dashboard-button-popup"
         >
           Add to dashboard
-        </v-btn>
-        <v-btn flat @click="closePopup" class="close-button-popup">
-          Close
-        </v-btn>
+        </VBtn>
+        <VBtn flat @click="closePopup" class="close-button-popup"> Close </VBtn>
       </div>
     </div>
   </MapboxPopup>

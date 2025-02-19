@@ -267,7 +267,7 @@ export default {
 .custom-navigation-drawer {
   margin-top: 25px;
   margin-left: 25px;
-  max-height: calc(100% - 2 * (25px));
+  max-height: min(800px, calc(100% - 2 * (25px)));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -340,7 +340,7 @@ export default {
   border-radius: 0px 28px 28px 0px;
   box-shadow: none;
   height: 100%;
-  max-height: calc(100% - 2 * (25px));
+  max-height: min(800px, calc(100% - 2 * (25px)));
 }
 
 .close-button {
