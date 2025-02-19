@@ -47,6 +47,7 @@ export default {
   },
   data() {
     return {
+      open: false,
       GRAPH_TYPES,
       graphComponents: {
         [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
