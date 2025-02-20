@@ -155,7 +155,7 @@
         <VList class="layer-list">
           <VListItem
             v-for="dataset in datasetsInActiveTheme.filter(
-              ({ id }) => id !== 'slp' && id !== 'cfhp',
+              ({ id }) => id !== 'slp' && id !== 'cfhp' && id !== 'cba',
             )"
             :key="dataset.id"
             :title="dataset.title"
@@ -212,8 +212,7 @@ const sidebarStyle = computed(() => {
 });
 const filteredDatasets = computed(() => {
   return datasetsInActiveTheme.value.filter(
-    (dataset) =>
-      dataset.id === "slp" || (dataset.id === "cfhp" && id !== "cba"),
+    (dataset) => dataset.id === "slp" || dataset.id === "cfhp",
   );
 });
 
