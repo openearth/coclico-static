@@ -2,7 +2,7 @@
   <VCard flat class="scrollable-card">
     <VCard
       flat
-      v-for="({ graphData, title }, index) in activeGraphs"
+      v-for="({ graphData, title }, index) in graphs"
       :key="index"
       class="ma-3"
     >
@@ -27,7 +27,22 @@
         style="height: 300px"
       />
     </VCard>
-    <VCard flat> </VCard>
+    <div v-if="!graphs.length" class="text-center mx-16 pb-4">
+      <p class="font-weight-black">
+        No data or graph has have been added to the dashboard.
+      </p>
+      <p class="mt-4">
+        <span class="d-block">
+          Explore data categories and activate data layers from the left
+          hand-side navigation bar.
+        </span>
+        <span class="d-block">
+          Add data to the dashboard by clicking
+          <span class="font-weight-bold">"add to dashboard"</span>
+          when viewing a graph
+        </span>
+      </p>
+    </div>
   </VCard>
 </template>
 
@@ -59,7 +74,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("dashboard", ["activeGraphs"]),
+    ...mapGetters("dashboard", ["graphs"]),
   },
   methods: {
     ...mapActions("dashboard", ["removeGraph"]),
