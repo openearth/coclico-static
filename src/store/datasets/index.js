@@ -24,7 +24,7 @@ export default {
         return state.datasets;
       }
       return state.datasets.filter((dataset) =>
-        dataset?.keywords?.includes(state.activeTheme)
+        dataset?.keywords?.includes(state.activeTheme),
       );
     },
     activeDatasets(state) {
@@ -96,20 +96,20 @@ export default {
     },
     ADD_ACTIVE_DATASET(state, id) {
       state.activeDatasetIds = Array.from(
-        new Set([id, ...state.activeDatasetIds])
+        new Set([id, ...state.activeDatasetIds]),
       );
     },
     REMOVE_ACTIVE_DATASET(state, id) {
       state.activeDatasetIds = state.activeDatasetIds.filter(
-        (activeDatasetId) => activeDatasetId !== id
+        (activeDatasetId) => activeDatasetId !== id,
       );
     },
   },
   actions: {
     async loadDatasets({ commit }) {
-      const catalog = await getCatalog(process.env.VUE_APP_CATALOG_URL);
+      const catalog = await getCatalog(import.meta.env.VITE_CATALOG_URL);
       catalog?.summaries?.keywords.forEach((keyword) =>
-        commit("ADD_THEME", { name: keyword, count: 0 })
+        commit("ADD_THEME", { name: keyword, count: 0 }),
       );
       const collections = await getCollections(catalog);
       collections.forEach((collection) => commit("ADD_DATASET", collection));
@@ -119,7 +119,7 @@ export default {
     },
     updateThemeObject({ commit, getters }) {
       const countActiveDatasets = getters.datasetsInActiveTheme.filter(
-        (dataset) => dataset.active === true
+        (dataset) => dataset.active === true,
       ).length;
       commit("UPDATE_NUMBER_OF_ACTIVE_DATASETS_ON_THEME", {
         name: getters.activeTheme,

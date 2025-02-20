@@ -12,7 +12,7 @@ export default {
     activeGraphs: (state, getters, rootState, rootGetters) => {
       const datasetIds = rootGetters["datasets/activeDatasetIds"];
       return state.graphs.filter(({ graphData: { datasetId } }) =>
-        datasetIds.includes(datasetId)
+        datasetIds.includes(datasetId),
       );
     },
   },

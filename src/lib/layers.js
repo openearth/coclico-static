@@ -37,7 +37,7 @@ export async function getResourceLayers(collection, properties) {
     "geoserver_link" in collection.assets
       ? ResourceTypeFunctionMask[collection.assets.geoserver_link.type](
           collection,
-          "geoserver_link"
+          "geoserver_link",
         )
       : null;
   const mapbox =
@@ -45,7 +45,7 @@ export async function getResourceLayers(collection, properties) {
       ? ResourceTypeFunctionMask[item.assets.mapbox.type](
           item,
           "mapbox",
-          properties
+          properties,
         )
       : null;
   const visual =
@@ -53,7 +53,7 @@ export async function getResourceLayers(collection, properties) {
       ? ResourceTypeFunctionMask[item.assets.visual.type](
           item,
           "visual",
-          properties
+          properties,
         )
       : null;
 
@@ -76,7 +76,7 @@ export async function getResourceLayers(collection, properties) {
 export function buildGeojsonMapboxLayer(
   { id, properties, assets },
   assetKey,
-  props
+  props,
 ) {
   const asset = assets?.[assetKey];
   const suffix =
@@ -107,7 +107,7 @@ export function buildGeojsonMapboxLayer(
 export function buildRasterMapboxLayer(
   { id, assets, tileSize = 256 },
   assetKey,
-  props
+  props,
 ) {
   const asset = assets?.[assetKey];
   const suffix =
@@ -134,7 +134,7 @@ export function buildRasterMapboxLayer(
  */
 export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
   const paint =
-    "properties" in dataset && "deltares:paint" in dataset?.properties
+    "properties" in dataset && "deltares:paint" in dataset.properties
       ? dataset.properties["deltares:paint"]
       : {
           "fill-color": "rgba(0,0,0,0)",
@@ -159,8 +159,8 @@ export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
     source: {
       type: "vector",
       tiles: [asset.href],
-      minZoom: 6,
-      maxZoom: 20,
+      minZoom: 0,
+      maxZoom: 22,
     },
     "source-layer": layerName,
     paint,
@@ -187,9 +187,9 @@ export function matchLayerIdToProperties(dataset, activeProperties) {
     : items.find(({ properties = {} }) =>
         Object.entries(activeProperties)
           .map(
-            ([key, value]) => properties?.[key] === value || !properties?.[key]
+            ([key, value]) => properties?.[key] === value || !properties?.[key],
           )
-          .every(Boolean)
+          .every(Boolean),
       ) || items[0];
 }
 
@@ -199,9 +199,9 @@ export function matchLayerIdToProperties(dataset, activeProperties) {
  * @returns {boolean}
  */
 export function hasLegend(dataset) {
-  const isVector = "geoserver_link" in dataset.assets;
+  // const isVector = "geoserver_link" in dataset.assets;
   const hasGradient = "deltares:linearGradient" in dataset;
-  return isVector && hasGradient;
+  return hasGradient;
 }
 
 /**
@@ -264,7 +264,7 @@ export function prepareHighlightSource(map) {
  */
 export function setHighlight(map, queriedFeatures, clickableDatasetIds) {
   const feature = queriedFeatures?.find((feature) =>
-    clickableDatasetIds.some((id) => feature.layer.id.startsWith(id))
+    clickableDatasetIds.some((id) => feature.layer.id.startsWith(id)),
   );
   map.getSource("highlight").setData({
     type: "FeatureCollection",

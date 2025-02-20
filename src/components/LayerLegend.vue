@@ -1,145 +1,138 @@
 <template>
-  <v-container class="ma-0 pa-0">
-    <v-row>
-      <v-col cols="9" class="ma-0 pa-0 pl-2">
-        <svg viewBox="0 0 100 3">
-          <defs>
-            <linearGradient
-              :id="`gradient-${datasetId}`"
-              x1="0"
-              x2="1"
-              y1="0"
-              y2="0"
-            >
-              <stop
-                v-for="(stop, index) in linearGradient"
-                :key="index"
-                :offset="stop.offset"
-                :style="{
-                  'stop-color': stop.color,
-                  'stop-opacity': stop.opacity,
-                }"
-              />
-            </linearGradient>
-          </defs>
-          <rect
-            :fill="`url(#gradient-${datasetId})`"
-            width="100"
-            height="5"
-            x="0"
-            y="0"
-          />
-        </svg>
-      </v-col>
-    </v-row>
-    <v-row style="margin-top: 0px">
-      <v-col v-if="!editingRange" cols="1" class="ma-0 pa-0">
-        <v-btn variant="plain" icon @click="editRange">
+  <VContainer class="ma-0 pa-0">
+    <VRow justify="center">
+      <VCol ref="gradientContainer" cols="12" class="pl-3 gradient"></VCol>
+    </VRow>
+    <VRow style="margin-top: 0px">
+      <VCol v-if="!editingRange" cols="1" class="ma-0 pa-0">
+        <VBtn variant="plain" icon @click="editRange">
           {{ minValue }}
-        </v-btn>
-      </v-col>
-      <v-col v-else cols="4" class="ma-0">
-        <v-text-field
+        </VBtn>
+      </VCol>
+      <VCol v-else cols="5" class="ma-0 ml-1">
+        <VTextField
           id="range-min"
           v-model="minValue"
           :label="`Min (${unit})`"
           placeholder="Min value"
         />
-      </v-col>
-      <v-col v-if="!editingRange" cols="1" offset="7" class="pa-0">
-        <v-btn @click="editRange" small variant="plain" icon>
+      </VCol>
+      <VCol v-if="!editingRange" cols="1" offset="9" class="pa-0 pl-4">
+        <VBtn @click="editRange" small variant="plain" icon>
           {{ maxValue }}
-        </v-btn>
-      </v-col>
-      <v-col v-else cols="4" offset="1" class="ma-0">
-        <v-text-field
+        </VBtn>
+      </VCol>
+      <VCol v-else cols="5" offset="1" class="ma-0">
+        <VTextField
           id="range-max"
           v-model="maxValue"
           :label="`Max (${unit})`"
           placeholder="Max value"
         />
-      </v-col>
-      <v-col cols="3" class="my-auto pa-0 unit-text bodytext-s">
+      </VCol>
+      <VCol cols="1" class="my-auto pa-0 unit-text bodytext-s">
         [{{ unit }}]
-      </v-col>
-    </v-row>
-    <v-row v-if="editingRange" justify="space-between">
-      <v-col>
-        <v-btn dense @click="cancelEditRange"> Cancel </v-btn>
-      </v-col>
-      <v-col>
-        <v-btn dense @click="resetRange"> Reset </v-btn>
-      </v-col>
-      <v-col>
-        <v-btn dense @click="saveRange"> Save </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+      </VCol>
+    </VRow>
+    <VRow v-if="editingRange" justify="space-between">
+      <VCol>
+        <VBtn dense @click="cancelEditRange"> Cancel</VBtn>
+      </VCol>
+      <VCol>
+        <VBtn dense @click="resetRange"> Reset</VBtn>
+      </VCol>
+      <VCol>
+        <VBtn dense @click="saveRange"> Save</VBtn>
+      </VCol>
+    </VRow>
+  </VContainer>
 </template>
 
-<script>
-import { mapActions } from "vuex";
-import { get, set } from "lodash-es";
+<script setup>
+import { set } from "lodash-es";
+import { legend } from "@/lib/legend";
+import { computed, onMounted, ref, watch } from "vue";
 
-export default {
-  props: {
-    dataset: {
-      type: Object,
-      required: true,
-    },
+const props = defineProps({
+  dataset: {
+    type: Object,
+    required: true,
   },
-  data() {
-    return {
-      editingRange: false,
-      defaultMinValue: "",
-      minValue: "", //at the beginning equal to defaultMinValues. Same when reset.
-      defaultMaxValue: "",
-      maxValue: "",
-      unit: "",
-      linearGradient: {},
-      datasetId: "",
-    };
-  },
-  mounted() {
-    this.datasetId = get(this.dataset, "id");
-    this.unit = get(this.dataset, "deltares:units");
-    this.updateMinMax();
-    this.linearGradient = get(this.dataset, "deltares:linearGradient");
-  },
-  methods: {
-    ...mapActions(["reclassifyMapboxLayer"]),
-    updateMinMax() {
-      const min = get(this.dataset, "deltares:min", "");
-      const max = get(this.dataset, "deltares:max", "");
-      this.minValue = min.toString();
-      this.maxValue = max.toString();
-      this.defaultMinValue = min.toString();
-      this.defaultMaxValue = max.toString();
-    },
-    cancelEditRange() {
-      this.minValue = this.defaultMinValue;
-      this.maxValue = this.defaultMaxValue;
-      this.editingRange = false;
-    },
-    editRange() {
-      this.editingRange = true;
-    },
-    saveRange() {
-      this.editingRange = false;
-      set(this.dataset, "deltares:min", this.minValue);
-      set(this.dataset, "deltares:max", this.maxValue);
-      this.reclassifyMapboxLayer(this.dataset);
-    },
-    resetRange() {
-      this.minValue = this.defaultMinValue;
-      this.maxValue = this.defaultMaxValue;
-    },
-  },
-};
+});
+const gradientContainer = ref();
+const editingRange = ref(false);
+const defaultMinValue = computed(() =>
+  (props.dataset?.["deltares:min"] || 0).toString(),
+);
+const defaultMaxValue = computed(() =>
+  (props.dataset?.["deltares:max"] || 1).toString(),
+);
+const minValue = ref(defaultMinValue.value);
+const maxValue = ref(defaultMaxValue.value);
+const unit = computed(() => props.dataset?.["deltares:units"]);
+const linearGradient = computed(
+  () => props.dataset?.["deltares:linearGradient"],
+);
+watch([linearGradient, minValue, maxValue], () => {
+  renderGradient();
+});
+onMounted(() => {
+  updateMinMax();
+  renderGradient();
+});
+
+function renderGradient() {
+  if (linearGradient.value) {
+    gradientContainer.value?.$el.replaceChildren(
+      legend(
+        [Number(minValue.value), Number(maxValue.value)],
+        linearGradient.value.map((stop) => {
+          return stop.color;
+        }),
+        {
+          title: "Laagste punt (provincie)",
+        },
+      ),
+    );
+  }
+}
+
+function cancelEditRange() {
+  minValue.value = defaultMinValue.value;
+  maxValue.value = defaultMaxValue.value;
+  editingRange.value = false;
+}
+
+function editRange() {
+  editingRange.value = true;
+}
+
+function updateMinMax() {
+  minValue.value = defaultMinValue.value;
+  maxValue.value = defaultMaxValue.value;
+}
+
+function saveRange() {
+  editingRange.value = false;
+  set(props.dataset, "deltares:min", minValue.value);
+  set(props.dataset, "deltares:max", maxValue.value);
+  // reclassifyMapboxLayer(this.dataset);
+}
+
+function resetRange() {
+  minValue.value = defaultMinValue.value;
+  maxValue.value = defaultMaxValue.value;
+}
 </script>
 
 <style>
 .unit-text {
   text-align: center;
+}
+.gradient {
+  flex-grow: 1;
+  padding: 0;
+  display: grid;
+  place-items: center start;
 }
 </style>

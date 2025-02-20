@@ -1,30 +1,38 @@
 # Assets
+
 Examples of assets used in the frontend as provided by `coclicodata`
 The `type` property of these objects is used to determine the render strategy in the frontend.
-The following mask is defined for the `type` property:  
+The following mask is defined for the `type` property:
 
-| Asset Type                                                 	| Render Function              	| Output Type                        	|
-|------------------------------------------------------------	|------------------------------	|------------------------------------	|
-| "application/vnd.apache.parquet"                           	| `buildVectorTileMapboxLayer` 	| Vector Tile Layer                  	|
-| "image/tiff; application=geotiff; profile=cloud-optimized" 	| `buildRasterMapboxLayer`     	| Raster Tile Layer                  	|
-| "image/png"                                                	| `buildRasterMapboxLayer`     	| Raster Tile Layer                  	|
-| "application/png"                                          	| `buildRasterMapboxLayer`     	| Raster Tile Layer                  	|
-| "vector"                                                   	| `buildGeojsonMapboxLayer`    	| Geojson Feature (collection) Layer 	|
-| "geojson"                                                  	| `buildGeojsonMapboxLayer`    	| Geojson Feature (collection) Layer 	|
+| Asset Type                                                 | Render Function              | Output Type                        |
+| ---------------------------------------------------------- | ---------------------------- | ---------------------------------- |
+| "application/vnd.apache.parquet"                           | `buildVectorTileMapboxLayer` | Vector Tile Layer                  |
+| "image/tiff; application=geotiff; profile=cloud-optimized" | `buildRasterMapboxLayer`     | Raster Tile Layer                  |
+| "image/png"                                                | `buildRasterMapboxLayer`     | Raster Tile Layer                  |
+| "application/png"                                          | `buildRasterMapboxLayer`     | Raster Tile Layer                  |
+| "vector"                                                   | `buildGeojsonMapboxLayer`    | Geojson Feature (collection) Layer |
+| "geojson"                                                  | `buildGeojsonMapboxLayer`    | Geojson Feature (collection) Layer |
+
 ```typescript
 const ResourceTypeFunctionMask = {
-    "application/vnd.apache.parquet": buildVectorTileMapboxLayer,
-    "image/tiff; application=geotiff; profile=cloud-optimized": buildRasterMapboxLayer,
-    "image/png": buildRasterMapboxLayer,
-    "application/png": buildRasterMapboxLayer,
-    "vector": buildGeojsonMapboxLayer,
-    "geojson": buildGeojsonMapboxLayer,
+  "application/vnd.apache.parquet": buildVectorTileMapboxLayer,
+  "image/tiff; application=geotiff; profile=cloud-optimized":
+    buildRasterMapboxLayer,
+  "image/png": buildRasterMapboxLayer,
+  "application/png": buildRasterMapboxLayer,
+  vector: buildGeojsonMapboxLayer,
+  geojson: buildGeojsonMapboxLayer,
 };
 ```
+
 ## Collections
-### `geoserver_link`  
-Transparent layer that is used to create clickable polygons on the map.    
+
+### `geoserver_link`
+
+Transparent layer that is used to create clickable polygons on the map.
+
 #### Example
+
 ```json
 {
   "geoserver_link": {
@@ -36,14 +44,18 @@ Transparent layer that is used to create clickable polygons on the map.
 ```
 
 ## Items
-### `visual`  
+
+### `visual`
+
 Visual layer from a geoserver, which is displayed on the map when a collection is toggled.
 Can contain Raster tiles or Vector tiles.
 
 #### Vector example
+
 An item with a vector visual should contain a `"deltares:paint"` property (as seen on mapbox resources).
 It is used to style the vector tiles.
 The following example shows the fallback paint that is used when `"deltares:paint"` is not present.
+
 ```json
 {
   "properties": {
@@ -54,6 +66,7 @@ The following example shows the fallback paint that is used when `"deltares:pain
   }
 }
 ```
+
 ```json
 {
   "visual": {
@@ -61,13 +74,13 @@ The following example shows the fallback paint that is used when `"deltares:pain
     "type": "application/vnd.apache.parquet",
     "title": "Title",
     "description": "Description",
-    "roles": [ 
-      "visual"
-    ]
+    "roles": ["visual"]
   }
 }
 ```
+
 #### Raster example
+
 ```json
 {
   "visual": {
@@ -75,16 +88,17 @@ The following example shows the fallback paint that is used when `"deltares:pain
     "type": "application/png",
     "title": "Title",
     "description": "Description",
-    "roles": [
-      "visual"
-    ]
+    "roles": ["visual"]
   }
 }
 ```
 
 ### `mapbox`
-Visual layer from the mapbox api, usually containing Geojson features to show information on the map.  
+
+Visual layer from the mapbox api, usually containing Geojson features to show information on the map.
+
 #### Example
+
 ```json
 {
   "mapbox": {
@@ -93,9 +107,7 @@ Visual layer from the mapbox api, usually containing Geojson features to show in
     "title": "Title",
     "description": "Description",
     "source": "nuts_regions-b1ics1",
-    "roles": [
-      "mapbox"
-    ]
+    "roles": ["mapbox"]
   }
 }
 ```

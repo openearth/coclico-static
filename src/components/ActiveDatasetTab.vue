@@ -1,44 +1,44 @@
 <template>
-  <v-card flat class="scrollable-card">
-    <v-container
+  <VCard flat class="scrollable-card">
+    <VContainer
       style="padding-top: 0px"
       v-for="dataset in datasets"
       :key="dataset.id"
     >
-      <v-card-text class="layer-title">
+      <VCardText class="layer-title">
         {{ dataset.title }}
-        <v-tooltip
+        <VTooltip
           location="bottom"
           max-width="450px"
           :text="dataset.description"
         >
           <template v-slot:activator="{ props }">
-            <v-icon v-bind="props" small class="summary-info, ml-4"
-              >mdi-information-outline</v-icon
+            <VIcon v-bind="props" small class="summary-info, ml-4"
+              >mdi-information-outline</VIcon
             >
           </template>
-        </v-tooltip>
-      </v-card-text>
+        </VTooltip>
+      </VCardText>
 
       <ActiveDatasetRow :dataset-id="dataset.id" />
       <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here -->
-      <v-row v-if="hasLegend(dataset)">
-        <v-col>
+      <VRow v-if="hasLegend(dataset)">
+        <VCol>
           <layer-legend :dataset="dataset" />
-        </v-col>
-      </v-row>
-      <v-row class="pb-4">
-        <v-col cols="12">
-          <v-card-text class="text-style">
-            <v-icon> mdi-cursor-default-click </v-icon>
+        </VCol>
+      </VRow>
+      <VRow class="pb-4">
+        <VCol cols="12">
+          <VCardText class="text-style">
+            <VIcon> mdi-cursor-default-click </VIcon>
             Select an element in the map for specific
             <strong>location analysis</strong>.
-          </v-card-text>
-        </v-col>
-      </v-row>
-      <v-divider />
-    </v-container>
-  </v-card>
+          </VCardText>
+        </VCol>
+      </VRow>
+      <VDivider />
+    </VContainer>
+  </VCard>
 </template>
 
 <script setup>

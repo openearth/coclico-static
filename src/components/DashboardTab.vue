@@ -1,13 +1,13 @@
 <template>
-  <v-card flat class="scrollable-card">
-    <v-card
+  <VCard flat class="scrollable-card">
+    <VCard
       flat
       v-for="({ graphData, title }, index) in activeGraphs"
       :key="index"
       class="ma-3"
     >
       <div class="graph-title">
-        <v-card-title>
+        <VCardTitle>
           {{ title }}<br />
           <small>
             (
@@ -15,19 +15,19 @@
             {{ roundCoords(graphData.coords.lng) }}
             )
           </small>
-        </v-card-title>
-        <v-btn icon flat class="close-button" @click="removeGraph(index)">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
+        </VCardTitle>
+        <VBtn icon flat class="close-button" @click="removeGraph(index)">
+          <VIcon>mdi-close</VIcon>
+        </VBtn>
       </div>
       <component
         :is="graphComponents[graphData.graphType]"
         :graph-data="graphData"
         style="height: 300px"
       />
-    </v-card>
-    <v-card flat> </v-card>
-  </v-card>
+    </VCard>
+    <VCard flat> </VCard>
+  </VCard>
 </template>
 
 <script>
@@ -35,7 +35,7 @@ import { markRaw } from "vue";
 import { mapActions, mapGetters } from "vuex";
 import SeaLevelGraph from "@/components/ChartComponents/SeaLevelGraph.vue";
 import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue";
-import LineChartZarr from "@/components/ChartComponents/LineChartZarr.vue";
+import LineChart from "@/components/ChartComponents/LineChart.vue";
 import { GRAPH_TYPES } from "@/lib/graphs";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
 
@@ -43,15 +43,16 @@ export default {
   components: {
     SeaLevelGraph,
     FloodExtentGraph,
-    LineChartZarr,
+    LineChart,
   },
   data() {
     return {
+      open: false,
       GRAPH_TYPES,
       graphComponents: {
         [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
         [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
-        [GRAPH_TYPES.LINE_CHART]: markRaw(LineChartZarr),
+        [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
         [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
       },
     };

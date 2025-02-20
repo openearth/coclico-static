@@ -61,7 +61,7 @@ export default async function getFeatureInfo({
         layers.map((layer, index) => ({
           ...layer,
           value: features[index].properties.GRAY_INDEX,
-        }))
+        })),
       )
       .catch(() => undefined)
   );

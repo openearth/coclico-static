@@ -4,7 +4,7 @@ import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
 
 export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
-  LINE_CHART: "line-chart-zarr",
+  LINE_CHART: "line-chart",
   SEA_LEVEL_RISE: "sea-level-rise",
   PIE_CHART: "pie-chart",
 };
@@ -19,6 +19,7 @@ const GRAPH_TYPE_MASK = {
   slp: GRAPH_TYPES.SEA_LEVEL_RISE,
   ssl: GRAPH_TYPES.LINE_CHART,
   cba: GRAPH_TYPES.PIE_CHART,
+  pp: GRAPH_TYPES.LINE_CHART,
 };
 
 /**
@@ -43,20 +44,21 @@ export const getGraphType = (id) =>
 // };
 
 /**
- * Get data for a dataset with a WMTS geoserver_link
- * @param dataset
+ * Get graph feature data for a dataset with a WMTS geoserver_link
+ * @param datasetId
+ * @param feature
  * @param properties
  * @param values
- * @returns {{name: *, value: *}[]|{[p: string]: unknown}}
+ * @returns {{id, name, xAxis: {data: *, title: string}, yAxis: {type: string, min: number, alignTicks, max: number, interval: number, axisLabel: {formatter: function(*): string}, nameTextStyle: {color: string, fontFamily: string}, name: string, nameLocation: string}[], series: *}|{name: *, value: *}[]|{name: string, value: *}[]|[string, unknown][]}
  */
-export function getFeatureData(dataset, properties, values) {
-  switch (dataset) {
+export function getFeatureData({ datasetId, feature, properties, values }) {
+  switch (datasetId) {
     case "cba": {
-      return Object.entries(properties)
+      return Object.entries(feature)
         .filter(
           ([key]) =>
             key.toLowerCase().includes(values.time.toLowerCase()) &&
-            key.toLowerCase().includes(values.scenarios.toLowerCase())
+            key.toLowerCase().includes(values.scenarios.toLowerCase()),
         )
         .map(([name, value]) => {
           return {
@@ -72,7 +74,7 @@ export function getFeatureData(dataset, properties, values) {
           : "mean_spring_tide";
       const time = values?.time.toLowerCase() || "";
       const defenseLevel = values?.["defense level"].toLowerCase() || "";
-      return Object.entries(properties)
+      return Object.entries(feature)
         .filter(([_key]) => {
           const key = _key.toLowerCase();
           return (
@@ -87,10 +89,10 @@ export function getFeatureData(dataset, properties, values) {
           const name = key.includes("more05")
             ? "% flood > 0.5m"
             : key.includes("less05")
-            ? "% flood < 0.5m"
-            : key.includes("nans")
-            ? "% not flooded"
-            : key;
+              ? "% flood < 0.5m"
+              : key.includes("nans")
+                ? "% not flooded"
+                : key;
 
           return {
             name,
@@ -98,10 +100,80 @@ export function getFeatureData(dataset, properties, values) {
           };
         });
     }
+    case "pp": {
+      const dataColRegex =
+        /(?<defense>[\da-zA-Z_-]+)\\(?<rp>[\da-zA-Z_-]+)\\(?<climateScenario>[\da-zA-Z_-]+)\\(?<time>\d+)\\population_(?<scenario>[\da-zA-Z_-]+)\\(?<type>[\da-zA-Z_-]+)/;
+      const times = properties.find(({ id }) => id === "time").values;
+      const scenarios = properties.find(({ id }) => id === "scenarios").values;
+      const data = Object.entries(feature)
+        .filter(([key]) => dataColRegex.test(key))
+        .map(([key, value]) => ({
+          ...key.match(dataColRegex).groups,
+          value,
+        }));
+
+      // const colors = ["#000000", "#173c66", "#f79320", "#951b1e"];
+      return {
+        id: datasetId,
+        name: datasetId,
+        xAxis: {
+          data: times,
+          title: "Year",
+        },
+        yAxis: ["rel_affected", "abs_affected"].flatMap((type) => ({
+          type: "value",
+          min: 0,
+          alignTicks: !type.startsWith("rel"),
+          max: Math.max(
+            ...data
+              .filter((datum) => datum.type === type)
+              .map(({ value }) => value),
+          ),
+          interval: type.startsWith("rel") ? 0.1 : 10000,
+          axisLabel: {
+            formatter: (value) =>
+              type.startsWith("rel")
+                ? `${parseInt(value * 100)}%`
+                : `${value / 1000}k`,
+          },
+          nameTextStyle: {
+            color: "black",
+            fontFamily: "Helvetica",
+          },
+          name: type.startsWith("rel") ? "Percentage" : "Amount",
+          nameLocation: "start",
+        })),
+        series: scenarios.flatMap((scenario) =>
+          ["rel_affected", "abs_affected"].flatMap((type) => ({
+            name: `${scenario} ${type.startsWith("rel") ? "%" : "#"}`,
+            type: type.startsWith("rel") ? "line" : "line",
+            yAxisIndex: type.startsWith("rel") ? 0 : 1,
+            tooltip: {
+              valueFormatter: function (value) {
+                return type.startsWith("rel")
+                  ? `${parseFloat(value * 100).toFixed(2)}%`
+                  : `${parseFloat(value).toFixed(2)} people`;
+              },
+            },
+            data: data
+              .filter(
+                (datum) =>
+                  datum.type === type &&
+                  datum.scenario === scenario &&
+                  datum.climateScenario.startsWith(datum.scenario) &&
+                  datum.defense === "UNDEFENDED_MAPS" &&
+                  datum.rp === "100",
+              )
+              .sort((a, b) => a.time - b.time)
+              .map(({ value }) => {
+                return value;
+              }),
+          })),
+        ),
+      };
+    }
     default:
-      return Object.fromEntries(
-        Object.entries(properties).filter(([key]) => key.includes(dataset))
-      );
+      return Object.entries(feature).filter(([key]) => key.includes(datasetId));
   }
 }
 
@@ -156,11 +228,11 @@ export async function getZarrData(dataset, features, props) {
   if (get(dataset, "deltares:plotType") !== "bar") {
     path = path.filter((x) => x)[0];
     dimensions = Object.entries(
-      get(dataset, `["cube:variables"].${path}.dimensions`)
+      get(dataset, `["cube:variables"].${path}.dimensions`),
     );
   } else if (get(dataset, "deltares:plotType") === "bar") {
     dimensions = Object.entries(
-      get(dataset, `["cube:variables"].${path[0]}.dimensions`)
+      get(dataset, `["cube:variables"].${path[0]}.dimensions`),
     );
   }
 
@@ -173,10 +245,10 @@ export async function getZarrData(dataset, features, props) {
       get(dataset, "deltares:plotSeries") !== "scenarios"
     ) {
       const scenarioIndex = summaryList.find(
-        (object) => object.id === "scenarios"
+        (object) => object.id === "scenarios",
       );
       return scenarioIndex?.values.findIndex(
-        (scenario) => scenario === props.scenarios
+        (scenario) => scenario === props.scenarios,
       );
     } else if (
       dim[1] === "rp" &&
@@ -229,7 +301,7 @@ export async function getZarrData(dataset, features, props) {
       }
 
       const variableUnit = Object.entries(
-        get(dataset, `["cube:variables"].${path}.unit`)
+        get(dataset, `["cube:variables"].${path}.unit`),
       );
 
       let cubeDimensions = get(dataset, "cube:dimensions");
@@ -237,7 +309,7 @@ export async function getZarrData(dataset, features, props) {
       const plotSeries = get(dataset, "deltares:plotSeries");
 
       const dimensionNames = Object.entries(
-        get(dataset, `cube:dimensions.${plotSeries}.values`)
+        get(dataset, `cube:dimensions.${plotSeries}.values`),
       );
 
       if (cubeDimensions[xAxis].description === "decade window") {
@@ -322,4 +394,45 @@ export async function getZarrData(dataset, features, props) {
     }
   }
   return graphData;
+}
+
+export function getGraphTypeData({
+  datasetId,
+  feature,
+  values,
+  properties,
+  coords,
+  graphType,
+}) {
+  const graphValues = getFeatureData({
+    datasetId,
+    feature,
+    values,
+    properties,
+  });
+  if (graphType === GRAPH_TYPES.LINE_CHART) {
+    return {
+      ...graphValues,
+      values: graphValues?.series,
+      datasetId,
+      graphType: GRAPH_TYPES.LINE_CHART,
+      coords,
+    };
+  } else {
+    const totalInSet = graphValues?.find?.(({ name }) =>
+      name.toLowerCase().includes("total"),
+    );
+    const _values = totalInSet
+      ? graphValues.filter(({ name }) => name !== totalInSet.name)
+      : graphValues;
+    const total =
+      totalInSet || Math.ceil(values.reduce((acc, cur) => acc + cur.value, 0));
+    return {
+      total,
+      values: _values,
+      datasetId,
+      graphType,
+      coords,
+    };
+  }
 }
