@@ -212,7 +212,8 @@ const sidebarStyle = computed(() => {
 });
 const filteredDatasets = computed(() => {
   return datasetsInActiveTheme.value.filter(
-    (dataset) => dataset.id === "slp" || dataset.id === "cfhp",
+    (dataset) =>
+      dataset.id === "slp" || (dataset.id === "cfhp" && id !== "cba"),
   );
 });
 
