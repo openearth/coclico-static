@@ -108,12 +108,12 @@ export default {
   top: 25px;
   right: 50px;
   border-radius: 28px 28px 28px 28px;
-  max-width: 450px;
+  max-width: 500px;
   max-height: 397px;
   transition:
     height 0.2s linear,
     width 0.2s linear 0.1s;
-  width: 225px;
+  width: 230px;
   height: 50px;
   .tab-label {
     transition: 0.1s linear;
@@ -127,8 +127,8 @@ export default {
         width: calc-size(auto, size);
       }
       & {
-        width: calc-size(auto, size);
-        height: calc-size(auto, size);
+        width: calc-size(auto, min(size + 5vw, 40vw));
+        height: calc-size(auto, min(size + 5vh, 50vh));
       }
     }
   }
