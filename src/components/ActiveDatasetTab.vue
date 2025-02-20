@@ -7,17 +7,6 @@
     >
       <VCardText class="layer-title">
         {{ dataset.title }}
-        <VTooltip
-          location="bottom"
-          max-width="450px"
-          :text="dataset.description"
-        >
-          <template v-slot:activator="{ props }">
-            <VIcon v-bind="props" small class="summary-info, ml-4"
-              >mdi-information-outline</VIcon
-            >
-          </template>
-        </VTooltip>
       </VCardText>
 
       <ActiveDatasetRow :dataset-id="dataset.id" />

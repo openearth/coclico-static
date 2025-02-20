@@ -8,7 +8,8 @@
     >
       <div class="graph-title">
         <VCardTitle>
-          {{ title }}<br />
+          {{ title }}
+          <br />
           <small>
             (
             {{ roundCoords(graphData.coords.lat) }},

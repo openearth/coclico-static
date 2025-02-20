@@ -1,26 +1,27 @@
 # coclico-static
 
 ## Project setup
-
-```
+```bash
 npm install
 ```
 
 ### Compiles and hot-reloads for development
-
-```
-npm run serve
+```bash
+npm run dev
 ```
 
 ### Compiles and minifies for production
-
-```
+```bash
 npm run build
 ```
 
-### Lints and fixes files
-
+### Preview the production build locally
+```bash
+npm run serve
 ```
+
+### Lints and fixes files
+```bash
 npm run lint
 ```
 
