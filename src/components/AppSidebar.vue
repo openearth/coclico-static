@@ -1,15 +1,17 @@
 <template>
   <VNavigationDrawer
     permanent
-    floating
-    width="200"
+    expand-on-hover
+    rail
+    width="180"
+    rail-width="100"
     class="custom-navigation-drawer"
     :style="sidebarStyle"
   >
-    <div class="image-container">
-      <custom-icon name="coclico-full" class="coclico-image" />
-    </div>
-    <VList>
+    <VListItem class="image-container">
+      <custom-icon name="logo" class="coclico-image" />
+    </VListItem>
+    <VList nav>
       <VListItem
         class="list-item"
         @click="
@@ -68,7 +70,7 @@
               </VListItem>
               <VListItem @click="openCatalogPage">
                 <div class="extra-list-item">
-                  <VIcon color="black" size="18px"> mdi-database-search </VIcon>
+                  <VIcon color="black" size="18px"> mdi-database-search</VIcon>
                   <VListItemSubtitle class="extra-list-item-text">
                     DATA CATALOG
                   </VListItemSubtitle>
@@ -90,214 +92,207 @@
     </VList>
   </VNavigationDrawer>
 
-  <VCard raised class="pa-0 custom-data-layers-card" v-if="showLayersCard">
-    <VRow style="width: 100%; max-height: 60px">
-      <VCol cols="10">
-        <VCardTitle class="dataset-card-theme-title">
-          {{ activeTheme }}
+  <VNavigationDrawer
+    floating
+    temporary
+    class="custom-data-layers-card"
+    :class="{ closed: !showLayersCard }"
+    v-model="showLayersCard"
+    width="400"
+  >
+    <VListItem>
+      <VRow>
+        <VCol cols="10">
+          <VCardTitle class="dataset-card-theme-title">
+            {{ activeTheme }}
+          </VCardTitle>
+        </VCol>
+        <VCol class="column-right" cols="2">
+          <VBtn icon @click="close" flat class="close-button">
+            <VIcon>mdi-close</VIcon>
+          </VBtn>
+        </VCol>
+      </VRow>
+    </VListItem>
+    <VList>
+      <VListItem>
+        <VCardTitle class="layer-card-title" v-if="filteredDatasets.length">
+          User stories
         </VCardTitle>
-      </VCol>
-      <VCol class="column-right" cols="2">
-        <VBtn icon @click="close" flat class="close-button">
-          <VIcon>mdi-close</VIcon>
-        </VBtn>
-      </VCol>
-    </VRow>
-
-    <VRow style="width: 100%">
-      <VCol>
-        <VRow>
-          <VCol style="min-width: 80%">
-            <VCardTitle class="layer-card-title" v-if="filteredDatasets.length">
-              User stories
-            </VCardTitle>
-            <VList class="layer-list" v-if="filteredDatasets.length">
-              <VListItem
-                v-for="dataset in filteredDatasets"
-                :key="dataset.id"
-                :title="dataset.title"
+        <VList class="layer-list" v-if="filteredDatasets.length">
+          <VListItem
+            v-for="dataset in filteredDatasets"
+            :key="dataset.id"
+            :title="dataset.title"
+          >
+            <template v-slot:prepend>
+              <VSwitch
+                v-model="dataset.active"
+                hide-details
+                class="mr-5"
+                color="primary"
+                @change="toggleDataset(dataset)"
+              ></VSwitch>
+            </template>
+            <template v-slot:append>
+              <VTooltip
+                max-width="300px"
+                location="bottom"
+                :text="dataset.description"
               >
-                <template v-slot:prepend>
-                  <VSwitch
-                    v-model="dataset.active"
-                    hide-details
-                    class="mr-5"
-                    color="primary"
-                    @change="toggleDataset(dataset)"
-                  ></VSwitch>
+                <template v-slot:activator="{ props }">
+                  <VIcon v-bind="props" small class="summary-info, ml-4">
+                    mdi-information-outline
+                  </VIcon>
                 </template>
-                <template v-slot:append>
-                  <VTooltip
-                    max-width="300px"
-                    location="bottom"
-                    :text="dataset.description"
-                  >
-                    <template v-slot:activator="{ props }">
-                      <VIcon v-bind="props" small class="summary-info, ml-4">
-                        mdi-information-outline
-                      </VIcon>
-                    </template>
-                  </VTooltip>
-                </template>
-              </VListItem>
-            </VList>
-            <VCardTitle class="layer-card-title"> Data layers</VCardTitle>
-            <VList class="layer-list">
-              <VListItem
-                v-for="dataset in this.datasetsInActiveTheme.filter(
-                  ({ id }) => id !== 'slp' && id !== 'cfhp',
-                )"
-                :key="dataset.id"
-                :title="dataset.title"
+              </VTooltip>
+            </template>
+          </VListItem>
+        </VList>
+      </VListItem>
+      <VListItem>
+        <VCardTitle class="layer-card-title"> Data layers</VCardTitle>
+        <VList class="layer-list">
+          <VListItem
+            v-for="dataset in datasetsInActiveTheme.filter(
+              ({ id }) => id !== 'slp' && id !== 'cfhp',
+            )"
+            :key="dataset.id"
+            :title="dataset.title"
+          >
+            <template v-slot:prepend>
+              <VSwitch
+                v-model="dataset.active"
+                hide-details
+                class="mr-5"
+                color="primary"
+                @change="toggleDataset(dataset)"
+              ></VSwitch>
+            </template>
+            <template v-slot:append>
+              <VTooltip
+                max-width="300px"
+                location="bottom"
+                :text="dataset.description"
               >
-                <template v-slot:prepend>
-                  <VSwitch
-                    v-model="dataset.active"
-                    hide-details
-                    class="mr-5"
-                    color="primary"
-                    @change="toggleDataset(dataset)"
-                  ></VSwitch>
+                <template v-slot:activator="{ props }">
+                  <VIcon v-bind="props" small class="summary-info, ml-4">
+                    mdi-information-outline
+                  </VIcon>
                 </template>
-                <template v-slot:append>
-                  <VTooltip
-                    max-width="300px"
-                    location="bottom"
-                    :text="dataset.description"
-                  >
-                    <template v-slot:activator="{ props }">
-                      <VIcon v-bind="props" small class="summary-info, ml-4">
-                        mdi-information-outline
-                      </VIcon>
-                    </template>
-                  </VTooltip>
-                </template>
-              </VListItem>
-            </VList>
-          </VCol>
-        </VRow>
-      </VCol>
-    </VRow>
-  </VCard>
+              </VTooltip>
+            </template>
+          </VListItem>
+        </VList>
+      </VListItem>
+    </VList>
+  </VNavigationDrawer>
 </template>
 
-<script>
-import { mapActions, mapGetters } from "vuex";
+<script setup>
 import CustomIcon from "@/components/CustomIcon.vue";
-import { mergeProps } from "vue";
+import { computed, mergeProps, ref } from "vue";
+import { useStore } from "vuex";
 
-export default {
-  components: {
-    CustomIcon,
-  },
-  data() {
-    return {
-      showLayersCard: false,
-      expandMenu: false,
-    };
-  },
-  methods: {
-    mergeProps,
-    ...mapActions("datasets", [
-      "setActiveTheme",
-      "toggleActiveDataset",
-      "updateThemeObject",
-    ]),
-    ...mapActions("map", ["loadDatasetOnMap"]),
-    openLayersCard() {
-      this.showLayersCard = true;
-    },
-    toggleLayersCard(theme) {
-      this.showLayersCard =
-        this.activeTheme === theme ? !this.showLayersCard : true;
-    },
-    setTheme(theme) {
-      this.setActiveTheme(theme);
-    },
-    close() {
-      this.showLayersCard = false;
-    },
-    async toggleDataset(dataset) {
-      this.toggleActiveDataset(dataset.id);
-      await this.loadDatasetOnMap(dataset.id);
-      this.updateThemeObject();
-    },
-    openLandingPage() {
-      window.open("https://coclicoservices.eu", "_blank");
-    },
-    openWorkbenchPage() {
-      window.open("https://github.com/openearth/coclico-workbench", "_blank");
-    },
-    openCatalogPage() {
-      window.open(
-        "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/coclico-data-public/coclico/coclico-stac-4oct/catalog.json?.language=en",
-        "_blank",
-      );
-    },
-  },
-  computed: {
-    ...mapGetters("datasets", [
-      "themes",
-      "datasetsInActiveTheme",
-      "activeTheme",
-    ]),
-    sidebarStyle() {
-      return {
-        borderRadius: this.showLayersCard
-          ? "28px 0px 0px 28px"
-          : "28px 28px 28px 28px",
-        borderRight: this.showLayersCard
-          ? "2px solid #e4e4e4"
-          : "2px solid white",
-      };
-    },
-    numberOfDatasetsInTheme() {
-      return this.datasetsInActiveTheme.length;
-    },
-    filteredDatasets() {
-      return this.datasetsInActiveTheme.filter(
-        (dataset) => dataset.id === "slp" || dataset.id === "cfhp",
-      );
-    },
-  },
-};
+const store = useStore();
+const showLayersCard = ref(false);
+
+const activeTheme = computed(() => store.getters["themes/activeTheme"]);
+const datasetsInActiveTheme = computed(
+  () => store.getters["datasets/datasetsInActiveTheme"],
+);
+const themes = computed(() => store.getters["datasets/themes"]);
+const sidebarStyle = computed(() => {
+  return {
+    borderRadius: showLayersCard.value
+      ? "28px 0px 0px 28px"
+      : "28px 28px 28px 28px",
+    borderRight: showLayersCard.value ? "2px solid #e4e4e4" : "2px solid white",
+  };
+});
+const filteredDatasets = computed(() => {
+  return datasetsInActiveTheme.value.filter(
+    (dataset) => dataset.id === "slp" || dataset.id === "cfhp",
+  );
+});
+
+function openLayersCard() {
+  showLayersCard.value = true;
+}
+function toggleLayersCard(theme) {
+  showLayersCard.value = activeTheme === theme ? !showLayersCard.value : true;
+}
+function setTheme(theme) {
+  store.dispatch("datasets/setActiveTheme", theme);
+}
+function close() {
+  showLayersCard.value = false;
+}
+async function toggleDataset(dataset) {
+  await store.dispatch("datasets/toggleActiveDataset", dataset.id);
+  await store.dispatch("map/loadDatasetOnMap", dataset.id);
+  await store.dispatch("datasets/updateThemeObject");
+}
+function openLandingPage() {
+  window.open("https://coclicoservices.eu", "_blank");
+}
+function openWorkbenchPage() {
+  window.open("https://github.com/openearth/coclico-workbench", "_blank");
+}
+function openCatalogPage() {
+  window.open(
+    "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/coclico-data-public/coclico/coclico-stac-4oct/catalog.json?.language=en",
+    "_blank",
+  );
+}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .custom-navigation-drawer {
-  margin-top: 25px;
-  margin-left: 25px;
-  max-height: min(800px, calc(100% - 2 * (25px)));
   display: flex;
+  position: absolute;
+  left: 0;
   flex-direction: column;
   align-items: center;
+  max-height: calc(100% - var(--drawer-block-margin) * 2);
+  margin-top: var(--drawer-block-margin);
+  margin-left: var(--drawer-inline-margin);
+  & :global(.v-navigation-drawer--rail .list-item-title) {
+    opacity: 0;
+  }
+  &
+    :global(
+      .v-navigation-drawer--rail.v-navigation-drawer--is-hovering
+        .list-item-title
+    ) {
+    opacity: 1;
+  }
 }
 
 .image-container {
   margin-top: 20px;
+  padding-inline: 1rem;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .coclico-image {
-  width: 8rem;
   height: 4rem;
+  width: 4rem;
 }
 
 .list-item {
   display: flex;
   justify-content: center;
-  margin: auto;
-  margin-top: 20px;
+  margin: 20px auto auto;
   border-radius: 5px !important;
 }
 
 .list-item-more {
   display: flex;
   justify-content: center;
-  margin: auto;
-  margin-top: 100px;
+  margin: 100px auto auto;
 }
 
 .list-item-img {
@@ -310,10 +305,11 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 32px;
-  white-space: normal;
+  white-space: nowrap;
   text-align: center;
   font-size: 14px;
   line-height: 20px;
+  word-break: keep-all;
 }
 
 .item-image {
@@ -325,22 +321,30 @@ export default {
   width: 1.5rem;
   height: 0.5rem;
 }
-
+@keyframes delay-out {
+  0% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 .custom-data-layers-card {
-  position: absolute;
   display: flex;
   align-items: center;
   flex-direction: column;
-  top: 25px;
-  left: 225px;
   z-index: 5;
-  width: 40vw;
-  max-width: 500px;
-  min-width: 250px;
-  border-radius: 0px 28px 28px 0px;
-  box-shadow: none;
-  height: 100%;
-  max-height: min(800px, calc(100% - 2 * (25px)));
+  max-height: calc(100% - var(--drawer-block-margin) * 2);
+  margin-top: var(--drawer-block-margin);
+  margin-left: var(--drawer-inline-margin);
+  border-radius: 0 28px 28px 0;
+  &.closed {
+    opacity: 0;
+    animation: forwards linear delay-out 0.2s;
+  }
 }
 
 .close-button {

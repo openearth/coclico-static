@@ -27,6 +27,13 @@
       </VRow>
       <VDivider />
     </VContainer>
+    <div v-if="!datasets.length" class="text-center mx-16 pb-4">
+      <p class="font-weight-black">No data layers have been selected.</p>
+      <p class="mt-4">
+        Explore data categories and activate data layers from the left hand-side
+        navigation bar.
+      </p>
+    </div>
   </VCard>
 </template>
 

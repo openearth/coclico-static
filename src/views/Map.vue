@@ -1,22 +1,28 @@
 <template>
-  <VApp>
-    <MapboxMap
-      id="map"
-      ref="mapboxMap"
-      @mb-click="onMapClicked"
-      :access-token="accessToken"
-      :preserve-drawing-buffer="true"
-      :zoom="4"
-      :center="[5.2913, 48.1326]"
-      map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
-    >
-      <MapboxNavigationControl :visualizePitch="true" />
-      <MapLayer v-for="layer in mapboxLayers" :key="layer.id" :layer="layer" />
-      <Popup :isOpen="isPopupOpen" :position="position" @close="closePopup" />
-      <dataset-card />
-    </MapboxMap>
+  <VLayout>
     <app-sidebar />
-  </VApp>
+    <VMain style="padding-inline: 0">
+      <MapboxMap
+        id="map"
+        ref="mapboxMap"
+        @mb-click="onMapClicked"
+        :access-token="accessToken"
+        :preserve-drawing-buffer="true"
+        :zoom="4"
+        :center="[5.2913, 48.1326]"
+        map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
+      >
+        <MapboxNavigationControl :visualizePitch="true" />
+        <MapLayer
+          v-for="layer in mapboxLayers"
+          :key="layer.id"
+          :layer="layer"
+        />
+        <Popup :isOpen="isPopupOpen" :position="position" @close="closePopup" />
+        <dataset-card />
+      </MapboxMap>
+    </VMain>
+  </VLayout>
 </template>
 
 <script setup>
@@ -110,8 +116,16 @@ onBeforeMount(() => {
 </script>
 
 <style>
+:root {
+  --drawer-block-margin: 50px;
+  --drawer-inline-margin: 10px;
+}
 #map {
   width: 100%;
   height: 100%;
+}
+.mapboxgl-ctrl,
+.mapboxgl-ctrl-group {
+  display: flex;
 }
 </style>

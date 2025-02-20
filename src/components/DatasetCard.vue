@@ -1,40 +1,49 @@
 <template>
   <VCard class="custom-dataset-card" :class="{ open: isOpen }">
-    <VTabs v-model="tab" grow hide-slider class="pa-2" height="35px">
-      <VTab
-        value="option-1"
-        hide-slider
-        rounded="xl"
-        :ripple="false"
-        selected-class="selected-tab-style"
-        class="mr-2"
-        @click="toggle"
+    <VTabs v-model="tab" hide-slider class="tabs" height="35px">
+      <VTooltip
+        :location="isOpen ? 'top' : 'bottom'"
+        :text="isOpen ? 'Close this window' : 'Open Active data layers'"
       >
-        <custom-icon name="layers" class="pr-1 mr-1"></custom-icon>
-        <span class="tab-label">Active Data Layers </span>
-      </VTab>
-      <VTab
-        value="option-2"
-        hide-slider
-        rounded="xl"
-        :ripple="false"
-        selected-class="selected-tab-style"
-        class="mr-2"
-        @click="toggle"
+        <template v-slot:activator="{ props: tooltip }">
+          <VTab
+            v-bind="mergeProps(tooltip)"
+            value="option-1"
+            hide-slider
+            :ripple="false"
+            height="50"
+            class="tab"
+            selected-class="selected-tab-style"
+            @click="toggle"
+          >
+            <custom-icon name="layers"></custom-icon>
+            <span class="tab-label">Active Data Layers </span>
+          </VTab>
+        </template>
+      </VTooltip>
+      <VTooltip
+        :location="isOpen ? 'top' : 'bottom'"
+        :text="isOpen ? 'Close this window' : 'Open Active dashboard'"
       >
-        <custom-icon name="dashboard" class="pr-1 mr-1"></custom-icon>
-        <span class="tab-label">Dashboard</span>
-      </VTab>
+        <template v-slot:activator="{ props: tooltip }">
+          <VTab
+            v-bind="mergeProps(tooltip)"
+            value="option-2"
+            hide-slider
+            :ripple="false"
+            height="50"
+            class="tab"
+            selected-class="selected-tab-style"
+            @click="toggle"
+          >
+            <custom-icon name="dashboard"></custom-icon>
+            <span class="tab-label">Dashboard</span>
+          </VTab>
+        </template>
+      </VTooltip>
     </VTabs>
-    <div v-if="!activeDatasets.length" class="text-center mx-16 pb-4">
-      <p class="font-weight-black">No data layers have been selected.</p>
-      <p class="mt-4">
-        Explore data categories and activate data layers from the left hand-side
-        navigation bar.
-      </p>
-    </div>
 
-    <VWindow v-model="tab" v-else>
+    <VWindow v-model="tab" class="pt-4">
       <VWindowItem value="option-1">
         <active-dataset-tab />
       </VWindowItem>
@@ -49,6 +58,7 @@ import ActiveDatasetTab from "./ActiveDatasetTab.vue";
 import DashboardTab from "./DashboardTab.vue";
 import CustomIcon from "./CustomIcon.vue";
 import { mapGetters } from "vuex";
+import { mergeProps } from "vue";
 
 export default {
   components: {
@@ -64,31 +74,38 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("dashboard", ["activeGraphs"]),
+    ...mapGetters("dashboard", ["graphs"]),
     ...mapGetters("datasets", ["activeDatasets", "activeDatasetProperties"]),
   },
   watch: {
     tab() {
       this.open();
     },
-    activeGraphs(newVals, prevVals) {
+    graphs(newVals, prevVals) {
       if (prevVals.length === 0 && newVals.length > 0) {
         this.open();
       }
-      if (newVals.length === 0) {
+      if (newVals.length === 0 && this.activeDatasets.length === 0) {
         this.close();
+      }
+      if (newVals.length === 0 && this.activeDatasets.length > 0) {
+        this.tab = "option-1";
       }
     },
     activeDatasets(newVals, prevVals) {
       if (prevVals.length === 0 && newVals.length > 0) {
         this.open();
       }
-      if (newVals.length === 0) {
+      if (newVals.length === 0 && this.graphs.length === 0) {
         this.close();
+      }
+      if (newVals.length === 0 && this.graphs.length > 0) {
+        this.tab = "option-2";
       }
     },
   },
   methods: {
+    mergeProps,
     toggle() {
       this.isOpen = !this.isOpen;
     },
@@ -105,10 +122,9 @@ export default {
 <style lang="scss" scoped>
 .custom-dataset-card {
   position: absolute;
-  top: 25px;
-  right: 50px;
+  top: var(--drawer-block-margin);
+  right: var(--drawer-inline-margin);
   border-radius: 28px 28px 28px 28px;
-  max-width: 500px;
   max-height: 397px;
   transition:
     height 0.2s linear,
@@ -116,24 +132,31 @@ export default {
   width: 230px;
   height: 50px;
   .tab-label {
+    margin-left: 0;
     transition: 0.1s linear;
     visibility: hidden;
     width: 0;
   }
   &.open {
-    @supports (height: calc-size(auto, size)) {
+    @supports (height: calc-size(max-content, size)) {
       .tab-label {
         visibility: visible;
-        width: calc-size(auto, size);
+        margin-left: 0.5rem;
+        width: calc-size(max-content, size);
       }
       & {
-        width: calc-size(auto, min(size + 5vw, 40vw));
-        height: calc-size(auto, min(size + 5vh, 50vh));
+        width: calc-size(max-content, min(size + 5vw, 500px));
+        height: max-content;
       }
     }
   }
 }
-
+.tabs {
+  border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
+}
+.tab {
+  width: 50%;
+}
 .custom-tab {
   z-index: 5;
 }
