@@ -34,61 +34,29 @@
           {{ theme.name }}
         </VListItemTitle>
       </VListItem>
-      <VList>
-        <VListItem class="list-item" @click="openLayersCard()">
-          <VListImg class="list-item-img">
-            <custom-icon name="Search" class="item-image" />
-          </VListImg>
-          <VListItemTitle class="list-item-title">Search</VListItemTitle>
-        </VListItem>
-        <VListItem class="list-item-more">
-          <VMenu>
-            <template v-slot:activator="{ props: menu }">
-              <VTooltip location="top">
-                <template v-slot:activator="{ props: tooltip }">
-                  <VBtn
-                    v-bind="mergeProps(menu, tooltip)"
-                    variant="plain"
-                    class="list-item-img"
-                  >
-                    <custom-icon name="More" class="item-image-more" />
-                  </VBtn>
-                </template>
-                <span>Extra tools</span>
-              </VTooltip>
-            </template>
-            <VList class="pa-0">
-              <VListItem @click="openLandingPage">
-                <div class="extra-list-item">
-                  <VIcon color="black" size="18px">
-                    mdi-information-outline
-                  </VIcon>
-                  <VListItemSubtitle class="extra-list-item-text">
-                    WEBSITE
-                  </VListItemSubtitle>
-                </div>
-              </VListItem>
-              <VListItem @click="openCatalogPage">
-                <div class="extra-list-item">
-                  <VIcon color="black" size="18px"> mdi-database-search</VIcon>
-                  <VListItemSubtitle class="extra-list-item-text">
-                    DATA CATALOG
-                  </VListItemSubtitle>
-                </div>
-              </VListItem>
-              <VListItem @click="openWorkbenchPage">
-                <div class="extra-list-item-container">
-                  <VIcon color="black" size="18px"> mdi-hammer</VIcon>
-                  <VListItemSubtitle class="extra-list-item-text">
-                    WORKBENCH
-                  </VListItemSubtitle>
-                </div>
-              </VListItem>
-            </VList>
-          </VMenu>
-          <VListItemTitle class="list-item-title"></VListItemTitle>
-        </VListItem>
-      </VList>
+      <VDivider class="my-8" />
+      <VListItem
+        class="list-item"
+        href="https://www.openearth.nl/coclico-workbench/"
+        target="_blank"
+      >
+        <VListImg class="list-item-img">
+          <VIcon color="black" size="1.5rem"
+            >mdi-book-open-variant-outline</VIcon
+          >
+        </VListImg>
+        <VListItemTitle class="list-item-title">Handbook</VListItemTitle>
+      </VListItem>
+      <VListItem
+        class="list-item"
+        href="https://coclicoservices.eu/"
+        target="_blank"
+      >
+        <VListImg class="list-item-img">
+          <VIcon color="black" size="1.5rem">mdi-web</VIcon>
+        </VListImg>
+        <VListItemTitle class="list-item-title">Website</VListItemTitle>
+      </VListItem>
     </VList>
   </VNavigationDrawer>
 
@@ -115,11 +83,9 @@
       </VRow>
     </VListItem>
     <VList>
-      <VListItem>
-        <VCardTitle class="layer-card-title" v-if="filteredDatasets.length">
-          User stories
-        </VCardTitle>
-        <VList class="layer-list" v-if="filteredDatasets.length">
+      <VListItem v-if="filteredDatasets.length">
+        <VCardTitle class="layer-card-title"> User stories </VCardTitle>
+        <VList class="layer-list">
           <VListItem
             v-for="dataset in filteredDatasets"
             :key="dataset.id"
@@ -150,13 +116,11 @@
           </VListItem>
         </VList>
       </VListItem>
-      <VListItem>
+      <VListItem v-if="dataLayers">
         <VCardTitle class="layer-card-title"> Data layers</VCardTitle>
         <VList class="layer-list">
           <VListItem
-            v-for="dataset in datasetsInActiveTheme.filter(
-              ({ id }) => id !== 'slp' && id !== 'cfhp' && id !== 'cba',
-            )"
+            v-for="dataset in dataLayers"
             :key="dataset.id"
             :title="dataset.title"
           >
@@ -191,13 +155,13 @@
 
 <script setup>
 import CustomIcon from "@/components/CustomIcon.vue";
-import { computed, mergeProps, ref } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 const showLayersCard = ref(false);
 
-const activeTheme = computed(() => store.getters["themes/activeTheme"]);
+const activeTheme = computed(() => store.getters["datasets/activeTheme"]);
 const datasetsInActiveTheme = computed(
   () => store.getters["datasets/datasetsInActiveTheme"],
 );
@@ -205,7 +169,7 @@ const themes = computed(() => store.getters["datasets/themes"]);
 const sidebarStyle = computed(() => {
   return {
     borderRadius: showLayersCard.value
-      ? "28px 0px 0px 28px"
+      ? "28px 0px 28px 28px"
       : "28px 28px 28px 28px",
     borderRight: showLayersCard.value ? "2px solid #e4e4e4" : "2px solid white",
   };
@@ -215,12 +179,15 @@ const filteredDatasets = computed(() => {
     (dataset) => dataset.id === "slp" || dataset.id === "cfhp",
   );
 });
+const dataLayers = computed(() =>
+  datasetsInActiveTheme.value.filter(
+    ({ id }) => id !== "slp" && id !== "cfhp" && id !== "cba",
+  ),
+);
 
-function openLayersCard() {
-  showLayersCard.value = true;
-}
 function toggleLayersCard(theme) {
-  showLayersCard.value = activeTheme === theme ? !showLayersCard.value : true;
+  showLayersCard.value =
+    activeTheme.value === theme ? !showLayersCard.value : true;
 }
 function setTheme(theme) {
   store.dispatch("datasets/setActiveTheme", theme);
@@ -254,6 +221,7 @@ function openCatalogPage() {
   left: 0;
   flex-direction: column;
   align-items: center;
+  height: max-content !important;
   max-height: calc(100% - var(--drawer-block-margin) * 2);
   margin-top: var(--drawer-block-margin);
   margin-left: var(--drawer-inline-margin);
@@ -289,12 +257,6 @@ function openCatalogPage() {
   border-radius: 5px !important;
 }
 
-.list-item-more {
-  display: flex;
-  justify-content: center;
-  margin: 100px auto auto;
-}
-
 .list-item-img {
   display: flex;
   justify-content: center;
@@ -317,10 +279,6 @@ function openCatalogPage() {
   height: 1.5rem;
 }
 
-.item-image-more {
-  width: 1.5rem;
-  height: 0.5rem;
-}
 @keyframes delay-out {
   0% {
     opacity: 1;
@@ -337,6 +295,7 @@ function openCatalogPage() {
   align-items: center;
   flex-direction: column;
   z-index: 5;
+  height: max-content !important;
   max-height: calc(100% - var(--drawer-block-margin) * 2);
   margin-top: var(--drawer-block-margin);
   margin-left: var(--drawer-inline-margin);
@@ -380,24 +339,6 @@ function openCatalogPage() {
   font-family: "Inter", sans-serif;
   font-size: 12px;
   margin-top: -8px;
-}
-
-.extra-list-item {
-  display: grid;
-  place-items: center;
-  text-align: center;
-  margin-top: 9px;
-}
-
-.extra-list-item-container {
-  display: grid;
-  place-items: center;
-  text-align: center;
-}
-
-.extra-list-item-text {
-  font-size: 8px !important;
-  margin-top: 3px;
 }
 
 .dataset-card-theme-title {
