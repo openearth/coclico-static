@@ -10,7 +10,8 @@
 </template>
 <script setup>
 import { MapboxLayer } from "@studiometa/vue-mapbox-gl";
-import { inject, onBeforeUnmount, ref } from "vue";
+import { computed, inject, onBeforeUnmount, ref } from "vue";
+import { useStore } from "vuex";
 
 const props = defineProps({
   layer: {
@@ -18,9 +19,18 @@ const props = defineProps({
     required: true,
   },
 });
+const store = useStore();
 const id = ref(props.layer.id);
 const emit = defineEmits(["click"]);
 const map = inject("map");
+const clickableDatasetIds = computed(
+  () => store.getters["map/clickableDatasetsIds"],
+);
+const clickable = computed(() =>
+  clickableDatasetIds.value.some((id) =>
+    props.layer.id.toLowerCase().startsWith(id),
+  ),
+);
 
 onBeforeUnmount(async () => {
   await map.value.removeLayer(id.value);
@@ -30,7 +40,9 @@ function onLayerClicked(e) {
   emit("click", e.features[0]);
 }
 function onMouseenter() {
-  map.value.getCanvas().style.cursor = "pointer";
+  if (clickable.value) {
+    map.value.getCanvas().style.cursor = "pointer";
+  }
 }
 function onMouseleave() {
   map.value.getCanvas().style.cursor = "";
