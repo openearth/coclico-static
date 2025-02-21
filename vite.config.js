@@ -40,6 +40,19 @@ export default defineConfig({
     }),
     svgLoader({
       defaultImport: "component",
+      svgoConfig: {
+        plugins: [
+          {
+            name: "preset-default",
+            params: {
+              overrides: {
+                removeDimensions: false,
+                removeViewBox: false,
+              },
+            },
+          },
+        ],
+      },
     }),
   ],
   define: { "process.env": {} },

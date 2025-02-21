@@ -32,7 +32,7 @@ const props = defineProps({
 const icon = computed(() => {
   try {
     return defineAsyncComponent(
-      () => import(`@/assets/icons/icon-${props.name}.svg?skipsvgo`),
+      () => import(`@/assets/icons/icon-${props.name}.svg`),
     );
   } catch (e) {
     console.error(e);
