@@ -46,7 +46,6 @@ export default defineConfig({
             name: "preset-default",
             params: {
               overrides: {
-                removeDimensions: false,
                 removeViewBox: false,
               },
             },
