@@ -5,11 +5,10 @@
       <MapboxMap
         id="map"
         ref="mapboxMap"
+        key="map"
         @mb-click="onMapClicked"
         :access-token="accessToken"
         :preserve-drawing-buffer="true"
-        :zoom="4"
-        :center="[5.2913, 48.1326]"
         map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
       >
         <MapboxNavigationControl :visualizePitch="true" />
@@ -130,8 +129,14 @@ onMounted(() => {
   if (store.getters["datasets/dataset"])
     store.dispatch("datasets/loadDatasets");
   map.value.on("load", () => {
+    map.value.flyTo({
+      center: [6, 53],
+      zoom: 6,
+      speed: 3,
+    });
     prepareHighlightSource(map.value);
   });
+  map.value.on("focusout", (e) => console.log(e));
 });
 onBeforeMount(() => {
   store.dispatch("map/setSeaLevelRiseData", seaLevelRiseData.value);
