@@ -34,6 +34,7 @@ import { prepareHighlightSource, setHighlight } from "@/lib/layers";
 import { computed, onBeforeMount, onMounted, provide, ref, watch } from "vue";
 import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
 import Popup from "@/components/Popup.vue";
+import { toast } from "vue-sonner";
 
 const store = useStore();
 const position = ref([]);
@@ -41,6 +42,7 @@ const accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 const isPopupOpen = ref(false);
 const mapboxMap = ref();
 const map = computed(() => mapboxMap.value.map);
+const emptyDataToast = ref();
 provide("map", map);
 
 function setFeatures(queriedFeatures, point, lngLat) {
@@ -60,14 +62,36 @@ function onMapClicked(e) {
     setFeatures(queriedFeatures, e.point, e.lngLat);
     if (graphFeature.value) {
       isPopupOpen.value = true;
-      setHighlight(map.value, queriedFeatures, clickableDatasetsIds.value);
+      const hasHighlight = setHighlight({
+        map: map.value,
+        queriedFeatures,
+        clickableDatasetsIds: clickableDatasetsIds.value,
+      });
+      store.dispatch("map/setHighlightedId", hasHighlight);
+    } else {
+      isPopupOpen.value = false;
+      store.dispatch("map/setHighlightedId");
+      setHighlight({
+        map: map.value,
+        queriedFeatures,
+        clickableDatasetsIds: clickableDatasetsIds.value,
+        event: "empty",
+      });
+      toast.dismiss(emptyDataToast.value);
+      emptyDataToast.value = toast.warning(
+        "No data available for this area with these filters.",
+      );
     }
   }
 }
 function closePopup() {
   isPopupOpen.value = false;
+  store.dispatch("map/setHighlightedId");
   store.dispatch("graphs/emptyGraphData");
-  setHighlight(map.value);
+  setHighlight({
+    map: map.value,
+    highlightedId: store.getters["map/highlightedId"],
+  });
 }
 const activeClickableDataset = computed(
   () => store.getters["map/activeClickableDataset"],
@@ -90,8 +114,7 @@ watch(
   () => store.getters["graphs/graphFeature"],
   (newVal) => {
     if (!newVal) {
-      isPopupOpen.value = false;
-      setHighlight(map.value);
+      closePopup();
     }
   },
 );
@@ -99,13 +122,13 @@ watch(
   () => store.getters["map/activeClickableDataset"],
   (newVal) => {
     if (!newVal) {
-      isPopupOpen.value = false;
-      setHighlight(map.value);
+      closePopup();
     }
   },
 );
 onMounted(() => {
-  store.dispatch("datasets/loadDatasets");
+  if (store.getters["datasets/dataset"])
+    store.dispatch("datasets/loadDatasets");
   map.value.on("load", () => {
     prepareHighlightSource(map.value);
   });

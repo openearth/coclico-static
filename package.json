@@ -24,6 +24,7 @@
     "vue-echarts": "^7.0.3",
     "vue-html-loader": "^1.2.4",
     "vue-router": "^4.5.0",
+    "vue-sonner": "^1.3.0",
     "vuex": "^4.0.0",
     "zarr": "^0.6.3"
   },

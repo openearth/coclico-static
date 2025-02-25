@@ -137,7 +137,13 @@ export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
     "properties" in dataset && "deltares:paint" in dataset.properties
       ? dataset.properties["deltares:paint"]
       : {
-          "fill-color": "rgba(0,0,0,0)",
+          "fill-color": "#0080ff",
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            0.25,
+            0,
+          ],
           ...(assetKey !== "geoserver_link"
             ? { "fill-outline-color": "#000000" }
             : {}),
@@ -259,22 +265,40 @@ export function prepareHighlightSource(map) {
 /**
  * Set the highlight source data based on the queried features
  * @param map
- * @param [queriedFeatures]
- * @param [clickableDatasetIds]
+ * @param {array | undefined} [queriedFeatures]
+ * @param {array | undefined} [clickableDatasetsIds]
+ * @param {"click" | "hover"} [event]
+ * @param {string | undefined} highlightedId
  */
-export function setHighlight(map, queriedFeatures, clickableDatasetIds) {
+export function setHighlight({
+  map,
+  queriedFeatures,
+  clickableDatasetsIds,
+  event = "click",
+  highlightedId,
+}) {
+  if (highlightedId) {
+    map.setPaintProperty(highlightedId, "fill-opacity", 0);
+    return;
+  }
   const feature = queriedFeatures?.find((feature) =>
-    clickableDatasetIds.some((id) => feature.layer.id.startsWith(id)),
+    clickableDatasetsIds.some((id) => feature.layer.id.startsWith(id)),
   );
-  map.getSource("highlight").setData({
-    type: "FeatureCollection",
-    features: feature
-      ? [
-          {
-            type: "Feature",
-            geometry: feature.geometry,
-          },
-        ]
-      : [],
-  });
+  const layerId =
+    feature?.layer?.id ||
+    map.getLayer(`${clickableDatasetsIds?.[0]}_geoserver_link`)?.id;
+  if (!layerId) return;
+  const giscoId = feature?.properties?.["GISCO_ID"] || null;
+  map.setPaintProperty(layerId, "fill-opacity", [
+    "case",
+    ["boolean", ["==", ["get", "GISCO_ID"], giscoId], false],
+    event === "click" ? 0.5 : 0.2,
+    0,
+  ]);
+  map.setPaintProperty(
+    layerId,
+    "fill-color",
+    event === "empty" ? "#DC7609" : "#0080ff",
+  );
+  return event === "click" ? feature?.layer?.id : null;
 }

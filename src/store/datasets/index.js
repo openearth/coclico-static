@@ -106,7 +106,8 @@ export default {
     },
   },
   actions: {
-    async loadDatasets({ commit }) {
+    async loadDatasets({ commit, state }) {
+      if (Boolean(state.datasets.length)) return;
       const catalog = await getCatalog(import.meta.env.VITE_CATALOG_URL);
       catalog?.summaries?.keywords.forEach((keyword) =>
         commit("ADD_THEME", { name: keyword, count: 0 }),

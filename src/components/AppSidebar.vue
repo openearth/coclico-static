@@ -18,8 +18,8 @@
           toggleLayersCard(theme.name);
           setTheme(theme.name);
         "
-        v-for="(theme, i) in themes"
-        :key="i"
+        v-for="theme in themes"
+        :key="theme.name"
         color="primary"
         :value="theme.name"
       >

@@ -6,8 +6,10 @@ export default {
     mapboxLayers: [], //wmsLayers state have the format that is needed to add the layers on the map
     seaLevelRiseData: {},
     clickableDatasetsIds: [], // Not all layers are clickable. Only the ones in user stories.
+    highlightedId: "",
   },
   getters: {
+    highlightedId: (state) => state.highlightedId,
     mapboxLayers(state) {
       return state.mapboxLayers;
     },
@@ -22,6 +24,9 @@ export default {
     },
   },
   mutations: {
+    SET_HIGHLIGHTED_ID(state, id) {
+      state.highlightedId = id;
+    },
     ADD_MAPBOX_LAYER(state, mapboxLayer) {
       state.mapboxLayers = [...state.mapboxLayers, mapboxLayer];
     },
@@ -45,6 +50,9 @@ export default {
     },
   },
   actions: {
+    setHighlightedId({ commit }, id) {
+      commit("SET_HIGHLIGHTED_ID", id || "");
+    },
     addMapboxLayer({ commit }, mapboxLayer) {
       commit("ADD_MAPBOX_LAYER", mapboxLayer);
     },

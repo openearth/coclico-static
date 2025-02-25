@@ -419,14 +419,17 @@ export function getGraphTypeData({
       coords,
     };
   } else {
-    const totalInSet = graphValues?.find?.(({ name }) =>
-      name.toLowerCase().includes("total"),
+    const totalInSet = graphValues?.find?.(
+      ({ name }) =>
+        name.toLowerCase().includes("total") ||
+        name.toLowerCase().includes("tot"),
     );
     const _values = totalInSet
       ? graphValues.filter(({ name }) => name !== totalInSet.name)
       : graphValues;
     const total =
-      totalInSet || Math.ceil(values.reduce((acc, cur) => acc + cur.value, 0));
+      totalInSet ||
+      Math.ceil(values?.reduce?.((acc, cur) => acc + cur.value, 0));
     return {
       total,
       values: _values,
