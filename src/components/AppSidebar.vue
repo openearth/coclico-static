@@ -200,18 +200,6 @@ async function toggleDataset(dataset) {
   await store.dispatch("map/loadDatasetOnMap", dataset.id);
   await store.dispatch("datasets/updateThemeObject");
 }
-function openLandingPage() {
-  window.open("https://coclicoservices.eu", "_blank");
-}
-function openWorkbenchPage() {
-  window.open("https://github.com/openearth/coclico-workbench", "_blank");
-}
-function openCatalogPage() {
-  window.open(
-    "https://radiantearth.github.io/stac-browser/#/external/storage.googleapis.com/coclico-data-public/coclico/coclico-stac-4oct/catalog.json?.language=en",
-    "_blank",
-  );
-}
 </script>
 
 <style lang="scss" scoped>
