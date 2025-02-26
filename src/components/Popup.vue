@@ -1,7 +1,7 @@
 <template>
   <MapboxPopup
-    v-if="isOpen"
     :key="position.join('-')"
+    v-if="position && isOpen && graphData"
     :lng-lat="position"
     anchor="bottom"
     style="display: flex; justify-content: center"
@@ -12,7 +12,7 @@
         {{ activeClickableDataset.title }}
       </VCardTitle>
       <app-chart />
-      <div class="buttons-container" v-if="graphData">
+      <div class="buttons-container">
         <VBtn
           flat
           @click="saveGraphOnDashboard"
