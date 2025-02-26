@@ -11,7 +11,7 @@
     <VListItem class="image-container">
       <custom-icon name="logo" class="coclico-image" />
     </VListItem>
-    <VList nav>
+    <VList nav ref="tour">
       <VListItem
         class="list-item"
         @click="
@@ -89,7 +89,7 @@
           <VListItem
             v-for="dataset in filteredDatasets"
             :key="dataset.id"
-            :title="dataset.title"
+            :aria-label="dataset.title"
           >
             <template v-slot:prepend>
               <VSwitch
@@ -98,7 +98,8 @@
                 class="mr-5"
                 color="primary"
                 @change="toggleDataset(dataset)"
-              ></VSwitch>
+                :label="dataset.title"
+              />
             </template>
             <template v-slot:append>
               <VTooltip
@@ -122,7 +123,7 @@
           <VListItem
             v-for="dataset in dataLayers"
             :key="dataset.id"
-            :title="dataset.title"
+            :aria-label="dataset.title"
           >
             <template v-slot:prepend>
               <VSwitch
@@ -131,6 +132,7 @@
                 class="mr-5"
                 color="primary"
                 @change="toggleDataset(dataset)"
+                :label="dataset.title"
               ></VSwitch>
             </template>
             <template v-slot:append>
@@ -157,9 +159,26 @@
 import CustomIcon from "@/components/CustomIcon.vue";
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
+import { useTour } from "@/lib/useTour";
 
 const store = useStore();
 const showLayersCard = ref(false);
+useTour({
+  id: "sidebar",
+  refId: "tour",
+  title: "Themes",
+  location: "end center",
+  index: 0,
+  description: `Select a theme to view the available datasets.
+   Toggle user stories and data layers on and off to display them on the map.
+   Click on the layer to view spatial data.`,
+  onTourStep: () => {
+    showLayersCard.value = true;
+  },
+  onAfterTourStep: () => {
+    showLayersCard.value = false;
+  },
+});
 
 const activeTheme = computed(() => store.getters["datasets/activeTheme"]);
 const datasetsInActiveTheme = computed(

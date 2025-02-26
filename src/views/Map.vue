@@ -136,8 +136,8 @@ onMounted(() => {
     });
     prepareHighlightSource(map.value);
   });
-  map.value.on("focusout", (e) => console.log(e));
 });
+
 onBeforeMount(() => {
   store.dispatch("map/setSeaLevelRiseData", seaLevelRiseData.value);
 });

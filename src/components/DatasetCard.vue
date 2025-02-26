@@ -1,5 +1,5 @@
 <template>
-  <VCard class="custom-dataset-card" :class="{ open: isOpen }">
+  <VCard ref="tour" class="custom-dataset-card" :class="{ open: isOpen }">
     <VTabs v-model="tab" hide-slider class="tabs" height="35px">
       <VTooltip
         :location="isOpen ? 'top' : 'bottom'"
@@ -53,70 +53,71 @@
     </VWindow>
   </VCard>
 </template>
-<script>
+<script setup>
 import ActiveDatasetTab from "./ActiveDatasetTab.vue";
 import DashboardTab from "./DashboardTab.vue";
 import CustomIcon from "./CustomIcon.vue";
-import { mapGetters } from "vuex";
-import { mergeProps } from "vue";
+import { computed, mergeProps, ref, watch } from "vue";
+import { useTour } from "@/lib/useTour";
+import { useStore } from "vuex";
 
-export default {
-  components: {
-    ActiveDatasetTab,
-    DashboardTab,
-    CustomIcon,
+const store = useStore();
+
+const isOpen = ref(false);
+const tab = ref("option-1");
+
+const activeDatasets = computed(() => store.getters["datasets/activeDatasets"]);
+const graphs = computed(() => store.getters["dashboard/graphs"]);
+
+useTour({
+  id: "dataset",
+  refId: "tour",
+  title: "Active Data Layers & Dashboard",
+  description: `This window displays the active data layers and allows you to view saved graphs on the dashboard.\n\n
+  It opens and closes either automatically or by pressing one of the tabs.`,
+  onTourStep: () => {
+    open();
   },
-  data() {
-    return {
-      isOpen: false,
-      tab: "option-1",
-      sliderValue: 0,
-    };
+  onAfterTourStep: () => {
+    close();
   },
-  computed: {
-    ...mapGetters("dashboard", ["graphs"]),
-    ...mapGetters("datasets", ["activeDatasets", "activeDatasetProperties"]),
-  },
-  watch: {
-    tab() {
-      this.open();
-    },
-    graphs(newVals, prevVals) {
-      if (prevVals.length === 0 && newVals.length > 0) {
-        this.open();
-      }
-      if (newVals.length === 0 && this.activeDatasets.length === 0) {
-        this.close();
-      }
-      if (newVals.length === 0 && this.activeDatasets.length > 0) {
-        this.tab = "option-1";
-      }
-    },
-    activeDatasets(newVals, prevVals) {
-      if (prevVals.length === 0 && newVals.length > 0) {
-        this.open();
-      }
-      if (newVals.length === 0 && this.graphs.length === 0) {
-        this.close();
-      }
-      if (newVals.length === 0 && this.graphs.length > 0) {
-        this.tab = "option-2";
-      }
-    },
-  },
-  methods: {
-    mergeProps,
-    toggle() {
-      this.isOpen = !this.isOpen;
-    },
-    open() {
-      this.isOpen = true;
-    },
-    close() {
-      this.isOpen = false;
-    },
-  },
-};
+});
+
+watch(tab, () => {
+  open();
+});
+watch(graphs, (newVals, prevVals) => {
+  if (prevVals.length === 0 && newVals.length > 0) {
+    open();
+  }
+  if (newVals.length === 0 && activeDatasets.value.length === 0) {
+    close();
+  }
+  if (newVals.length === 0 && activeDatasets.value.length > 0) {
+    tab.value = "option-1";
+  }
+});
+watch(activeDatasets, (newVals, prevVals) => {
+  if (prevVals.length === 0 && newVals.length > 0) {
+    open();
+  }
+  if (newVals.length === 0 && graphs.value.length === 0) {
+    close();
+  }
+  if (newVals.length === 0 && graphs.value.length > 0) {
+    tab.value = "option-2";
+  }
+});
+
+function toggle() {
+  isOpen.value = !isOpen.value;
+}
+function open() {
+  isOpen.value = true;
+}
+function close() {
+  isOpen.value = false;
+}
 </script>
 
 <style lang="scss" scoped>
