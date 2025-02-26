@@ -68,7 +68,7 @@ const saveGraphOnDashboard = () => {
   color: white !important;
   font-family: "Inter", sans-serif;
   text-transform: none;
-  font-weight: 100 !important;
+  font-weight: 400 !important;
   border-radius: 8px;
   max-width: 15vw;
   min-width: 15vw;
@@ -79,7 +79,7 @@ const saveGraphOnDashboard = () => {
   color: #293a45 !important;
   font-family: "Inter", sans-serif;
   text-transform: none;
-  font-weight: 100 !important;
+  font-weight: 400 !important;
   border-radius: 8px;
   border: 1px solid #293a45;
   min-width: 10vw;
