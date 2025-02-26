@@ -130,8 +130,8 @@ onMounted(() => {
     store.dispatch("datasets/loadDatasets");
   map.value.on("load", () => {
     map.value.flyTo({
-      center: [6, 53],
-      zoom: 6,
+      center: [5.2913, 48.1326],
+      zoom: 4,
       speed: 3,
     });
     prepareHighlightSource(map.value);
