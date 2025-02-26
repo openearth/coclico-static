@@ -89,6 +89,7 @@
           <VListItem
             v-for="dataset in filteredDatasets"
             :key="dataset.id"
+            :title="dataset.title"
           >
             <template v-slot:prepend>
               <VSwitch
@@ -99,9 +100,6 @@
                 @change="toggleDataset(dataset)"
               ></VSwitch>
             </template>
-            <VListItemTitle class="layer-item-title">
-              {{ dataset.title }}
-            </VListItemTitle>
             <template v-slot:append>
               <VTooltip
                 max-width="300px"
@@ -124,6 +122,7 @@
           <VListItem
             v-for="dataset in dataLayers"
             :key="dataset.id"
+            :title="dataset.title"
           >
             <template v-slot:prepend>
               <VSwitch
@@ -134,9 +133,6 @@
                 @change="toggleDataset(dataset)"
               ></VSwitch>
             </template>
-            <VListItemTitle class="layer-item-title">
-              {{ dataset.title }}
-            </VListItemTitle>
             <template v-slot:append>
               <VTooltip
                 max-width="300px"
@@ -283,11 +279,6 @@ function openCatalogPage() {
   font-size: 14px;
   line-height: 20px;
   word-break: keep-all;
-}
-
-.layer-item-title {
-  white-space: normal;
-  word-break: break-word;
 }
 
 .item-image {
