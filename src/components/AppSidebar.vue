@@ -229,6 +229,7 @@ function openCatalogPage() {
   max-height: calc(100% - var(--drawer-block-margin) * 2);
   margin-top: var(--drawer-block-margin);
   margin-left: var(--drawer-inline-margin);
+  overflow: hidden;
   & :global(.v-navigation-drawer--rail .list-item-title) {
     opacity: 0;
   }
@@ -238,6 +239,12 @@ function openCatalogPage() {
         .list-item-title
     ) {
     opacity: 1;
+  }
+  &
+    :global(
+      .v-navigation-drawer__content
+    ) {
+    scrollbar-width: thin;
   }
 }
 
