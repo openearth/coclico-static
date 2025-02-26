@@ -42,7 +42,7 @@
       >
         <VListImg class="list-item-img">
           <VIcon color="black" size="1.5rem"
-            >mdi-book-open-variant-outline</VIcon
+            >mdi-book-open-page-variant-outline</VIcon
           >
         </VListImg>
         <VListItemTitle class="list-item-title">Handbook</VListItemTitle>
