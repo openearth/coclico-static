@@ -2,6 +2,7 @@ import { get, unzip } from "lodash-es";
 import { openArray } from "zarr";
 import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
 import { getPpGraphData } from "@/lib/graphs/pp/get-graph-data-pp";
+import { getBeGraphData } from "@/lib/graphs/be/get-graph-data-pp";
 
 export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
@@ -21,6 +22,7 @@ const GRAPH_TYPE_MASK = {
   ssl: GRAPH_TYPES.LINE_CHART,
   cba: GRAPH_TYPES.PIE_CHART,
   pp_maps: GRAPH_TYPES.LINE_CHART,
+  be_maps: GRAPH_TYPES.LINE_CHART,
 };
 
 /**
@@ -130,6 +132,66 @@ export async function getRasterData(dataset, coords, props) {
     case "pp_maps":
       try {
         const data = await getPpGraphData(dataset, coords, props);
+        const scenarios = props.find(({ id }) => id === "scenarios").values;
+        return {
+          id,
+          name: id,
+          xAxis: {
+            data: props.find((prop) => prop.id === "time").values.sort(),
+            title: "Year",
+          },
+          yAxis: ["rel_affected", "abs_affected"].flatMap((type) => ({
+            type: "value",
+            min: 0,
+            max: Math.max(...data.map(({ value }) => value[type])),
+            axisLabel: {
+              formatter: (value) =>
+                type.startsWith("rel")
+                  ? `${parseInt(value * 100)}%`
+                  : `${value / 1000}k`,
+            },
+            nameTextStyle: {
+              color: "black",
+              fontFamily: "Helvetica",
+            },
+            name: type.startsWith("rel") ? "Percentage" : "Amount",
+            nameLocation: "start",
+          })),
+          series: scenarios.flatMap((scenario) =>
+            ["rel_affected", "abs_affected"].flatMap((type) => ({
+              name: `${scenario} ${type.startsWith("rel") ? "%" : "#"}`,
+              type: type.startsWith("rel") ? "line" : "line",
+              yAxisIndex: type.startsWith("rel") ? 0 : 1,
+              tooltip: {
+                valueFormatter: function (value) {
+                  return type.startsWith("rel")
+                    ? `${parseFloat(value * 100).toFixed(2)}%`
+                    : `${parseFloat(value).toFixed(2)} people`;
+                },
+              },
+              data: data
+                .filter(
+                  (datum) =>
+                    datum.scenario === scenario &&
+                    datum.defenseLevel ===
+                      props.find((prop) => prop.id === "defense level").value &&
+                    datum.rp ===
+                      props.find((prop) => prop.id === "return period").value,
+                )
+                .sort((a, b) => a.time - b.time)
+                .map(({ value }) => {
+                  return value[type];
+                }),
+            })),
+          ),
+        };
+      } catch (error) {
+        console.error("Error while fetching data from getGraphDataPp:", error);
+        throw error;
+      }
+    case "be_maps":
+      try {
+        const data = await getBeGraphData(dataset, coords, props);
         const scenarios = props.find(({ id }) => id === "scenarios").values;
         return {
           id,

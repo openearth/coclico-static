@@ -4,7 +4,6 @@ const chunkArray = (arr, size) =>
   arr.length > size
     ? [arr.slice(0, size), ...chunkArray(arr.slice(size), size)]
     : [arr];
-
 /**
  * Function that fetches the data for the sea level rise graph
  * @param dataset
@@ -13,7 +12,7 @@ const chunkArray = (arr, size) =>
  * @param props
  * @returns {Promise<*>}
  */
-export async function getPpGraphData(dataset, { lng, lat }, props) {
+export async function getBeGraphData(dataset, { lng, lat }, props) {
   const defenseLevel = props.find((prop) => prop.id === "defense level").value;
   const rp = props.find((prop) => prop.id === "return period").value;
   const times = props.find((prop) => prop.id === "time").values.sort();
@@ -35,7 +34,7 @@ export async function getPpGraphData(dataset, { lng, lat }, props) {
       layerChunks.map((layers) =>
         getFeatureInfo({
           layers,
-          url: "https://coclico.avi.deltares.nl/geoserver/pp_maps/wms",
+          url: "https://coclico.avi.deltares.nl/geoserver/be_maps/wms",
           lng,
           lat,
           keys: ["rel_affected", "abs_affected"],
