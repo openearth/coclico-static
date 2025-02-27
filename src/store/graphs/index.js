@@ -5,6 +5,7 @@ import {
   getZarrData,
 } from "@/lib/graphs";
 import { getLayerType } from "@/lib/layers";
+import { toast } from "vue-sonner";
 
 export default {
   namespaced: true,
@@ -136,7 +137,7 @@ export default {
             coords,
             rootGetters["datasets/activeDatasetProperties"](dataset),
           );
-          if (!graphData?.values?.[0]?.data?.[0]) {
+          if (!graphData?.values?.[0]?.data?.[0] && !graphData.series.length) {
             commit("EMPTY_GRAPH_DATA");
             commit("ADD_GRAPH_FEATURE");
             return;
@@ -149,6 +150,11 @@ export default {
           });
         } catch (error) {
           console.error("Error getting raster data:", error);
+          toast.error(
+            "Error getting raster data, you may have selected an area that is not covered by the dataset.",
+          );
+          commit("EMPTY_GRAPH_DATA");
+          commit("ADD_GRAPH_FEATURE");
         }
       }
     },

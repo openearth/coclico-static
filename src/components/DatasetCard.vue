@@ -1,6 +1,12 @@
 <template>
   <VCard ref="tour" class="custom-dataset-card" :class="{ open: isOpen }">
-    <VTabs v-model="tab" hide-slider class="tabs" height="35px">
+    <VTabs
+      v-model="tab"
+      hide-slider
+      class="tabs"
+      height="35px"
+      align-tabs="center"
+    >
       <VTooltip
         :location="isOpen ? 'top' : 'bottom'"
         :text="isOpen ? 'Close this window' : 'Open Active data layers'"
@@ -43,14 +49,14 @@
       </VTooltip>
     </VTabs>
 
-    <VWindow v-model="tab" class="pt-4">
-      <VWindowItem value="option-1">
+    <VTabsWindow v-model="tab" class="pt-4">
+      <VTabsWindowItem value="option-1">
         <active-dataset-tab />
-      </VWindowItem>
-      <VWindowItem value="option-2">
+      </VTabsWindowItem>
+      <VTabsWindowItem value="option-2">
         <dashboard-tab />
-      </VWindowItem>
-    </VWindow>
+      </VTabsWindowItem>
+    </VTabsWindow>
   </VCard>
 </template>
 <script setup>
@@ -126,9 +132,9 @@ function close() {
   top: var(--drawer-block-margin);
   right: var(--drawer-inline-margin);
   border-radius: 28px 28px 28px 28px;
-  max-height: 397px;
   transition:
     height 0.2s linear,
+    border-radius 0.2s linear,
     width 0.2s linear 0.1s;
   width: 230px;
   height: 50px;
@@ -139,6 +145,12 @@ function close() {
     width: 0;
   }
   &.open {
+    border-radius: 28px 28px 28px 0px;
+    :deep(.v-tabs-window) {
+      min-width: 450px;
+      min-height: 260px;
+    }
+
     @supports (height: calc-size(max-content, size)) {
       .tab-label {
         visibility: visible;
@@ -146,7 +158,7 @@ function close() {
         width: calc-size(max-content, size);
       }
       & {
-        width: calc-size(max-content, min(size + 5vw, 500px));
+        width: calc-size(max-content, size);
         height: max-content;
       }
     }
@@ -169,5 +181,15 @@ function close() {
 
 :deep(.v-slide-group) {
   height: auto;
+}
+:deep(.v-slide-group__content) {
+  overflow: hidden;
+}
+:deep(.v-tabs-window) {
+  direction: rtl;
+  resize: both;
+}
+:deep(.v-window__container) {
+  direction: ltr;
 }
 </style>

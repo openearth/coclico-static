@@ -1,7 +1,7 @@
 <template>
   <MapboxPopup
     :key="position.join('-')"
-    v-if="position && isOpen && graphData"
+    v-if="position && isOpen"
     :lng-lat="position"
     anchor="bottom"
     style="display: flex; justify-content: center"

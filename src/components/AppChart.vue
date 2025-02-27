@@ -1,10 +1,17 @@
 <template>
   <div class="app-chart__container" v-if="graphData">
-    <component
-      :is="graphComponent"
-      :graph-data="graphData"
-      :key="JSON.stringify(graphData.coords)"
-    />
+    <Suspense>
+      <component
+        :is="graphComponent"
+        :graph-data="graphData"
+        :key="JSON.stringify(graphData.coords)"
+      />
+      <template #fallback>
+        <div class="app-chart__loader">
+          <VProgressCircular indeterminate color="primary" :size="50" />
+        </div>
+      </template>
+    </Suspense>
   </div>
   <div v-else class="app-chart__loader">
     <VProgressCircular
@@ -45,7 +52,7 @@ const graphComponent = computed(
   height: 400px;
 }
 .app-chart__container {
-  width: 500px;
+  width: 100%;
   height: 300px;
 }
 </style>

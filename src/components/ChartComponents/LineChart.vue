@@ -1,9 +1,9 @@
 <template>
-  <VChart :option="option" autoresize />
+  <VChart v-if="option?.id" :option="option" autoresize />
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent } from "vue";
+import { computed } from "vue";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { BarChart, LineChart } from "echarts/charts";
@@ -29,28 +29,22 @@ use([
   LegendComponent,
 ]);
 
-const baseOptions = computed(() => {
-  try {
-    return defineAsyncComponent(
-      `@/assets/echart-templates/${props.graphData.id}.js`,
-    );
-  } catch {
-    return defineAsyncComponent("@/assets/echart-templates/default.js");
-  }
-});
+const baseOptions =
+  (await import(`@/assets/echart-templates/${props.graphData.id}.js`))
+    .default || (await import("@/assets/echart-templates/default.js")).default;
 
 const option = computed(() => {
   return {
-    ...baseOptions.value,
+    ...baseOptions,
     ...props.graphData,
     xAxis: {
-      ...baseOptions.value.xAxis,
+      ...baseOptions.xAxis,
       ...props.graphData.xAxis,
     },
     yAxis: Array.isArray(props.graphData.yAxis)
       ? props.graphData.yAxis
       : {
-          ...baseOptions.value.yAxis,
+          ...baseOptions.yAxis,
           ...props.graphData.yAxis,
         },
   };
