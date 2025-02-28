@@ -195,12 +195,12 @@ const sidebarStyle = computed(() => {
 });
 const filteredDatasets = computed(() => {
   return datasetsInActiveTheme.value.filter(
-    (dataset) => dataset.id === "slp" || dataset.id === "cfhp",
+    (dataset) => dataset.id === "slp" || dataset.id === "cfhp" || dataset.id === "cba" || dataset.id === "pp_maps" || dataset.id === "be_maps",
   );
 });
 const dataLayers = computed(() =>
   datasetsInActiveTheme.value.filter(
-    ({ id }) => id !== "slp" && id !== "cfhp" && id !== "cba",
+    ({ id }) => id !== "slp" && id !== "cfhp" && id !== "cba" && id !== "pp_maps" && id !== "be_maps",
   ),
 );
 
