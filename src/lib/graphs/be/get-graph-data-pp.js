@@ -24,7 +24,7 @@ export async function getBeGraphData(dataset, { lng, lat }, props) {
         defenseLevel,
         scenario,
         time,
-        name: `pop_stats_${defenseLevel}_${rp}_${scenario}_${time}`,
+        name: `be_stats_${defenseLevel}_${rp}_${scenario}_${time}`,
       })),
     ),
     100,
