@@ -83,7 +83,7 @@
       </VRow>
     </VListItem>
     <VList>
-      <VListItem v-if="filteredDatasets.length">
+      <VListItem v-if="filteredDatasets?.length">
         <VCardTitle class="layer-card-title"> User stories </VCardTitle>
         <VList class="layer-list">
           <VListItem
@@ -117,7 +117,7 @@
           </VListItem>
         </VList>
       </VListItem>
-      <VListItem v-if="dataLayers">
+      <VListItem v-if="dataLayers?.length">
         <VCardTitle class="layer-card-title"> Data layers</VCardTitle>
         <VList class="layer-list">
           <VListItem
@@ -243,10 +243,7 @@ async function toggleDataset(dataset) {
     ) {
     opacity: 1;
   }
-  &
-    :global(
-      .v-navigation-drawer__content
-    ) {
+  & :global(.v-navigation-drawer__content) {
     scrollbar-width: thin;
   }
 }

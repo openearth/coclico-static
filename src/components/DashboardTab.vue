@@ -1,10 +1,10 @@
 <template>
-  <VCard flat class="scrollable-card">
+  <VCard flat class="card">
     <VCard
       flat
       v-for="({ graphData, title }, index) in graphs"
       :key="index"
-      class="ma-3"
+      class="ma-3 item"
     >
       <div class="graph-title">
         <VCardTitle>
@@ -21,13 +21,18 @@
           <VIcon>mdi-close</VIcon>
         </VBtn>
       </div>
-      <component
-        :is="graphComponents[graphData.graphType]"
-        :graph-data="graphData"
-        style="height: 300px"
-      />
+      <Suspense>
+        <component
+          :is="graphComponents[graphData.graphType]"
+          :graph-data="graphData"
+          style="height: 300px"
+        />
+        <template #fallback>
+          <VProgressCircular indeterminate color="primary" :size="50" />
+        </template>
+      </Suspense>
     </VCard>
-    <div v-if="!graphs.length" class="text-center mx-16 pb-4">
+    <div v-if="!graphs.length" class="empty text-center mx-16 pb-4">
       <p class="font-weight-black">
         No data or graph has have been added to the dashboard.
       </p>
@@ -86,9 +91,16 @@ export default {
 </script>
 
 <style scoped>
-.scrollable-card {
-  max-height: 300px;
-  overflow-y: visible;
+.empty {
+  max-width: 50ch;
+}
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.item {
+  max-width: 400px;
 }
 .close-button {
   color: rgb(var(--v-theme-grey80));

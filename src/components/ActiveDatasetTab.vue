@@ -1,5 +1,5 @@
 <template>
-  <VCard flat class="scrollable-card">
+  <VCard flat class="card">
     <VContainer
       style="padding-top: 0px"
       v-for="dataset in datasets"
@@ -27,7 +27,7 @@
       </VRow>
       <VDivider />
     </VContainer>
-    <div v-if="!datasets.length" class="text-center mx-16 pb-4">
+    <div v-if="!datasets.length" class="empty text-center mx-16 pb-4">
       <p class="font-weight-black">No data layers have been selected.</p>
       <p class="mt-4">
         Explore data categories and activate data layers from the left hand-side
@@ -50,13 +50,16 @@ const datasets = computed(() => store.getters["datasets/activeDatasets"]);
 </script>
 
 <style>
+.empty {
+  max-width: 50ch;
+}
 .text-style {
   background: #f0f0f0;
   padding: 5px;
 }
-.scrollable-card {
-  max-height: 300px;
-  overflow-y: visible;
+.card {
+  display: flex;
+  justify-content: center;
 }
 .layer-title {
   font-family: "Inter", sans-serif;

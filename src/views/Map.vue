@@ -59,7 +59,10 @@ function onMapClicked(e) {
     position.value = [lng, lat];
     const queriedFeatures = map.value.queryRenderedFeatures(e.point);
     setFeatures(queriedFeatures, e.point, e.lngLat);
-    if (graphFeature.value) {
+    if (
+      graphFeature.value &&
+      (hasGeoserverLink.value ? graphFeature.value.features : true)
+    ) {
       isPopupOpen.value = true;
       const hasHighlight = setHighlight({
         map: map.value,
@@ -101,6 +104,9 @@ const clickableDatasetsIds = computed(
 );
 const seaLevelRiseData = computed(() => store.getters["map/seaLevelRiseData"]);
 const mapboxLayers = computed(() => store.getters["map/mapboxLayers"]);
+const hasGeoserverLink = computed(() =>
+  mapboxLayers.value.some((layer) => layer.id.endsWith("_geoserver_link")),
+);
 watch(
   () => store.getters["graphs/graphData"],
   (newVal) => {
