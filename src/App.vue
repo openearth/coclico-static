@@ -1,22 +1,19 @@
 <template>
-  <v-app>
-    <v-main>
+  <VApp>
+    <UserTour>
+      <Toaster
+        position="bottom-right"
+        rich-colors
+        close-button
+        :toast-options="{
+          class: 'py-4 px-2',
+        }"
+      />
       <router-view />
-    </v-main>
-  </v-app>
+    </UserTour>
+  </VApp>
 </template>
-
-<script>
-import { mapActions } from "vuex";
-
-export default {
-  name: "App",
-  methods: {
-    ...mapActions("datasets", ["loadDatasets"]),
-  },
-
-  mounted() {
-    this.loadDatasets();
-  },
-};
+<script setup lang="ts">
+import { Toaster } from "vue-sonner";
+import UserTour from "@/components/UserTour.vue";
 </script>

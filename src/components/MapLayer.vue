@@ -9,31 +9,58 @@
   </MapboxLayer>
 </template>
 <script setup>
-import { MapboxLayer, useMap } from "@studiometa/vue-mapbox-gl";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { MapboxLayer } from "@studiometa/vue-mapbox-gl";
+import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
+import { useStore } from "vuex";
+import { setHighlight } from "@/lib/layers";
 
 const props = defineProps({
   layer: {
     type: Object,
-    default: () => {},
+    required: true,
   },
 });
+const store = useStore();
+const id = ref(props.layer.id);
 const emit = defineEmits(["click"]);
-let mapRef = ref();
+const map = inject("map");
+const clickableDatasetsIds = computed(
+  () => store.getters["map/clickableDatasetsIds"],
+);
+const clickable = computed(() =>
+  clickableDatasetsIds.value.some((id) =>
+    props.layer.id.toLowerCase().startsWith(id),
+  ),
+);
+const highlightedId = computed(() => store.getters["map/highlightedId"]);
 
 onMounted(() => {
-  mapRef.value = useMap();
+  if (!props.layer.id.endsWith("_geoserver_link")) return;
+  map.value.on("mousemove", props.layer.id, (e) => {
+    if (Boolean(highlightedId.value) || clickableDatasetsIds.value[0] === "cba")
+      return;
+    setHighlight({
+      map: map.value,
+      queriedFeatures: e.features,
+      clickableDatasetsIds: clickableDatasetsIds.value,
+      event: "hover",
+    });
+  });
 });
 
 onBeforeUnmount(async () => {
-  await mapRef.value.map.removeLayer(props.layer.id);
+  await map.value.removeLayer(id.value);
 });
 
-const onLayerClicked = (e) => emit("click", e.features[0]);
-const onMouseenter = () => {
-  mapRef.value.map.getCanvas().style.cursor = "pointer";
-};
-const onMouseleave = () => {
-  mapRef.value.map.getCanvas().style.cursor = "";
-};
+function onLayerClicked(e) {
+  emit("click", e.features[0]);
+}
+function onMouseenter() {
+  if (clickable.value) {
+    map.value.getCanvas().style.cursor = "pointer";
+  }
+}
+function onMouseleave() {
+  map.value.getCanvas().style.cursor = "";
+}
 </script>

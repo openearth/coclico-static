@@ -1,10 +1,12 @@
 import { get, unzip } from "lodash-es";
 import { openArray } from "zarr";
 import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
+import { getPpGraphData } from "@/lib/graphs/pp/get-graph-data-pp";
+import { getBeGraphData } from "@/lib/graphs/be/get-graph-data-pp";
 
 export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
-  LINE_CHART: "line-chart-zarr",
+  LINE_CHART: "line-chart",
   SEA_LEVEL_RISE: "sea-level-rise",
   PIE_CHART: "pie-chart",
 };
@@ -19,6 +21,8 @@ const GRAPH_TYPE_MASK = {
   slp: GRAPH_TYPES.SEA_LEVEL_RISE,
   ssl: GRAPH_TYPES.LINE_CHART,
   cba: GRAPH_TYPES.PIE_CHART,
+  pp_maps: GRAPH_TYPES.LINE_CHART,
+  be_maps: GRAPH_TYPES.LINE_CHART,
 };
 
 /**
@@ -43,20 +47,21 @@ export const getGraphType = (id) =>
 // };
 
 /**
- * Get data for a dataset with a WMTS geoserver_link
- * @param dataset
+ * Get graph feature data for a dataset with a WMTS geoserver_link
+ * @param datasetId
+ * @param feature
  * @param properties
  * @param values
- * @returns {{name: *, value: *}[]|{[p: string]: unknown}}
+ * @returns {{id, name, xAxis: {data: *, title: string}, yAxis: {type: string, min: number, alignTicks, max: number, interval: number, axisLabel: {formatter: function(*): string}, nameTextStyle: {color: string, fontFamily: string}, name: string, nameLocation: string}[], series: *}|{name: *, value: *}[]|{name: string, value: *}[]|[string, unknown][]}
  */
-export function getFeatureData(dataset, properties, values) {
-  switch (dataset) {
+export function getFeatureData({ datasetId, feature, properties, values }) {
+  switch (datasetId) {
     case "cba": {
-      return Object.entries(properties)
+      return Object.entries(feature)
         .filter(
           ([key]) =>
             key.toLowerCase().includes(values.time.toLowerCase()) &&
-            key.toLowerCase().includes(values.scenarios.toLowerCase())
+            key.toLowerCase().includes(values.scenarios.toLowerCase()),
         )
         .map(([name, value]) => {
           return {
@@ -72,7 +77,7 @@ export function getFeatureData(dataset, properties, values) {
           : "mean_spring_tide";
       const time = values?.time.toLowerCase() || "";
       const defenseLevel = values?.["defense level"].toLowerCase() || "";
-      return Object.entries(properties)
+      return Object.entries(feature)
         .filter(([_key]) => {
           const key = _key.toLowerCase();
           return (
@@ -87,10 +92,10 @@ export function getFeatureData(dataset, properties, values) {
           const name = key.includes("more05")
             ? "% flood > 0.5m"
             : key.includes("less05")
-            ? "% flood < 0.5m"
-            : key.includes("nans")
-            ? "% not flooded"
-            : key;
+              ? "% flood < 0.5m"
+              : key.includes("nans")
+                ? "% not flooded"
+                : key;
 
           return {
             name,
@@ -99,9 +104,7 @@ export function getFeatureData(dataset, properties, values) {
         });
     }
     default:
-      return Object.fromEntries(
-        Object.entries(properties).filter(([key]) => key.includes(dataset))
-      );
+      return Object.entries(feature).filter(([key]) => key.includes(datasetId));
   }
 }
 
@@ -114,7 +117,6 @@ export function getFeatureData(dataset, properties, values) {
  */
 export async function getRasterData(dataset, coords, props) {
   const { id } = dataset;
-
   switch (id) {
     case "slp":
       try {
@@ -127,9 +129,76 @@ export async function getRasterData(dataset, coords, props) {
         console.error("Error while fetching data from getGraphDataSlp:", error);
         throw error;
       }
+    case "pp_maps":
+      return exposed({ dataset, coords, props, fn: getPpGraphData });
+    case "be_maps":
+      return exposed({ dataset, coords, props, fn: getBeGraphData });
     default:
       console.warn(`No handler for dataset id: ${id}`);
       return null;
+  }
+}
+
+async function exposed({ dataset, coords, props, fn }) {
+  try {
+    const { id } = dataset;
+    const data = await fn(dataset, coords, props);
+    const scenarios = props.find(({ id }) => id === "scenarios").values;
+    return {
+      id,
+      name: id,
+      xAxis: {
+        data: props.find((prop) => prop.id === "time").values.sort(),
+        title: "Year",
+      },
+      yAxis: ["rel_affected", "abs_affected"].flatMap((type) => ({
+        type: "value",
+        min: 0,
+        max: Math.max(...data.map(({ value }) => value[type])),
+        axisLabel: {
+          formatter: (value) =>
+            type.startsWith("rel")
+              ? `${parseInt(value * 100)}%`
+              : `${value / 1000}k`,
+        },
+        nameTextStyle: {
+          color: "black",
+          fontFamily: "Helvetica",
+        },
+        name: type.startsWith("rel") ? "Percentage" : "Amount",
+        nameLocation: "start",
+      })),
+      series: scenarios.flatMap((scenario) =>
+        ["rel_affected", "abs_affected"].flatMap((type) => ({
+          name: `${scenario} ${type.startsWith("rel") ? "%" : "#"}`,
+          type: type.startsWith("rel") ? "line" : "line",
+          yAxisIndex: type.startsWith("rel") ? 0 : 1,
+          tooltip: {
+            valueFormatter: function (value) {
+              return type.startsWith("rel")
+                ? `${parseFloat(value * 100).toFixed(2)}%`
+                : `${parseFloat(value).toFixed(2)} people`;
+            },
+          },
+          data: data
+            .filter(
+              (datum) =>
+                datum.scenario === scenario &&
+                datum.defenseLevel ===
+                  props.find((prop) => prop.id === "defense level").value &&
+                datum.rp ===
+                  props.find((prop) => prop.id === "return period").value,
+            )
+            .sort((a, b) => a.time - b.time)
+            .map(({ value }) => {
+              return value[type];
+            }),
+        })),
+      ),
+    };
+  } catch (error) {
+    console.error("Error while fetching data from getGraphDataPp:", error);
+    throw error;
   }
 }
 
@@ -156,11 +225,11 @@ export async function getZarrData(dataset, features, props) {
   if (get(dataset, "deltares:plotType") !== "bar") {
     path = path.filter((x) => x)[0];
     dimensions = Object.entries(
-      get(dataset, `["cube:variables"].${path}.dimensions`)
+      get(dataset, `["cube:variables"].${path}.dimensions`),
     );
   } else if (get(dataset, "deltares:plotType") === "bar") {
     dimensions = Object.entries(
-      get(dataset, `["cube:variables"].${path[0]}.dimensions`)
+      get(dataset, `["cube:variables"].${path[0]}.dimensions`),
     );
   }
 
@@ -173,10 +242,10 @@ export async function getZarrData(dataset, features, props) {
       get(dataset, "deltares:plotSeries") !== "scenarios"
     ) {
       const scenarioIndex = summaryList.find(
-        (object) => object.id === "scenarios"
+        (object) => object.id === "scenarios",
       );
       return scenarioIndex?.values.findIndex(
-        (scenario) => scenario === props.scenarios
+        (scenario) => scenario === props.scenarios,
       );
     } else if (
       dim[1] === "rp" &&
@@ -229,7 +298,7 @@ export async function getZarrData(dataset, features, props) {
       }
 
       const variableUnit = Object.entries(
-        get(dataset, `["cube:variables"].${path}.unit`)
+        get(dataset, `["cube:variables"].${path}.unit`),
       );
 
       let cubeDimensions = get(dataset, "cube:dimensions");
@@ -237,7 +306,7 @@ export async function getZarrData(dataset, features, props) {
       const plotSeries = get(dataset, "deltares:plotSeries");
 
       const dimensionNames = Object.entries(
-        get(dataset, `cube:dimensions.${plotSeries}.values`)
+        get(dataset, `cube:dimensions.${plotSeries}.values`),
       );
 
       if (cubeDimensions[xAxis].description === "decade window") {
@@ -322,4 +391,48 @@ export async function getZarrData(dataset, features, props) {
     }
   }
   return graphData;
+}
+
+export function getGraphTypeData({
+  datasetId,
+  feature,
+  values,
+  properties,
+  coords,
+  graphType,
+}) {
+  const graphValues = getFeatureData({
+    datasetId,
+    feature,
+    values,
+    properties,
+  });
+  if (graphType === GRAPH_TYPES.LINE_CHART) {
+    return {
+      ...graphValues,
+      values: graphValues?.series,
+      datasetId,
+      graphType: GRAPH_TYPES.LINE_CHART,
+      coords,
+    };
+  } else {
+    const totalInSet = graphValues?.find?.(
+      ({ name }) =>
+        name.toLowerCase().includes("total") ||
+        name.toLowerCase().includes("tot"),
+    );
+    const _values = totalInSet
+      ? graphValues.filter(({ name }) => name !== totalInSet.name)
+      : graphValues;
+    const total =
+      totalInSet ||
+      Math.ceil(values?.reduce?.((acc, cur) => acc + cur.value, 0));
+    return {
+      total,
+      values: _values,
+      datasetId,
+      graphType,
+      coords,
+    };
+  }
 }

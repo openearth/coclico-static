@@ -1,205 +1,165 @@
 <template>
-  <v-app>
-    <mapbox-map
-      id="map"
-      ref="map"
-      @mb-click="onMapClicked"
-      :access-token="accessToken"
-      :preserve-drawing-buffer="true"
-      :zoom="4"
-      :center="[5.2913, 48.1326]"
-      map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
-    >
-      <MapboxNavigationControl :visualizePitch="true" />
-      <MapLayer v-for="layer in mapboxLayers" :key="layer.id" :layer="layer" />
-      <MapboxPopup
-        v-if="isOpen"
-        :key="position.join('-')"
-        :lng-lat="position"
-        anchor="bottom"
-        style="
-          width: 30vw;
-          height: 38vh;
-          display: flex;
-          justify-content: center;
-        "
-        :closeButton="false"
-      >
-        <div style="width: auto; height: auto; overflow: hidden">
-          <v-card-title>
-            {{ activeClickableDataset.title }}
-          </v-card-title>
-          <app-chart />
-          <div class="buttons-container" v-if="graphData">
-            <v-btn
-              flat
-              @click="saveGraphOnDashboard"
-              class="add-to-dashboard-button-popup"
-            >
-              Add to dashboard
-            </v-btn>
-            <v-btn flat @click="closePopup" class="close-button-popup">
-              Close
-            </v-btn>
-          </div>
-        </div>
-      </MapboxPopup>
-      <dataset-card />
-    </mapbox-map>
+  <VLayout>
     <app-sidebar />
-  </v-app>
+    <VMain style="padding-inline: 0">
+      <MapboxMap
+        id="map"
+        ref="mapboxMap"
+        key="map"
+        @mb-click="onMapClicked"
+        :access-token="accessToken"
+        :preserve-drawing-buffer="true"
+        map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
+      >
+        <MapboxNavigationControl :visualizePitch="true" />
+        <MapLayer
+          v-for="layer in mapboxLayers"
+          :key="layer.id"
+          :layer="layer"
+        />
+        <Popup :isOpen="isPopupOpen" :position="position" @close="closePopup" />
+        <dataset-card />
+      </MapboxMap>
+    </VMain>
+  </VLayout>
 </template>
 
-<script>
-import { mapActions, mapGetters } from "vuex";
-import {
-  MapboxMap,
-  MapboxNavigationControl,
-  MapboxPopup,
-} from "@studiometa/vue-mapbox-gl";
+<script setup>
+import { useStore } from "vuex";
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
 import MapLayer from "@/components/MapLayer.vue";
-import AppChart from "@/components/AppChart.vue";
 import { prepareHighlightSource, setHighlight } from "@/lib/layers";
+import { computed, onBeforeMount, onMounted, provide, ref, watch } from "vue";
+import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
+import Popup from "@/components/Popup.vue";
+import { toast } from "vue-sonner";
 
-export default {
-  data() {
-    return {
-      accessToken: process.env.VUE_APP_MAPBOX_TOKEN,
-      isOpen: false,
-      position: [],
-    };
-  },
-  components: {
-    MapboxMap,
-    MapboxNavigationControl,
-    MapLayer,
-    MapboxPopup,
-    AppSidebar,
-    DatasetCard,
-    AppChart,
-  },
-  methods: {
-    ...mapActions("dashboard", ["addGraph"]),
-    ...mapActions("map", [
-      "setSeaLevelRiseData",
-      "addMapboxLayer",
-      "removeMapboxLayer",
-    ]),
-    ...mapActions("graphs", ["setGraphFeature", "emptyGraphData"]),
-    saveGraphOnDashboard() {
-      const { title } = this.activeClickableDataset;
-      const graphData = this.graphData;
-      this.addGraph({ graphData, title });
-    },
-    closePopup() {
-      this.isOpen = false;
-      this.emptyGraphData();
-      setHighlight(this.map);
-    },
-    setFeatures(queriedFeatures, point, lngLat) {
-      this.setGraphFeature({
+const store = useStore();
+const position = ref([]);
+const accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+const isPopupOpen = ref(false);
+const mapboxMap = ref();
+const map = computed(() => mapboxMap.value.map);
+const emptyDataToast = ref();
+provide("map", map);
+
+function setFeatures(queriedFeatures, point, lngLat) {
+  store.dispatch("graphs/setGraphFeature", {
+    queriedFeatures,
+    datasetId: activeClickableDataset.value.id,
+    point: point,
+    ...lngLat,
+  });
+}
+function onMapClicked(e) {
+  if (activeClickableDataset.value) {
+    store.dispatch("graphs/emptyGraphData");
+    const { lng, lat } = e.lngLat;
+    position.value = [lng, lat];
+    const queriedFeatures = map.value.queryRenderedFeatures(e.point);
+    setFeatures(queriedFeatures, e.point, e.lngLat);
+    if (
+      graphFeature.value &&
+      (hasGeoserverLink.value ? graphFeature.value.features : true)
+    ) {
+      isPopupOpen.value = true;
+      const hasHighlight = setHighlight({
+        map: map.value,
         queriedFeatures,
-        datasetId: this.activeClickableDataset.id,
-        point: point,
-        ...lngLat,
+        clickableDatasetsIds: clickableDatasetsIds.value,
       });
-    },
-    onMapClicked(e) {
-      this.map = this.$refs.map.map;
-      if (this.activeClickableDataset) {
-        this.emptyGraphData();
-        const { lng, lat } = e.lngLat;
-        this.position = [lng, lat];
-        const queriedFeatures = this.map.queryRenderedFeatures(e.point);
-        this.setFeatures(queriedFeatures, e.point, e.lngLat);
-        if (this.graphFeature) {
-          this.isOpen = true;
-          setHighlight(this.map, queriedFeatures, this.clickableDatasetsIds);
-        }
-      }
-    },
+      store.dispatch("map/setHighlightedId", hasHighlight);
+    } else {
+      isPopupOpen.value = false;
+      store.dispatch("map/setHighlightedId");
+      setHighlight({
+        map: map.value,
+        queriedFeatures,
+        clickableDatasetsIds: clickableDatasetsIds.value,
+        event: "empty",
+      });
+      toast.dismiss(emptyDataToast.value);
+      emptyDataToast.value = toast.warning(
+        "No data available for this area with these filters.",
+      );
+    }
+  }
+}
+function closePopup() {
+  isPopupOpen.value = false;
+  store.dispatch("map/setHighlightedId");
+  store.dispatch("graphs/emptyGraphData");
+  setHighlight({
+    map: map.value,
+    highlightedId: store.getters["map/highlightedId"],
+  });
+}
+const activeClickableDataset = computed(
+  () => store.getters["map/activeClickableDataset"],
+);
+const graphFeature = computed(() => store.getters["graphs/graphFeature"]);
+const clickableDatasetsIds = computed(
+  () => store.getters["map/clickableDatasetsIds"],
+);
+const seaLevelRiseData = computed(() => store.getters["map/seaLevelRiseData"]);
+const mapboxLayers = computed(() => store.getters["map/mapboxLayers"]);
+const hasGeoserverLink = computed(() =>
+  mapboxLayers.value.some((layer) => layer.id.endsWith("_geoserver_link")),
+);
+watch(
+  () => store.getters["graphs/graphData"],
+  (newVal) => {
+    if (newVal) {
+      isPopupOpen.value = true;
+    }
   },
+);
+watch(
+  () => store.getters["graphs/graphFeature"],
+  (newVal) => {
+    if (!newVal) {
+      closePopup();
+    }
+  },
+);
+watch(
+  () => store.getters["map/activeClickableDataset"],
+  (newVal) => {
+    if (!newVal) {
+      closePopup();
+    }
+  },
+);
+onMounted(() => {
+  if (store.getters["datasets/dataset"])
+    store.dispatch("datasets/loadDatasets");
+  map.value.on("load", () => {
+    map.value.flyTo({
+      center: [5.2913, 48.1326],
+      zoom: 4,
+      speed: 3,
+    });
+    prepareHighlightSource(map.value);
+  });
+});
 
-  watch: {
-    graphData() {
-      if (this.graphData) {
-        this.isOpen = true;
-      }
-    },
-    graphFeature() {
-      if (!this.graphFeature) {
-        this.isOpen = false;
-        setHighlight(this.map);
-      }
-    },
-    activeClickableDataset() {
-      if (!this.activeClickableDataset) {
-        this.isOpen = false;
-        setHighlight(this.map);
-      }
-    },
-  },
-  computed: {
-    ...mapGetters("map", [
-      "mapboxLayers",
-      "activeClickableDataset",
-      "clickableDatasetsIds",
-    ]),
-    ...mapGetters("datasets", [
-      "activeDatasets",
-      "activeDatasetIds",
-      "activeDatasetProperties",
-    ]),
-    ...mapGetters("graphs", ["graphData", "graphFeature"]),
-  },
-  mounted() {
-    this.map = this.$refs.map.map;
-    this.map.on("load", () => prepareHighlightSource(this.map));
-  },
-  created() {
-    this.setSeaLevelRiseData(this.seaLevelRiseData);
-  },
-};
+onBeforeMount(() => {
+  store.dispatch("map/setSeaLevelRiseData", seaLevelRiseData.value);
+});
 </script>
 
 <style>
+:root {
+  --drawer-block-margin: 50px;
+  --drawer-inline-margin: 10px;
+}
 #map {
   width: 100%;
   height: 100%;
 }
-
-.mapboxgl-popup-content {
-  width: fit-content;
-}
-
-.buttons-container {
+.mapboxgl-ctrl,
+.mapboxgl-ctrl-group {
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 5px;
-}
-
-.add-to-dashboard-button-popup {
-  background-color: #293a45;
-  color: white !important;
-  font-family: "Inter", sans-serif;
-  text-transform: none;
-  font-weight: 100 !important;
-  border-radius: 8px;
-  max-width: 15vw;
-  min-width: 15vw;
-}
-
-.close-button-popup {
-  background-color: white;
-  color: #293a45 !important;
-  font-family: "Inter", sans-serif;
-  text-transform: none;
-  font-weight: 100 !important;
-  border-radius: 8px;
-  border: 1px solid #293a45;
-  min-width: 10vw;
 }
 </style>

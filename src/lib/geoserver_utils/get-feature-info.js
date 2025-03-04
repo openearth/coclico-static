@@ -13,6 +13,7 @@ export default async function getFeatureInfo({
   bounds,
   width = 110,
   height = 110,
+  keys = ["GRAY_INDEX"],
 }) {
   let bbox = null;
   // Bounding box used with area selection.
@@ -60,8 +61,13 @@ export default async function getFeatureInfo({
       .then((features) =>
         layers.map((layer, index) => ({
           ...layer,
-          value: features[index].properties.GRAY_INDEX,
-        }))
+          value:
+            keys.length === 1
+              ? features[index].properties[keys[0]]
+              : Object.fromEntries(
+                  keys.map((key) => [key, features[index].properties[key]]),
+                ),
+        })),
       )
       .catch(() => undefined)
   );

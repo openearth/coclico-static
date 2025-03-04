@@ -1,44 +1,40 @@
 <template>
-  <v-card flat class="scrollable-card">
-    <v-container
+  <VCard flat class="card">
+    <VContainer
       style="padding-top: 0px"
       v-for="dataset in datasets"
       :key="dataset.id"
     >
-      <v-card-text class="layer-title">
+      <VCardText class="layer-title">
         {{ dataset.title }}
-        <v-tooltip
-          location="bottom"
-          max-width="450px"
-          :text="dataset.description"
-        >
-          <template v-slot:activator="{ props }">
-            <v-icon v-bind="props" small class="summary-info, ml-4"
-              >mdi-information-outline</v-icon
-            >
-          </template>
-        </v-tooltip>
-      </v-card-text>
+      </VCardText>
 
       <ActiveDatasetRow :dataset-id="dataset.id" />
       <!-- TODO: check if the condition of the old viewer && dataset.id === activeRasterDatasetId should also be implemented here -->
-      <v-row v-if="hasLegend(dataset)">
-        <v-col>
+      <VRow v-if="hasLegend(dataset)">
+        <VCol>
           <layer-legend :dataset="dataset" />
-        </v-col>
-      </v-row>
-      <v-row class="pb-4">
-        <v-col cols="12">
-          <v-card-text class="text-style">
-            <v-icon> mdi-cursor-default-click </v-icon>
+        </VCol>
+      </VRow>
+      <VRow class="pb-4">
+        <VCol cols="12">
+          <VCardText class="text-style">
+            <VIcon> mdi-cursor-default-click </VIcon>
             Select an element in the map for specific
             <strong>location analysis</strong>.
-          </v-card-text>
-        </v-col>
-      </v-row>
-      <v-divider />
-    </v-container>
-  </v-card>
+          </VCardText>
+        </VCol>
+      </VRow>
+      <VDivider />
+    </VContainer>
+    <div v-if="!datasets.length" class="empty text-center mx-16 pb-4">
+      <p class="font-weight-black">No data layers have been selected.</p>
+      <p class="mt-4">
+        Explore data categories and activate data layers from the left hand-side
+        navigation bar.
+      </p>
+    </div>
+  </VCard>
 </template>
 
 <script setup>
@@ -54,13 +50,16 @@ const datasets = computed(() => store.getters["datasets/activeDatasets"]);
 </script>
 
 <style>
+.empty {
+  max-width: 50ch;
+}
 .text-style {
   background: #f0f0f0;
   padding: 5px;
 }
-.scrollable-card {
-  max-height: 300px;
-  overflow-y: visible;
+.card {
+  display: flex;
+  justify-content: center;
 }
 .layer-title {
   font-family: "Inter", sans-serif;

@@ -1,41 +1,44 @@
 <template>
   <span
     class="icon"
+    v-if="icon"
     :class="{ 'icon--large': size === 'large' }"
     role="presentation"
   >
-    <span v-html="icon" />
+    <span>
+      <component :is="icon" />
+    </span>
   </span>
 </template>
 
-<script>
-export default {
-  props: {
-    name: {
-      type: String,
-      default: "",
-    },
-    iconFolder: {
-      type: String,
-      default: null,
-    },
-    size: {
-      type: String,
-      default: null,
-    },
-  },
-  computed: {
-    icon() {
-      try {
-        const subFolder = this.iconFolder ? `${this.iconFolder}/` : "";
+<script setup>
+import fallback from "@/assets/icons/icon-placeholder.svg";
+import { computed, defineAsyncComponent } from "vue";
 
-        return require(`..//assets/icons/${subFolder}icon-${this.name}.svg`);
-      } catch {
-        return require("../assets/icons/icon-placeholder.svg");
-      }
-    },
+const props = defineProps({
+  name: {
+    type: String,
+    default: "",
   },
-};
+  iconFolder: {
+    type: String,
+    default: null,
+  },
+  size: {
+    type: String,
+    default: null,
+  },
+});
+const icon = computed(() => {
+  try {
+    return defineAsyncComponent(
+      () => import(`@/assets/icons/icon-${props.name}.svg`),
+    );
+  } catch (e) {
+    console.error(e);
+    return fallback;
+  }
+});
 </script>
 
 <style>
@@ -58,7 +61,6 @@ export default {
 
 .icon svg {
   display: block;
-  width: 100%;
   width: 100%;
   height: 100%;
   fill: currentColor;

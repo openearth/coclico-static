@@ -28,6 +28,6 @@ export async function getCollections(catalog) {
               })
             : [],
       };
-    })
+    }),
   );
 }

@@ -10,7 +10,8 @@ const getEnsembleLabel = (ensemble) =>
     msl_l: "Low",
     msl_m: "Medium",
     msl_h: "High",
-  }[ensemble]);
+  })[ensemble];
+
 /**
  * Function that fetches the data for the sea level rise graph
  * @param dataset
@@ -31,10 +32,10 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
           ensemble,
           time,
           name: `${scenario}_${ensemble}_${time}`,
-        }))
-      )
+        })),
+      ),
     ),
-    10
+    10,
   );
   const data = (
     await Promise.all(
@@ -44,8 +45,8 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
           url: "https://coclico.avi.deltares.nl/geoserver/slp/wms",
           lng,
           lat,
-        })
-      )
+        }),
+      ),
     )
   ).flat();
   const colors = ["#000000", "#173c66", "#f79320", "#951b1e"];
@@ -67,13 +68,13 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
             },
       data: data
         .filter(
-          (datum) => datum.scenario === scenario && datum.ensemble === ensemble
+          (datum) => datum.scenario === scenario && datum.ensemble === ensemble,
         )
         .sort((a, b) => a.time - b.time)
         .map(({ value }) => value),
       animation: false,
       silent: true,
       barWidth: 3,
-    }))
+    })),
   );
 }
