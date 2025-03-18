@@ -2,7 +2,7 @@ import { get, unzip } from "lodash-es";
 import { openArray } from "zarr";
 import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
 import { getPpGraphData } from "@/lib/graphs/pp/get-graph-data-pp";
-import { getBeGraphData } from "@/lib/graphs/be/get-graph-data-pp";
+import { getBeGraphData } from "@/lib/graphs/be/get-graph-data-be";
 
 export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
