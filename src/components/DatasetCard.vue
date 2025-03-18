@@ -49,7 +49,7 @@
       </VTooltip>
     </VTabs>
 
-    <VTabsWindow v-model="tab" class="pt-4">
+    <VTabsWindow style="width: 450px" :key="isOpen" v-model="tab" class="pt-4">
       <VTabsWindowItem value="option-1">
         <active-dataset-tab />
       </VTabsWindowItem>
@@ -118,9 +118,11 @@ watch(activeDatasets, (newVals, prevVals) => {
 function toggle() {
   isOpen.value = !isOpen.value;
 }
+
 function open() {
   isOpen.value = true;
 }
+
 function close() {
   isOpen.value = false;
 }
@@ -138,18 +140,16 @@ function close() {
     width 0.2s linear 0.1s;
   width: 230px;
   height: 50px;
+
   .tab-label {
     margin-left: 0;
     transition: 0.1s linear;
     visibility: hidden;
     width: 0;
   }
+
   &.open {
     border-radius: 28px 28px 28px 0px;
-    :deep(.v-tabs-window) {
-      min-width: 450px;
-      min-height: 260px;
-    }
 
     @supports (height: calc-size(max-content, size)) {
       .tab-label {
@@ -164,15 +164,19 @@ function close() {
     }
   }
 }
+
 .tabs {
   border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
 }
+
 .tab {
   width: 50%;
 }
+
 .custom-tab {
   z-index: 5;
 }
+
 .selected-tab-style {
   background-color: rgb(var(--v-theme-primary));
   border: none;
@@ -182,12 +186,18 @@ function close() {
 :deep(.v-slide-group) {
   height: auto;
 }
+
 :deep(.v-slide-group__content) {
   overflow: hidden;
+  max-height: max-content;
 }
 :deep(.v-tabs-window) {
   direction: rtl;
   resize: both;
+  overflow: scroll;
+  scrollbar-width: none;
+  min-width: 450px;
+  min-height: 260px;
 }
 :deep(.v-window__container) {
   direction: ltr;

@@ -1,10 +1,6 @@
 <template>
   <VCard flat class="card">
-    <VContainer
-      style="padding-top: 0px"
-      v-for="dataset in datasets"
-      :key="dataset.id"
-    >
+    <VContainer class="container" v-for="dataset in datasets" :key="dataset.id">
       <VCardText class="layer-title">
         {{ dataset.title }}
       </VCardText>
@@ -49,9 +45,14 @@ const store = useStore();
 const datasets = computed(() => store.getters["datasets/activeDatasets"]);
 </script>
 
-<style>
+<style scoped>
 .empty {
   max-width: 50ch;
+}
+.container {
+  padding-top: 0;
+  min-width: 450px;
+  max-width: 510px;
 }
 .text-style {
   background: #f0f0f0;
@@ -60,6 +61,7 @@ const datasets = computed(() => store.getters["datasets/activeDatasets"]);
 .card {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 .layer-title {
   font-family: "Inter", sans-serif;
