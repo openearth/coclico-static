@@ -143,6 +143,7 @@ async function exposed({ dataset, coords, props, fn }) {
   try {
     const { id } = dataset;
     const data = await fn(dataset, coords, props);
+    console.log(data);
     const scenarios = props.find(({ id }) => id === "scenarios").values;
     return {
       id,
