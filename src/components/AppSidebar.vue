@@ -42,8 +42,8 @@
       >
         <VListImg class="list-item-img">
           <VIcon color="black" size="1.5rem"
-            >mdi-book-open-variant-outline</VIcon
-          >
+            >mdi-book-open-variant-outline
+          </VIcon>
         </VListImg>
         <VListItemTitle class="list-item-title">Handbook</VListItemTitle>
       </VListItem>
@@ -84,7 +84,7 @@
     </VListItem>
     <VList>
       <VListItem v-if="filteredDatasets?.length">
-        <VCardTitle class="layer-card-title"> User stories </VCardTitle>
+        <VCardTitle class="layer-card-title"> User stories</VCardTitle>
         <VList class="layer-list">
           <VListItem
             v-for="dataset in filteredDatasets"
@@ -102,17 +102,25 @@
               />
             </template>
             <template v-slot:append>
-              <VTooltip
+              <VMenu
+                open-on-hover
+                open-delay="100"
+                close-delay="100"
                 max-width="300px"
-                location="bottom"
-                :text="dataset.description"
+                location="bottom center"
               >
                 <template v-slot:activator="{ props }">
                   <VIcon v-bind="props" small class="summary-info, ml-4">
                     mdi-information-outline
                   </VIcon>
                 </template>
-              </VTooltip>
+                <template v-slot:default>
+                  <VCard
+                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    v-html="marked.parse(dataset.description)"
+                  />
+                </template>
+              </VMenu>
             </template>
           </VListItem>
         </VList>
@@ -136,17 +144,25 @@
               ></VSwitch>
             </template>
             <template v-slot:append>
-              <VTooltip
+              <VMenu
+                open-on-hover
+                open-delay="100"
+                close-delay="100"
                 max-width="300px"
-                location="bottom"
-                :text="dataset.description"
+                location="bottom center"
               >
                 <template v-slot:activator="{ props }">
                   <VIcon v-bind="props" small class="summary-info, ml-4">
                     mdi-information-outline
                   </VIcon>
                 </template>
-              </VTooltip>
+                <template v-slot:default>
+                  <VCard
+                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    v-html="marked.parse(dataset.description)"
+                  />
+                </template>
+              </VMenu>
             </template>
           </VListItem>
         </VList>
@@ -160,6 +176,7 @@ import CustomIcon from "@/components/CustomIcon.vue";
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import { useTour } from "@/lib/useTour";
+import { marked } from "marked";
 
 const store = useStore();
 const showLayersCard = ref(false);
@@ -195,12 +212,22 @@ const sidebarStyle = computed(() => {
 });
 const filteredDatasets = computed(() => {
   return datasetsInActiveTheme.value.filter(
-    (dataset) => dataset.id === "slp" || dataset.id === "cfhp" || dataset.id === "cba" || dataset.id === "pp_maps" || dataset.id === "be_maps",
+    (dataset) =>
+      dataset.id === "slp" ||
+      dataset.id === "cfhp" ||
+      dataset.id === "cba" ||
+      dataset.id === "pp_maps" ||
+      dataset.id === "be_maps",
   );
 });
 const dataLayers = computed(() =>
   datasetsInActiveTheme.value.filter(
-    ({ id }) => id !== "slp" && id !== "cfhp" && id !== "cba" && id !== "pp_maps" && id !== "be_maps",
+    ({ id }) =>
+      id !== "slp" &&
+      id !== "cfhp" &&
+      id !== "cba" &&
+      id !== "pp_maps" &&
+      id !== "be_maps",
   ),
 );
 
@@ -208,12 +235,15 @@ function toggleLayersCard(theme) {
   showLayersCard.value =
     activeTheme.value === theme ? !showLayersCard.value : true;
 }
+
 function setTheme(theme) {
   store.dispatch("datasets/setActiveTheme", theme);
 }
+
 function close() {
   showLayersCard.value = false;
 }
+
 async function toggleDataset(dataset) {
   await store.dispatch("datasets/toggleActiveDataset", dataset.id);
   await store.dispatch("map/loadDatasetOnMap", dataset.id);
@@ -233,9 +263,11 @@ async function toggleDataset(dataset) {
   margin-top: var(--drawer-block-margin);
   margin-left: var(--drawer-inline-margin);
   overflow: hidden;
+
   & :global(.v-navigation-drawer--rail .list-item-title) {
     opacity: 0;
   }
+
   &
     :global(
       .v-navigation-drawer--rail.v-navigation-drawer--is-hovering
@@ -243,9 +275,14 @@ async function toggleDataset(dataset) {
     ) {
     opacity: 1;
   }
+
   & :global(.v-navigation-drawer__content) {
     scrollbar-width: thin;
   }
+}
+
+.tooltip :deep(a) {
+  color: white;
 }
 
 .image-container {
@@ -301,6 +338,7 @@ async function toggleDataset(dataset) {
     opacity: 0;
   }
 }
+
 .custom-data-layers-card {
   display: flex;
   align-items: center;
@@ -311,6 +349,7 @@ async function toggleDataset(dataset) {
   margin-top: var(--drawer-block-margin);
   margin-left: var(--drawer-inline-margin);
   border-radius: 0 28px 28px 0;
+
   &.closed {
     opacity: 0;
     animation: forwards linear delay-out 0.2s;
