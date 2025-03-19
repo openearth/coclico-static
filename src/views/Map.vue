@@ -9,7 +9,7 @@
         @mb-click="onMapClicked"
         :access-token="accessToken"
         :preserve-drawing-buffer="true"
-        map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
+        :map-style="mapstyle"
       >
         <MapboxNavigationControl :visualizePitch="true" />
         <MapLayer
@@ -34,6 +34,7 @@ import { computed, onBeforeMount, onMounted, provide, ref, watch } from "vue";
 import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
 import Popup from "@/components/Popup.vue";
 import { toast } from "vue-sonner";
+import mapstyle from "@/assets/map-styles/style.json";
 
 const store = useStore();
 const position = ref([]);
