@@ -1,11 +1,9 @@
 import * as d3 from "d3";
 
-export function createValueDomain({ stops, min, max }) {
+export function legend({ stops, min, max, options }) {
   const scale = d3.scaleLinear([min, max]);
-  return stops.map((stop) => scale(parseFloat(stop.offset) / 100));
-}
-
-export function legend(domain, range, options) {
+  const domain = stops.map((stop) => scale(parseFloat(stop.offset) / 100));
+  const range = stops.map((stop) => stop.color);
   return Legend(d3.scaleLinear(domain, range), options);
 }
 
@@ -87,7 +85,7 @@ function Legend(
       },
     );
 
-    svg
+    const image = svg
       .append("image")
       .attr("x", marginLeft)
       .attr("y", marginTop)

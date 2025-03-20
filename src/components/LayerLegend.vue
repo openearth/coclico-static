@@ -4,7 +4,7 @@
       <VCol ref="gradientContainer" class="gradient" cols="11"></VCol>
     </VRow>
     <VRow justify="center">
-      <VCol v-if="!editingRange" class="py-0" cols="1">
+      <VCol v-if="!editingRange" class="py-0" cols="6">
         <span>
           {{ minValue }}
         </span>
@@ -12,28 +12,28 @@
         <!--          {{ minValue }}-->
         <!--        </VBtn>-->
       </VCol>
-      <VCol v-else class="ma-0 ml-1" cols="5">
-        <VTextField
-          id="range-min"
-          v-model="minValue"
-          :label="`Min (${unit})`"
-          placeholder="Min value"
-        />
-      </VCol>
+      <!--      <VCol v-else class="ma-0 ml-1" cols="5">-->
+      <!--        <VTextField-->
+      <!--          id="range-min"-->
+      <!--          v-model="minValue"-->
+      <!--          :label="`Min (${unit})`"-->
+      <!--          placeholder="Min value"-->
+      <!--        />-->
+      <!--      </VCol>-->
       <!--      <VCol v-if="!editingRange" class="pa-0" cols="1" offset="9">-->
       <!--        <VBtn icon small variant="plain" @click="editRange">-->
       <!--          {{ maxValue }}-->
       <!--        </VBtn>-->
       <!--      </VCol>-->
-      <VCol v-else class="ma-0" cols="5" offset="1">
-        <VTextField
-          id="range-max"
-          v-model="maxValue"
-          :label="`Max (${unit})`"
-          placeholder="Max value"
-        />
-      </VCol>
-      <VCol class="my-auto pa-0 unit-text bodytext-s" offset="10" cols="1">
+      <!--      <VCol v-else class="ma-0" cols="5" offset="1">-->
+      <!--        <VTextField-->
+      <!--          id="range-max"-->
+      <!--          v-model="maxValue"-->
+      <!--          :label="`Max (${unit})`"-->
+      <!--          placeholder="Max value"-->
+      <!--        />-->
+      <!--      </VCol>-->
+      <VCol class="my-auto pa-0 unit-text" cols="6">
         <span> {{ maxValue }} </span>
         <span> [{{ unit }}] </span>
       </VCol>
@@ -54,7 +54,7 @@
 
 <script setup>
 import { set } from "lodash-es";
-import { createValueDomain, legend } from "@/lib/legend";
+import { legend } from "@/lib/legend";
 import { computed, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
@@ -88,16 +88,11 @@ onMounted(() => {
 function renderGradient() {
   if (linearGradient.value) {
     gradientContainer.value?.$el.replaceChildren(
-      legend(
-        createValueDomain({
-          stops: linearGradient.value,
-          min: parseFloat(minValue.value),
-          max: parseFloat(maxValue.value),
-        }),
-        linearGradient.value.map((stop) => {
-          return stop.color;
-        }),
-      ),
+      legend({
+        stops: linearGradient.value,
+        min: parseFloat(minValue.value),
+        max: parseFloat(maxValue.value),
+      }),
     );
   }
 }
@@ -135,8 +130,9 @@ function resetRange() {
   width: 420px;
   margin-inline: auto;
 }
+
 .unit-text {
-  text-align: center;
+  text-align: end;
 }
 
 .gradient {
@@ -144,5 +140,9 @@ function resetRange() {
   padding: 0;
   display: grid;
   place-items: center start;
+}
+
+:deep(image) {
+  outline: 1px solid hsla(0 0% 0% / 20%);
 }
 </style>
