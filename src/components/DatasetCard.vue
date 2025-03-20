@@ -49,11 +49,11 @@
       </VTooltip>
     </VTabs>
 
-    <VTabsWindow :key="isOpen" v-model="tab" class="pt-4" style="width: 450px">
-      <VTabsWindowItem value="option-1">
+    <VTabsWindow :key="isOpen" v-model="tab" class="pa-0" style="width: 500px">
+      <VTabsWindowItem class="window-item" value="option-1">
         <active-dataset-tab />
       </VTabsWindowItem>
-      <VTabsWindowItem value="option-2">
+      <VTabsWindowItem class="window-item" value="option-2">
         <dashboard-tab />
       </VTabsWindowItem>
     </VTabsWindow>
@@ -140,6 +140,8 @@ function close() {
     width 0.2s linear 0.1s;
   width: 230px;
   height: 50px;
+  max-height: calc(100vh - var(--drawer-block-margin) * 1.75);
+  max-width: calc(100vw - var(--drawer-inline-margin) * 3 - 100px);
 
   .tab-label {
     margin-left: 0;
@@ -204,9 +206,17 @@ function close() {
   scrollbar-width: none;
   min-width: 450px;
   min-height: 260px;
+  max-height: calc(100vh - var(--drawer-block-margin) * 1.75 - 50px);
+  max-width: calc(100vw - var(--drawer-inline-margin) * 3 - 100px);
 }
 
 :deep(.v-window__container) {
   direction: ltr;
+  height: 100%;
+  flex-grow: 1;
+}
+.window-item {
+  width: 100%;
+  height: 100%;
 }
 </style>

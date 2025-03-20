@@ -1,11 +1,12 @@
 import * as d3 from "d3";
 
+export function createValueDomain({ stops, min, max }) {
+  const scale = d3.scaleLinear([min, max]);
+  return stops.map((stop) => scale(parseFloat(stop.offset) / 100));
+}
+
 export function legend(domain, range, options) {
-  return Legend(
-    d3.scaleLinear().domain(domain).range(range),
-    d3.interpolateHcl,
-    options,
-  );
+  return Legend(d3.scaleLinear(domain, range), options);
 }
 
 function Legend(
@@ -13,7 +14,7 @@ function Legend(
   {
     title,
     tickSize = 6,
-    width = 375,
+    width = 400,
     height = 44 + tickSize,
     marginTop = 18,
     marginRight = 5,

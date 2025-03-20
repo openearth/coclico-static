@@ -19,8 +19,8 @@
             max-width="450px"
           >
             <template v-slot:activator="{ props }">
-              <VIcon class="summary-info, ml-4" small v-bind="props"
-                >mdi-information-outline
+              <VIcon class="summary-info, ml-4" small v-bind="props">
+                mdi-information-outline
               </VIcon>
             </template>
           </VTooltip>
@@ -29,7 +29,6 @@
       <VSelect
         :items="property.values"
         :value="property.value"
-        class="select"
         variant="outlined"
         @update:modelValue="(value) => updateProperty(property.id, value)"
       />
@@ -63,8 +62,18 @@ const updateProperty = async (property, value) => {
 };
 </script>
 
-<style>
+<style scoped>
 .summary-info {
   color: #a9b0b5;
+}
+
+:deep(.v-select__menu-icon) {
+  background: radial-gradient(
+    circle,
+    hsla(0 0% 100% / 100%) 30%,
+    hsla(0 0% 100% / 0%) 100%
+  );
+  opacity: 1;
+  border-radius: 50%;
 }
 </style>

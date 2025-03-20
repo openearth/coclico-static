@@ -1,13 +1,16 @@
 <template>
-  <VContainer class="ma-0 pa-0">
+  <VContainer class="ma-0 pa-0 root">
     <VRow justify="center">
-      <VCol ref="gradientContainer" class="pl-3 gradient" cols="12"></VCol>
+      <VCol ref="gradientContainer" class="gradient" cols="11"></VCol>
     </VRow>
-    <VRow style="margin-top: 0px">
-      <VCol v-if="!editingRange" class="ma-0 pa-0" cols="1">
-        <VBtn icon variant="plain" @click="editRange">
+    <VRow justify="center">
+      <VCol v-if="!editingRange" class="py-0" cols="1">
+        <span>
           {{ minValue }}
-        </VBtn>
+        </span>
+        <!--        <VBtn icon variant="plain" @click="editRange">-->
+        <!--          {{ minValue }}-->
+        <!--        </VBtn>-->
       </VCol>
       <VCol v-else class="ma-0 ml-1" cols="5">
         <VTextField
@@ -17,11 +20,11 @@
           placeholder="Min value"
         />
       </VCol>
-      <VCol v-if="!editingRange" class="pa-0 pl-4" cols="1" offset="9">
-        <VBtn icon small variant="plain" @click="editRange">
-          {{ maxValue }}
-        </VBtn>
-      </VCol>
+      <!--      <VCol v-if="!editingRange" class="pa-0" cols="1" offset="9">-->
+      <!--        <VBtn icon small variant="plain" @click="editRange">-->
+      <!--          {{ maxValue }}-->
+      <!--        </VBtn>-->
+      <!--      </VCol>-->
       <VCol v-else class="ma-0" cols="5" offset="1">
         <VTextField
           id="range-max"
@@ -30,8 +33,9 @@
           placeholder="Max value"
         />
       </VCol>
-      <VCol class="my-auto pa-0 unit-text bodytext-s" cols="1">
-        [{{ unit }}]
+      <VCol class="my-auto pa-0 unit-text bodytext-s" offset="10" cols="1">
+        <span> {{ maxValue }} </span>
+        <span> [{{ unit }}] </span>
       </VCol>
     </VRow>
     <VRow v-if="editingRange" justify="space-between">
@@ -50,7 +54,7 @@
 
 <script setup>
 import { set } from "lodash-es";
-import { legend } from "@/lib/legend";
+import { createValueDomain, legend } from "@/lib/legend";
 import { computed, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
@@ -85,13 +89,14 @@ function renderGradient() {
   if (linearGradient.value) {
     gradientContainer.value?.$el.replaceChildren(
       legend(
-        [Number(minValue.value), Number(maxValue.value)],
+        createValueDomain({
+          stops: linearGradient.value,
+          min: parseFloat(minValue.value),
+          max: parseFloat(maxValue.value),
+        }),
         linearGradient.value.map((stop) => {
           return stop.color;
         }),
-        {
-          title: "Laagste punt (provincie)",
-        },
       ),
     );
   }
@@ -125,7 +130,11 @@ function resetRange() {
 }
 </script>
 
-<style>
+<style scoped>
+.root {
+  width: 420px;
+  margin-inline: auto;
+}
 .unit-text {
   text-align: center;
 }
