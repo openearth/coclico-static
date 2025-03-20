@@ -72,7 +72,11 @@ const store = useStore();
 const isOpen = ref(false);
 const tab = ref("option-1");
 
-const activeDatasets = computed(() => store.getters["datasets/activeDatasets"]);
+const activeDatasets = computed(() =>
+  [...store.getters["datasets/activeDatasets"]].filter(
+    (dataset) => !dataset?.keywords?.includes("Background Layers"),
+  ),
+);
 const graphs = computed(() => store.getters["dashboard/graphs"]);
 
 useTour({
