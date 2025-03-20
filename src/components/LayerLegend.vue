@@ -1,15 +1,15 @@
 <template>
   <VContainer class="ma-0 pa-0">
     <VRow justify="center">
-      <VCol ref="gradientContainer" cols="12" class="pl-3 gradient"></VCol>
+      <VCol ref="gradientContainer" class="pl-3 gradient" cols="12"></VCol>
     </VRow>
     <VRow style="margin-top: 0px">
-      <VCol v-if="!editingRange" cols="1" class="ma-0 pa-0">
-        <VBtn variant="plain" icon @click="editRange">
+      <VCol v-if="!editingRange" class="ma-0 pa-0" cols="1">
+        <VBtn icon variant="plain" @click="editRange">
           {{ minValue }}
         </VBtn>
       </VCol>
-      <VCol v-else cols="5" class="ma-0 ml-1">
+      <VCol v-else class="ma-0 ml-1" cols="5">
         <VTextField
           id="range-min"
           v-model="minValue"
@@ -17,12 +17,12 @@
           placeholder="Min value"
         />
       </VCol>
-      <VCol v-if="!editingRange" cols="1" offset="9" class="pa-0 pl-4">
-        <VBtn @click="editRange" small variant="plain" icon>
+      <VCol v-if="!editingRange" class="pa-0 pl-4" cols="1" offset="9">
+        <VBtn icon small variant="plain" @click="editRange">
           {{ maxValue }}
         </VBtn>
       </VCol>
-      <VCol v-else cols="5" offset="1" class="ma-0">
+      <VCol v-else class="ma-0" cols="5" offset="1">
         <VTextField
           id="range-max"
           v-model="maxValue"
@@ -30,7 +30,7 @@
           placeholder="Max value"
         />
       </VCol>
-      <VCol cols="1" class="my-auto pa-0 unit-text bodytext-s">
+      <VCol class="my-auto pa-0 unit-text bodytext-s" cols="1">
         [{{ unit }}]
       </VCol>
     </VRow>
@@ -129,6 +129,7 @@ function resetRange() {
 .unit-text {
   text-align: center;
 }
+
 .gradient {
   flex-grow: 1;
   padding: 0;

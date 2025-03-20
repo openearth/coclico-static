@@ -1,36 +1,38 @@
 <template>
   <VRow>
     <VCol
-      class="pb-0 pt-0"
-      cols="6"
       v-for="property in properties"
       :key="property.id"
+      class="pb-0 pt-0"
+      cols="6"
     >
       <VRow class="align-center">
-        <VCol cols="9" class="mr-0">
-          <span class="summary-info">{{ property.id }}</span>
+        <VCol class="mr-0" cols="9">
+          <span class="summary-info">
+            {{ property.id }}
+          </span>
         </VCol>
-        <VCol v-if="property.description" cols="3" class="pa-4">
+        <VCol v-if="property.description" class="pa-4" cols="3">
           <VTooltip
+            :text="property.description"
             location="bottom"
             max-width="450px"
-            :text="property.description"
           >
             <template v-slot:activator="{ props }">
-              <VIcon v-bind="props" small class="summary-info, ml-4"
-                >mdi-information-outline</VIcon
-              >
+              <VIcon class="summary-info, ml-4" small v-bind="props"
+                >mdi-information-outline
+              </VIcon>
             </template>
           </VTooltip>
         </VCol>
       </VRow>
       <VSelect
-        :value="property.value"
         :items="property.values"
+        :value="property.value"
         class="select"
-        @update:modelValue="(value) => updateProperty(property.id, value)"
         variant="outlined"
-      ></VSelect>
+        @update:modelValue="(value) => updateProperty(property.id, value)"
+      />
     </VCol>
   </VRow>
 </template>

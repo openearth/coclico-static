@@ -7,6 +7,7 @@ export function legend(domain, range, options) {
     options,
   );
 }
+
 function Legend(
   color,
   {

@@ -1,30 +1,30 @@
 <template>
   <VNavigationDrawer
-    permanent
-    expand-on-hover
-    rail
-    width="180"
-    rail-width="100"
-    class="custom-navigation-drawer"
     :style="sidebarStyle"
+    class="custom-navigation-drawer"
+    expand-on-hover
+    permanent
+    rail
+    rail-width="100"
+    width="180"
   >
     <VListItem class="image-container">
-      <custom-icon name="logo" class="coclico-image" />
+      <custom-icon class="coclico-image" name="logo" />
     </VListItem>
-    <VList nav ref="tour">
+    <VList ref="tour" nav>
       <VListItem
+        v-for="theme in themes"
+        :key="theme.name"
+        :value="theme.name"
         class="list-item"
+        color="primary"
         @click="
           toggleLayersCard(theme.name);
           setTheme(theme.name);
         "
-        v-for="theme in themes"
-        :key="theme.name"
-        color="primary"
-        :value="theme.name"
       >
         <VListImg class="pa-2 list-item-img">
-          <VBadge color="primary" v-if="theme.count" :content="theme.count">
+          <VBadge v-if="theme.count" :content="theme.count" color="primary">
             <custom-icon :name="theme.name" class="item-image" />
           </VBadge>
 
@@ -41,9 +41,9 @@
         target="_blank"
       >
         <VListImg class="list-item-img">
-          <VIcon color="black" size="1.5rem"
-            >mdi-book-open-variant-outline</VIcon
-          >
+          <VIcon color="black" size="1.5rem">
+            mdi-book-open-variant-outline
+          </VIcon>
         </VListImg>
         <VListItemTitle class="list-item-title">Handbook</VListItemTitle>
       </VListItem>
@@ -61,11 +61,11 @@
   </VNavigationDrawer>
 
   <VNavigationDrawer
+    v-model="showLayersCard"
+    :class="{ closed: !showLayersCard }"
+    class="custom-data-layers-card"
     floating
     temporary
-    class="custom-data-layers-card"
-    :class="{ closed: !showLayersCard }"
-    v-model="showLayersCard"
     width="400"
   >
     <VListItem>
@@ -76,7 +76,7 @@
           </VCardTitle>
         </VCol>
         <VCol class="column-right" cols="2">
-          <VBtn icon @click="close" flat class="close-button">
+          <VBtn class="close-button" flat icon @click="close">
             <VIcon>mdi-close</VIcon>
           </VBtn>
         </VCol>
@@ -84,7 +84,7 @@
     </VListItem>
     <VList>
       <VListItem v-if="filteredDatasets?.length">
-        <VCardTitle class="layer-card-title"> User stories </VCardTitle>
+        <VCardTitle class="layer-card-title"> User stories</VCardTitle>
         <VList class="layer-list">
           <VListItem
             v-for="dataset in filteredDatasets"
@@ -94,21 +94,21 @@
             <template v-slot:prepend>
               <VSwitch
                 v-model="dataset.active"
-                hide-details
+                :label="dataset.title"
                 class="mr-5"
                 color="primary"
+                hide-details
                 @change="toggleDataset(dataset)"
-                :label="dataset.title"
               />
             </template>
             <template v-slot:append>
               <VTooltip
-                max-width="300px"
-                location="bottom"
                 :text="dataset.description"
+                location="bottom"
+                max-width="300px"
               >
                 <template v-slot:activator="{ props }">
-                  <VIcon v-bind="props" small class="summary-info, ml-4">
+                  <VIcon class="summary-info, ml-4" small v-bind="props">
                     mdi-information-outline
                   </VIcon>
                 </template>
@@ -128,21 +128,21 @@
             <template v-slot:prepend>
               <VSwitch
                 v-model="dataset.active"
-                hide-details
+                :label="dataset.title"
                 class="mr-5"
                 color="primary"
+                hide-details
                 @change="toggleDataset(dataset)"
-                :label="dataset.title"
               ></VSwitch>
             </template>
             <template v-slot:append>
               <VTooltip
-                max-width="300px"
-                location="bottom"
                 :text="dataset.description"
+                location="bottom"
+                max-width="300px"
               >
                 <template v-slot:activator="{ props }">
-                  <VIcon v-bind="props" small class="summary-info, ml-4">
+                  <VIcon class="summary-info, ml-4" small v-bind="props">
                     mdi-information-outline
                   </VIcon>
                 </template>
@@ -195,12 +195,22 @@ const sidebarStyle = computed(() => {
 });
 const filteredDatasets = computed(() => {
   return datasetsInActiveTheme.value.filter(
-    (dataset) => dataset.id === "slp" || dataset.id === "cfhp" || dataset.id === "cba" || dataset.id === "pp_maps" || dataset.id === "be_maps",
+    (dataset) =>
+      dataset.id === "slp" ||
+      dataset.id === "cfhp" ||
+      dataset.id === "cba" ||
+      dataset.id === "pp_maps" ||
+      dataset.id === "be_maps",
   );
 });
 const dataLayers = computed(() =>
   datasetsInActiveTheme.value.filter(
-    ({ id }) => id !== "slp" && id !== "cfhp" && id !== "cba" && id !== "pp_maps" && id !== "be_maps",
+    ({ id }) =>
+      id !== "slp" &&
+      id !== "cfhp" &&
+      id !== "cba" &&
+      id !== "pp_maps" &&
+      id !== "be_maps",
   ),
 );
 
@@ -208,12 +218,15 @@ function toggleLayersCard(theme) {
   showLayersCard.value =
     activeTheme.value === theme ? !showLayersCard.value : true;
 }
+
 function setTheme(theme) {
   store.dispatch("datasets/setActiveTheme", theme);
 }
+
 function close() {
   showLayersCard.value = false;
 }
+
 async function toggleDataset(dataset) {
   await store.dispatch("datasets/toggleActiveDataset", dataset.id);
   await store.dispatch("map/loadDatasetOnMap", dataset.id);
@@ -233,9 +246,11 @@ async function toggleDataset(dataset) {
   margin-top: var(--drawer-block-margin);
   margin-left: var(--drawer-inline-margin);
   overflow: hidden;
+
   & :global(.v-navigation-drawer--rail .list-item-title) {
     opacity: 0;
   }
+
   &
     :global(
       .v-navigation-drawer--rail.v-navigation-drawer--is-hovering
@@ -243,6 +258,7 @@ async function toggleDataset(dataset) {
     ) {
     opacity: 1;
   }
+
   & :global(.v-navigation-drawer__content) {
     scrollbar-width: thin;
   }
@@ -301,6 +317,7 @@ async function toggleDataset(dataset) {
     opacity: 0;
   }
 }
+
 .custom-data-layers-card {
   display: flex;
   align-items: center;
@@ -311,6 +328,7 @@ async function toggleDataset(dataset) {
   margin-top: var(--drawer-block-margin);
   margin-left: var(--drawer-inline-margin);
   border-radius: 0 28px 28px 0;
+
   &.closed {
     opacity: 0;
     animation: forwards linear delay-out 0.2s;

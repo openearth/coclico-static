@@ -1,11 +1,11 @@
 <template>
-  <VCard ref="tour" class="custom-dataset-card" :class="{ open: isOpen }">
+  <VCard ref="tour" :class="{ open: isOpen }" class="custom-dataset-card">
     <VTabs
       v-model="tab"
-      hide-slider
+      align-tabs="center"
       class="tabs"
       height="35px"
-      align-tabs="center"
+      hide-slider
     >
       <VTooltip
         :location="isOpen ? 'top' : 'bottom'"
@@ -13,13 +13,13 @@
       >
         <template v-slot:activator="{ props: tooltip }">
           <VTab
+            :ripple="false"
+            class="tab"
+            height="50"
+            hide-slider
+            selected-class="selected-tab-style"
             v-bind="mergeProps(tooltip)"
             value="option-1"
-            hide-slider
-            :ripple="false"
-            height="50"
-            class="tab"
-            selected-class="selected-tab-style"
             @click="toggle"
           >
             <custom-icon name="layers"></custom-icon>
@@ -33,13 +33,13 @@
       >
         <template v-slot:activator="{ props: tooltip }">
           <VTab
+            :ripple="false"
+            class="tab"
+            height="50"
+            hide-slider
+            selected-class="selected-tab-style"
             v-bind="mergeProps(tooltip)"
             value="option-2"
-            hide-slider
-            :ripple="false"
-            height="50"
-            class="tab"
-            selected-class="selected-tab-style"
             @click="toggle"
           >
             <custom-icon name="dashboard"></custom-icon>
@@ -49,7 +49,7 @@
       </VTooltip>
     </VTabs>
 
-    <VTabsWindow style="width: 450px" :key="isOpen" v-model="tab" class="pt-4">
+    <VTabsWindow :key="isOpen" v-model="tab" class="pt-4" style="width: 450px">
       <VTabsWindowItem value="option-1">
         <active-dataset-tab />
       </VTabsWindowItem>
@@ -149,17 +149,22 @@ function close() {
   }
 
   &.open {
-    border-radius: 28px 28px 28px 0px;
+    border-radius: 28px 28px 28px 0;
+    height: max-content;
+    width: max-content;
+
+    .tab-label {
+      visibility: visible;
+      margin-left: 0.5rem;
+      width: max-content;
+    }
 
     @supports (height: calc-size(max-content, size)) {
       .tab-label {
-        visibility: visible;
-        margin-left: 0.5rem;
         width: calc-size(max-content, size);
       }
       & {
         width: calc-size(max-content, size);
-        height: max-content;
       }
     }
   }
@@ -191,6 +196,7 @@ function close() {
   overflow: hidden;
   max-height: max-content;
 }
+
 :deep(.v-tabs-window) {
   direction: rtl;
   resize: both;
@@ -199,6 +205,7 @@ function close() {
   min-width: 450px;
   min-height: 260px;
 }
+
 :deep(.v-window__container) {
   direction: ltr;
 }

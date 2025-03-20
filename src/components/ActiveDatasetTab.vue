@@ -1,6 +1,6 @@
 <template>
-  <VCard flat class="card">
-    <VContainer class="container" v-for="dataset in datasets" :key="dataset.id">
+  <VCard class="card" flat>
+    <VContainer v-for="dataset in datasets" :key="dataset.id" class="container">
       <VCardText class="layer-title">
         {{ dataset.title }}
       </VCardText>
@@ -15,7 +15,7 @@
       <VRow class="pb-4">
         <VCol cols="12">
           <VCardText class="text-style">
-            <VIcon> mdi-cursor-default-click </VIcon>
+            <VIcon> mdi-cursor-default-click</VIcon>
             Select an element in the map for specific
             <strong>location analysis</strong>.
           </VCardText>
@@ -49,20 +49,24 @@ const datasets = computed(() => store.getters["datasets/activeDatasets"]);
 .empty {
   max-width: 50ch;
 }
+
 .container {
   padding-top: 0;
   min-width: 450px;
   max-width: 510px;
 }
+
 .text-style {
   background: #f0f0f0;
   padding: 5px;
 }
+
 .card {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
 }
+
 .layer-title {
   font-family: "Inter", sans-serif;
   font-weight: 600;

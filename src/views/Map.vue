@@ -4,12 +4,12 @@
     <VMain style="padding-inline: 0">
       <MapboxMap
         id="map"
-        ref="mapboxMap"
         key="map"
-        @mb-click="onMapClicked"
+        ref="mapboxMap"
         :access-token="accessToken"
         :preserve-drawing-buffer="true"
         map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
+        @mb-click="onMapClicked"
       >
         <MapboxNavigationControl :visualizePitch="true" />
         <MapLayer
@@ -52,6 +52,7 @@ function setFeatures(queriedFeatures, point, lngLat) {
     ...lngLat,
   });
 }
+
 function onMapClicked(e) {
   if (activeClickableDataset.value) {
     store.dispatch("graphs/emptyGraphData");
@@ -86,6 +87,7 @@ function onMapClicked(e) {
     }
   }
 }
+
 function closePopup() {
   isPopupOpen.value = false;
   store.dispatch("map/setHighlightedId");
@@ -95,6 +97,7 @@ function closePopup() {
     highlightedId: store.getters["map/highlightedId"],
   });
 }
+
 const activeClickableDataset = computed(
   () => store.getters["map/activeClickableDataset"],
 );
@@ -154,10 +157,12 @@ onBeforeMount(() => {
   --drawer-block-margin: 50px;
   --drawer-inline-margin: 10px;
 }
+
 #map {
   width: 100%;
   height: 100%;
 }
+
 .mapboxgl-ctrl,
 .mapboxgl-ctrl-group {
   display: flex;

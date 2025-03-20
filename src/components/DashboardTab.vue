@@ -1,10 +1,10 @@
 <template>
-  <VCard flat class="card">
+  <VCard class="card" flat>
     <VCard
-      flat
       v-for="({ graphData, title }, index) in graphs"
       :key="index"
       class="ma-3 item"
+      flat
     >
       <div class="graph-title">
         <VCardTitle>
@@ -17,7 +17,7 @@
             )
           </small>
         </VCardTitle>
-        <VBtn icon flat class="close-button" @click="removeGraph(index)">
+        <VBtn class="close-button" flat icon @click="removeGraph(index)">
           <VIcon>mdi-close</VIcon>
         </VBtn>
       </div>
@@ -28,7 +28,7 @@
           style="height: 300px"
         />
         <template #fallback>
-          <VProgressCircular indeterminate color="primary" :size="50" />
+          <VProgressCircular :size="50" color="primary" indeterminate />
         </template>
       </Suspense>
     </VCard>
@@ -94,21 +94,26 @@ export default {
 .empty {
   max-width: 50ch;
 }
+
 .card {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
 }
+
 .item {
   max-width: 400px;
 }
+
 .close-button {
   color: rgb(var(--v-theme-grey80));
 }
+
 .graph-title {
   display: flex;
   justify-content: space-between;
 }
+
 .graph-title > .v-card-title {
   flex: 0 1 auto;
 }
