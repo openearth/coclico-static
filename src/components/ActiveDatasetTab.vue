@@ -42,7 +42,11 @@ import ActiveDatasetRow from "@/components/ActiveDatasetRow.vue";
 
 const store = useStore();
 
-const datasets = computed(() => store.getters["datasets/activeDatasets"]);
+const datasets = computed(() =>
+  [...store.getters["datasets/activeDatasets"]].filter(
+    (dataset) => !dataset?.keywords?.includes("Background Layers"),
+  ),
+);
 </script>
 
 <style scoped>
