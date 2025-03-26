@@ -4,6 +4,7 @@ const chunkArray = (arr, size) =>
   arr.length > size
     ? [arr.slice(0, size), ...chunkArray(arr.slice(size), size)]
     : [arr];
+
 /**
  * Function that fetches the data for the sea level rise graph
  * @param dataset

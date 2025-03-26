@@ -1,10 +1,9 @@
 <template>
-  <VCard flat class="card">
+  <VContainer class="dashboard">
     <VCard
-      flat
       v-for="({ graphData, title }, index) in graphs"
-      :key="index"
-      class="ma-3 item"
+      :key="`${graphData.id}-card-${index}`"
+      class="item"
     >
       <div class="graph-title">
         <VCardTitle>
@@ -17,7 +16,7 @@
             )
           </small>
         </VCardTitle>
-        <VBtn icon flat class="close-button" @click="removeGraph(index)">
+        <VBtn class="close-button" flat icon @click="removeGraph(index)">
           <VIcon>mdi-close</VIcon>
         </VBtn>
       </div>
@@ -28,11 +27,11 @@
           style="height: 300px"
         />
         <template #fallback>
-          <VProgressCircular indeterminate color="primary" :size="50" />
+          <VProgressCircular :size="50" color="primary" indeterminate />
         </template>
       </Suspense>
     </VCard>
-    <div v-if="!graphs.length" class="empty text-center mx-16 pb-4">
+    <div v-if="!graphs.length" class="empty text-center mx-16 py-4">
       <p class="font-weight-black">
         No data or graph has have been added to the dashboard.
       </p>
@@ -48,7 +47,7 @@
         </span>
       </p>
     </div>
-  </VCard>
+  </VContainer>
 </template>
 
 <script>
@@ -94,21 +93,43 @@ export default {
 .empty {
   max-width: 50ch;
 }
-.card {
+
+.dashboard {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin: 0;
+  overflow: visible;
+  height: 100%;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  max-height: max-content;
+  gap: 1px;
 }
+
 .item {
-  max-width: 400px;
+  padding: 5px 10px;
+  min-width: 450px;
+  max-width: 510px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+  height: max-content;
+  box-shadow: 1px -1px 2px 0 hsla(0 0% 0% / 10%);
 }
+
 .close-button {
   color: rgb(var(--v-theme-grey80));
 }
+
 .graph-title {
   display: flex;
   justify-content: space-between;
 }
+
 .graph-title > .v-card-title {
   flex: 0 1 auto;
 }

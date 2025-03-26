@@ -1,14 +1,16 @@
 <template>
   <VRow>
     <VCol
-      class="pb-0 pt-0"
-      cols="6"
       v-for="property in properties"
       :key="property.id"
+      class="pb-0 pt-0"
+      cols="6"
     >
       <VRow class="align-center">
-        <VCol cols="9" class="mr-0">
-          <span class="summary-info">{{ property.id }}</span>
+        <VCol class="mr-0" cols="9">
+          <span class="summary-info">
+            {{ property.id }}
+          </span>
         </VCol>
         <VCol v-if="property.description" cols="3" class="pa-4">
           <VMenu
@@ -33,12 +35,11 @@
         </VCol>
       </VRow>
       <VSelect
-        :value="property.value"
         :items="property.values"
-        class="select"
-        @update:modelValue="(value) => updateProperty(property.id, value)"
+        :value="property.value"
         variant="outlined"
-      ></VSelect>
+        @update:modelValue="(value) => updateProperty(property.id, value)"
+      />
     </VCol>
   </VRow>
 </template>
@@ -70,8 +71,18 @@ const updateProperty = async (property, value) => {
 };
 </script>
 
-<style>
+<style scoped>
 .summary-info {
   color: #a9b0b5;
+}
+
+:deep(.v-select__menu-icon) {
+  background: radial-gradient(
+    circle,
+    hsla(0 0% 100% / 100%) 30%,
+    hsla(0 0% 100% / 0%) 100%
+  );
+  opacity: 1;
+  border-radius: 50%;
 }
 </style>

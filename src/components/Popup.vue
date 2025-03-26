@@ -1,11 +1,11 @@
 <template>
   <MapboxPopup
-    :key="position.join('-')"
     v-if="position && isOpen"
+    :key="position.join('-')"
+    :closeButton="false"
     :lng-lat="position"
     anchor="bottom"
     style="display: flex; justify-content: center"
-    :closeButton="false"
   >
     <div style="width: auto; height: auto">
       <VCardTitle>
@@ -14,13 +14,13 @@
       <app-chart />
       <div class="buttons-container">
         <VBtn
+          class="add-to-dashboard-button-popup"
           flat
           @click="saveGraphOnDashboard"
-          class="add-to-dashboard-button-popup"
         >
           Add to dashboard
         </VBtn>
-        <VBtn flat @click="closePopup" class="close-button-popup"> Close </VBtn>
+        <VBtn class="close-button-popup" flat @click="closePopup"> Close</VBtn>
       </div>
     </div>
   </MapboxPopup>
