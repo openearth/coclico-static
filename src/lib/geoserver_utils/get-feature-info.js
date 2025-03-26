@@ -54,22 +54,24 @@ export default async function getFeatureInfo({
     feature_count: names.length,
   });
 
-  return (
-    fetch(geoServerUrl)
-      .then((response) => response.json())
-      .then(({ features }) => features)
-      //map and send back only the greyIndex values
-      .then((features) =>
-        layers.map((layer, index) => ({
-          ...layer,
-          value:
-            keys.length === 1
-              ? features[index].properties[keys[0]]
-              : Object.fromEntries(
-                  keys.map((key) => [key, features[index].properties[key]]),
-                ),
-        })),
-      )
-      .catch(() => undefined)
-  );
+  return fetch(geoServerUrl)
+    .then((response) => response.json())
+    .then(({ features }) =>
+      Boolean(features.length) ? features : Promise.reject(),
+    )
+    .then((features) =>
+      layers.flatMap((layer, index) => ({
+        ...layer,
+        value:
+          keys.length === 1
+            ? features[index].properties[keys[0]]
+            : Object.fromEntries(
+                keys.map((key) => [
+                  key,
+                  features?.[index]?.properties?.[key] || null,
+                ]),
+              ),
+      })),
+    )
+    .catch(() => undefined);
 }

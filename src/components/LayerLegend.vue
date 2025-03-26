@@ -1,37 +1,41 @@
 <template>
-  <VContainer class="ma-0 pa-0">
+  <VContainer class="ma-0 pa-0 root">
     <VRow justify="center">
-      <VCol ref="gradientContainer" cols="12" class="pl-3 gradient"></VCol>
+      <VCol ref="gradientContainer" class="gradient" cols="11"></VCol>
     </VRow>
-    <VRow style="margin-top: 0px">
-      <VCol v-if="!editingRange" cols="1" class="ma-0 pa-0">
-        <VBtn variant="plain" icon @click="editRange">
+    <VRow justify="center">
+      <VCol v-if="!editingRange" class="py-0" cols="6">
+        <span>
           {{ minValue }}
-        </VBtn>
+        </span>
+        <!--        <VBtn icon variant="plain" @click="editRange">-->
+        <!--          {{ minValue }}-->
+        <!--        </VBtn>-->
       </VCol>
-      <VCol v-else cols="5" class="ma-0 ml-1">
-        <VTextField
-          id="range-min"
-          v-model="minValue"
-          :label="`Min (${unit})`"
-          placeholder="Min value"
-        />
-      </VCol>
-      <VCol v-if="!editingRange" cols="1" offset="9" class="pa-0 pl-4">
-        <VBtn @click="editRange" small variant="plain" icon>
-          {{ maxValue }}
-        </VBtn>
-      </VCol>
-      <VCol v-else cols="5" offset="1" class="ma-0">
-        <VTextField
-          id="range-max"
-          v-model="maxValue"
-          :label="`Max (${unit})`"
-          placeholder="Max value"
-        />
-      </VCol>
-      <VCol cols="1" class="my-auto pa-0 unit-text bodytext-s">
-        [{{ unit }}]
+      <!--      <VCol v-else class="ma-0 ml-1" cols="5">-->
+      <!--        <VTextField-->
+      <!--          id="range-min"-->
+      <!--          v-model="minValue"-->
+      <!--          :label="`Min (${unit})`"-->
+      <!--          placeholder="Min value"-->
+      <!--        />-->
+      <!--      </VCol>-->
+      <!--      <VCol v-if="!editingRange" class="pa-0" cols="1" offset="9">-->
+      <!--        <VBtn icon small variant="plain" @click="editRange">-->
+      <!--          {{ maxValue }}-->
+      <!--        </VBtn>-->
+      <!--      </VCol>-->
+      <!--      <VCol v-else class="ma-0" cols="5" offset="1">-->
+      <!--        <VTextField-->
+      <!--          id="range-max"-->
+      <!--          v-model="maxValue"-->
+      <!--          :label="`Max (${unit})`"-->
+      <!--          placeholder="Max value"-->
+      <!--        />-->
+      <!--      </VCol>-->
+      <VCol class="my-auto pa-0 unit-text" cols="6">
+        <span> {{ maxValue }} </span>
+        <span> [{{ unit }}] </span>
       </VCol>
     </VRow>
     <VRow v-if="editingRange" justify="space-between">
@@ -84,15 +88,11 @@ onMounted(() => {
 function renderGradient() {
   if (linearGradient.value) {
     gradientContainer.value?.$el.replaceChildren(
-      legend(
-        [Number(minValue.value), Number(maxValue.value)],
-        linearGradient.value.map((stop) => {
-          return stop.color;
-        }),
-        {
-          title: "Laagste punt (provincie)",
-        },
-      ),
+      legend({
+        stops: linearGradient.value,
+        min: parseFloat(minValue.value),
+        max: parseFloat(maxValue.value),
+      }),
     );
   }
 }
@@ -125,14 +125,24 @@ function resetRange() {
 }
 </script>
 
-<style>
-.unit-text {
-  text-align: center;
+<style scoped>
+.root {
+  width: 420px;
+  margin-inline: auto;
 }
+
+.unit-text {
+  text-align: end;
+}
+
 .gradient {
   flex-grow: 1;
   padding: 0;
   display: grid;
   place-items: center start;
+}
+
+:deep(image) {
+  outline: 1px solid hsla(0 0% 0% / 20%);
 }
 </style>

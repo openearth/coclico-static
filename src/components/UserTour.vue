@@ -3,24 +3,24 @@
     <svg>
       <defs>
         <mask id="mask">
-          <rect x="0" y="0" width="100%" height="100%" fill="white"></rect>
+          <rect fill="white" height="100%" width="100%" x="0" y="0"></rect>
           <rect
-            rx="28px"
-            ry="28px"
+            :height="current?.bounds?.height || 0"
+            :width="current?.bounds?.width || 0"
             :x="current?.bounds?.x || 0"
             :y="current?.bounds?.y || 0"
-            :width="current?.bounds?.width || 0"
-            :height="current?.bounds?.height || 0"
+            rx="28px"
+            ry="28px"
           ></rect>
         </mask>
       </defs>
       <rect
-        mask="url(#mask)"
         class="backdrop"
+        height="100%"
+        mask="url(#mask)"
+        width="100%"
         x="0"
         y="0"
-        width="100%"
-        height="100%"
       />
     </svg>
     <v-menu
@@ -29,28 +29,28 @@
       :location="current?.location"
     >
       <template v-slot:activator="{ props }">
-        <div class="cutout" :style="cutout" v-bind="props" />
+        <div :style="cutout" class="cutout" v-bind="props" />
       </template>
 
       <v-card
-        max-width="500px"
-        :title="current?.title"
         :text="current?.description"
+        :title="current?.title"
+        max-width="500px"
       >
         <VCardActions class="flex justify-space-around">
           <VBtn
-            @click="previous"
             :disabled="!hasPreviousTourStep"
             prepend-icon="mdi-chevron-left"
+            @click="previous"
           >
             Previous
           </VBtn>
-          <VBtn @click="stop" append-icon="mdi-fast-forward" variant="text">
+          <VBtn append-icon="mdi-fast-forward" variant="text" @click="stop">
             Skip Tour
           </VBtn>
           <VBtn
-            @click="next"
             :append-icon="hasNextTourStep ? 'mdi-chevron-right' : 'mdi-check'"
+            @click="next"
           >
             {{ hasNextTourStep ? "Next" : "Finish" }}
           </VBtn>
@@ -59,8 +59,8 @@
     </v-menu>
   </aside>
   <VFab
-    app
     v-tooltip:top-center="'Start a tutorial tour'"
+    app
     class="mb-7"
     icon="mdi-help"
     location="bottom center"
@@ -89,15 +89,19 @@ const cutout = computed(() => {
     height: `${current.value?.bounds?.height}px`,
   };
 });
+
 function start() {
   store.dispatch("tour/startTour");
 }
+
 function stop() {
   store.dispatch("tour/stopTour");
 }
+
 function next() {
   store.dispatch("tour/nextTourStep");
 }
+
 function previous() {
   store.dispatch("tour/previousTourStep");
 }
@@ -112,12 +116,14 @@ function previous() {
     opacity: 1;
   }
 }
+
 aside {
   position: fixed;
   width: 100vw;
   height: 100vh;
   z-index: 999;
 }
+
 svg {
   animation: fadeIn 1s forwards;
   width: 100%;
