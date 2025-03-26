@@ -102,17 +102,25 @@
               />
             </template>
             <template v-slot:append>
-              <VTooltip
-                :text="dataset.description"
-                location="bottom"
+              <VMenu
+                open-on-hover
+                open-delay="100"
+                close-delay="100"
                 max-width="300px"
+                location="bottom center"
               >
                 <template v-slot:activator="{ props }">
                   <VIcon class="summary-info, ml-4" small v-bind="props">
                     mdi-information-outline
                   </VIcon>
                 </template>
-              </VTooltip>
+                <template v-slot:default>
+                  <VCard
+                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    v-html="marked.parse(dataset.description)"
+                  />
+                </template>
+              </VMenu>
             </template>
           </VListItem>
         </VList>
@@ -136,17 +144,25 @@
               ></VSwitch>
             </template>
             <template v-slot:append>
-              <VTooltip
-                :text="dataset.description"
-                location="bottom"
+              <VMenu
+                open-on-hover
+                open-delay="100"
+                close-delay="100"
                 max-width="300px"
+                location="bottom center"
               >
                 <template v-slot:activator="{ props }">
                   <VIcon class="summary-info, ml-4" small v-bind="props">
                     mdi-information-outline
                   </VIcon>
                 </template>
-              </VTooltip>
+                <template v-slot:default>
+                  <VCard
+                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    v-html="marked.parse(dataset.description)"
+                  />
+                </template>
+              </VMenu>
             </template>
           </VListItem>
         </VList>
@@ -160,6 +176,7 @@ import CustomIcon from "@/components/CustomIcon.vue";
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import { useTour } from "@/lib/useTour";
+import { marked } from "marked";
 
 const store = useStore();
 const showLayersCard = ref(false);
@@ -262,6 +279,10 @@ async function toggleDataset(dataset) {
   & :global(.v-navigation-drawer__content) {
     scrollbar-width: thin;
   }
+}
+
+.tooltip :deep(a) {
+  color: white;
 }
 
 .image-container {

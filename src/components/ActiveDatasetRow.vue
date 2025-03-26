@@ -12,18 +12,26 @@
             {{ property.id }}
           </span>
         </VCol>
-        <VCol v-if="property.description" class="pa-4" cols="3">
-          <VTooltip
-            :text="property.description"
-            location="bottom"
+        <VCol v-if="property.description" cols="3" class="pa-4">
+          <VMenu
+            open-on-hover
+            open-delay="100"
+            close-delay="100"
             max-width="450px"
+            location="bottom center"
           >
             <template v-slot:activator="{ props }">
-              <VIcon class="summary-info, ml-4" small v-bind="props">
+              <VIcon v-bind="props" small class="summary-info, ml-4">
                 mdi-information-outline
               </VIcon>
             </template>
-          </VTooltip>
+            <template v-slot:default>
+              <VCard
+                class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                v-html="marked.parse(property.description)"
+              />
+            </template>
+          </VMenu>
         </VCol>
       </VRow>
       <VSelect
@@ -39,6 +47,7 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed } from "vue";
+import { marked } from "marked";
 
 const props = defineProps({
   datasetId: {
