@@ -16,8 +16,8 @@
         </div>
         <VCardSubtitle>
           {{ GISCO_ID }}
-          ({{ roundCoords(graphData.coords.lat) }},
-          {{ roundCoords(graphData.coords.lng) }})
+          ({{ roundCoord(graphData.coords.lat) }},
+          {{ roundCoord(graphData.coords.lng) }})
         </VCardSubtitle>
       </div>
       <Suspense>
@@ -58,6 +58,7 @@ import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue"
 import LineChart from "@/components/ChartComponents/LineChart.vue";
 import { GRAPH_TYPES } from "@/lib/graphs";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
+import { roundCoord } from "@/lib/coords";
 
 export default {
   components: {
@@ -81,10 +82,8 @@ export default {
     ...mapGetters("dashboard", ["graphs"]),
   },
   methods: {
+    roundCoord,
     ...mapActions("dashboard", ["removeGraph"]),
-    roundCoords(number) {
-      return Number(number).toFixed(3);
-    },
   },
 };
 </script>

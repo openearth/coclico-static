@@ -13,6 +13,8 @@
       </VCardTitle>
       <VCardSubtitle>
         {{ graphFeature?.features?.properties?.GISCO_ID }}
+        ({{ roundCoord(graphData.coords.lat) }},
+        {{ roundCoord(graphData.coords.lng) }})
       </VCardSubtitle>
       <app-chart />
       <div class="buttons-container">
@@ -33,6 +35,7 @@ import AppChart from "@/components/AppChart.vue";
 import { useStore } from "vuex";
 import { computed } from "vue";
 import { MapboxPopup } from "@studiometa/vue-mapbox-gl";
+import { roundCoord } from "../lib/coords";
 
 defineProps({
   isOpen: Boolean,
@@ -48,6 +51,7 @@ const graphFeature = computed(() => store.getters["graphs/graphFeature"]);
 const closePopup = () => {
   emit("close");
 };
+
 const saveGraphOnDashboard = () => {
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
