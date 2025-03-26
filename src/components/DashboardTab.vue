@@ -1,24 +1,24 @@
 <template>
   <VContainer class="dashboard">
     <VCard
-      v-for="({ graphData, title }, index) in graphs"
+      v-for="({ graphData, title, GISCO_ID = null }, index) in graphs"
       :key="`${graphData.id}-card-${index}`"
       class="item"
     >
-      <div class="graph-title">
-        <VCardTitle>
-          {{ title }}
-          <br />
-          <small>
-            (
-            {{ roundCoords(graphData.coords.lat) }},
-            {{ roundCoords(graphData.coords.lng) }}
-            )
-          </small>
-        </VCardTitle>
-        <VBtn class="close-button" flat icon @click="removeGraph(index)">
-          <VIcon>mdi-close</VIcon>
-        </VBtn>
+      <div>
+        <div class="graph-title">
+          <VCardTitle>
+            {{ title }}
+          </VCardTitle>
+          <VBtn class="close-button" flat icon @click="removeGraph(index)">
+            <VIcon>mdi-close</VIcon>
+          </VBtn>
+        </div>
+        <VCardSubtitle>
+          {{ GISCO_ID }}
+          ({{ roundCoords(graphData.coords.lat) }},
+          {{ roundCoords(graphData.coords.lng) }})
+        </VCardSubtitle>
       </div>
       <Suspense>
         <component
@@ -122,6 +122,7 @@ export default {
 }
 
 .close-button {
+  max-height: 36px;
   color: rgb(var(--v-theme-grey80));
 }
 
@@ -132,5 +133,6 @@ export default {
 
 .graph-title > .v-card-title {
   flex: 0 1 auto;
+  padding-bottom: 0;
 }
 </style>

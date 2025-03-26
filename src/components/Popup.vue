@@ -11,6 +11,9 @@
       <VCardTitle>
         {{ activeClickableDataset.title }}
       </VCardTitle>
+      <VCardSubtitle>
+        {{ graphFeature?.features?.properties?.GISCO_ID }}
+      </VCardSubtitle>
       <app-chart />
       <div class="buttons-container">
         <VBtn
@@ -41,12 +44,14 @@ const activeClickableDataset = computed(
   () => store.getters["map/activeClickableDataset"],
 );
 const graphData = computed(() => store.getters["graphs/graphData"]);
+const graphFeature = computed(() => store.getters["graphs/graphFeature"]);
 const closePopup = () => {
   emit("close");
 };
 const saveGraphOnDashboard = () => {
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
+    GISCO_ID: graphFeature.value?.features?.properties?.GISCO_ID,
     title: activeClickableDataset.value?.title,
   });
 };
