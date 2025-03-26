@@ -1,10 +1,5 @@
 import getFeatureInfo from "@/lib/geoserver_utils/get-feature-info";
 
-const chunkArray = (arr, size) =>
-  arr.length > size
-    ? [arr.slice(0, size), ...chunkArray(arr.slice(size), size)]
-    : [arr];
-
 /**
  * Function that fetches the data for the sea level rise graph
  * @param dataset
@@ -18,29 +13,23 @@ export async function getPpGraphData(dataset, { lng, lat }, props) {
   const rp = props.find((prop) => prop.id === "return period").value;
   const times = props.find((prop) => prop.id === "time").values.sort();
   const scenarios = props.find((prop) => prop.id === "scenarios").values;
-  const layerChunks = chunkArray(
-    scenarios.flatMap((scenario) =>
-      times.flatMap((time) => ({
-        rp,
-        defenseLevel,
-        scenario,
-        time,
-        name: `pop_stats_${defenseLevel}_${rp}_${scenario}_${time}`,
-      })),
-    ),
-    100,
+  const layers = scenarios.flatMap((scenario) =>
+    times.flatMap((time) => ({
+      rp,
+      defenseLevel,
+      scenario,
+      time,
+      name: `pop_stats_${defenseLevel}_${rp}_${scenario}_${time}`,
+    })),
   );
-  return (
-    await Promise.all(
-      layerChunks.map((layers) =>
-        getFeatureInfo({
-          layers,
-          url: "https://coclico.avi.deltares.nl/geoserver/pp_maps/wms",
-          lng,
-          lat,
-          keys: ["rel_affected", "abs_affected"],
-        }),
-      ),
-    )
-  ).flat();
+  return await getFeatureInfo({
+    layers,
+    layer: "pop_stats",
+    url: "https://coclico.avi.deltares.nl/geoserver/pp_maps/wms",
+    lng,
+    lat,
+    x: 1,
+    y: 1,
+    keys: ["rel_affected", "abs_affected"],
+  });
 }

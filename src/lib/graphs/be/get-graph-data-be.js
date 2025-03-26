@@ -18,29 +18,21 @@ export async function getBeGraphData(dataset, { lng, lat }, props) {
   const rp = props.find((prop) => prop.id === "return period").value;
   const times = props.find((prop) => prop.id === "time").values.sort();
   const scenarios = props.find((prop) => prop.id === "scenarios").values;
-  const layerChunks = chunkArray(
-    scenarios.flatMap((scenario) =>
-      times.flatMap((time) => ({
-        rp,
-        defenseLevel,
-        scenario,
-        time,
-        name: `be_stats_${defenseLevel}_${rp}_${scenario}_${time}`,
-      })),
-    ),
-    100,
+  const layers = scenarios.flatMap((scenario) =>
+    times.flatMap((time) => ({
+      rp,
+      defenseLevel,
+      scenario,
+      time,
+      name: `be_stats_${defenseLevel}_${rp}_${scenario}_${time}`,
+    })),
   );
-  return (
-    await Promise.all(
-      layerChunks.map((layers) =>
-        getFeatureInfo({
-          layers,
-          url: "https://coclico.avi.deltares.nl/geoserver/be_maps/wms",
-          lng,
-          lat,
-          keys: ["rel_affected", "abs_affected"],
-        }),
-      ),
-    )
-  ).flat();
+  return await getFeatureInfo({
+    layer: "be_stats",
+    layers,
+    url: "https://coclico.avi.deltares.nl/geoserver/be_maps/wms",
+    lng,
+    lat,
+    keys: ["rel_affected", "abs_affected"],
+  });
 }
