@@ -34,7 +34,7 @@ const props = defineProps({
   },
   colorPalette: {
     type: Array,
-    default: () => ["#307fb6", "#5e9dc4", "#abcfe5"],
+    default: () => ["#004c6d", "#3d708f", "#6996b3", "#94bed9", "#c1e7ff"],
   },
 });
 

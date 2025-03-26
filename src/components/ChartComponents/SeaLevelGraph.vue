@@ -8,11 +8,13 @@ import { CanvasRenderer } from "echarts/renderers";
 import { BarChart } from "echarts/charts";
 import {
   LegendComponent,
+  MarkAreaComponent,
   TitleComponent,
   TooltipComponent,
 } from "echarts/components";
 import { computed } from "vue";
 import VChart from "vue-echarts";
+import { useStore } from "vuex";
 
 use([
   CanvasRenderer,
@@ -20,13 +22,38 @@ use([
   TitleComponent,
   TooltipComponent,
   LegendComponent,
+  MarkAreaComponent,
 ]);
+const store = useStore();
 const props = defineProps({
   graphData: {
     type: Object,
     required: true,
   },
 });
+const activeDatasetId = computed(
+  () => store.getters["datasets/activeDatasetIds"][0],
+);
+const values = computed(() =>
+  store.getters["datasets/activeDatasetValues"]?.(activeDatasetId.value),
+);
+const series = computed(() =>
+  props.graphData.values.map((item) =>
+    item.stack === values.value.scenarios && item.name.startsWith("High")
+      ? {
+          ...item,
+          markArea: {
+            itemStyle: {
+              opacity: 0.5,
+            },
+            data: [
+              [{ xAxis: values.value.time }, { xAxis: values.value.time }],
+            ],
+          },
+        }
+      : item,
+  ),
+);
 
 const option = computed(() => ({
   title: {
@@ -59,7 +86,10 @@ const option = computed(() => ({
     },
   },
   legend: {
-    data: props.graphData.scenarios,
+    data: props.graphData.scenarios.map((scenario) => `High ${scenario}`),
+    formatter(name) {
+      return name.replace("High ", "");
+    },
     selectedMode: false,
     orient: "horizontal",
     bottom: 0,
@@ -67,14 +97,18 @@ const option = computed(() => ({
       borderWidth: 0.5,
     },
   },
+  emphasis: {
+    focus: "series",
+    blurScope: "coordinateSystem",
+  },
   grid: {
     top: "15%",
-    left: "5%",
+    left: "10%",
     right: "5%",
     bottom: "15%",
     containLabel: true,
   },
-  series: props.graphData.values,
+  series: series.value,
 }));
 </script>
 

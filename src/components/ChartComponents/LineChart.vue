@@ -13,6 +13,7 @@ import {
   TooltipComponent,
 } from "echarts/components";
 import VChart from "vue-echarts";
+import { useStore } from "vuex";
 
 const props = defineProps({
   graphData: {
@@ -29,14 +30,48 @@ use([
   LegendComponent,
 ]);
 
+const store = useStore();
 const baseOptions =
   (await import(`@/assets/echart-templates/${props.graphData.id}.js`))
     .default || (await import("@/assets/echart-templates/default.js")).default;
 
+const activeDatasetId = computed(
+  () => store.getters["datasets/activeDatasetIds"][0],
+);
+const values = computed(() =>
+  store.getters["datasets/activeDatasetValues"]?.(activeDatasetId.value),
+);
+
 const option = computed(() => {
+  const highlightIndex = props.graphData.xAxis.data.findIndex(
+    (datum) => datum === (values.value?.time || values.value?.rp),
+  );
+  const hasHighlight = props.graphData.series.some((serie) =>
+    serie.name.startsWith(values.value.scenarios),
+  );
   return {
     ...baseOptions,
     ...props.graphData,
+    series: props.graphData.series.map((serie) => {
+      return serie.name.startsWith(values.value.scenarios)
+        ? {
+            ...serie,
+            data: serie.data.map((datum, index) =>
+              index === highlightIndex
+                ? {
+                    value: datum,
+                    symbolSize: 10,
+                  }
+                : datum,
+            ),
+          }
+        : {
+            ...serie,
+            lineStyle: {
+              type: hasHighlight ? "dashed" : "solid",
+            },
+          };
+    }),
     xAxis: {
       ...baseOptions.xAxis,
       ...props.graphData.xAxis,
