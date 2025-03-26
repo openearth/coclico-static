@@ -1,10 +1,9 @@
 <template>
-  <VCard class="card" flat>
+  <VContainer class="dashboard">
     <VCard
       v-for="({ graphData, title }, index) in graphs"
-      :key="index"
-      class="ma-3 item"
-      flat
+      :key="`${graphData.id}-card-${index}`"
+      class="item"
     >
       <div class="graph-title">
         <VCardTitle>
@@ -32,7 +31,7 @@
         </template>
       </Suspense>
     </VCard>
-    <div v-if="!graphs.length" class="empty text-center mx-16 pb-4">
+    <div v-if="!graphs.length" class="empty text-center mx-16 py-4">
       <p class="font-weight-black">
         No data or graph has have been added to the dashboard.
       </p>
@@ -48,7 +47,7 @@
         </span>
       </p>
     </div>
-  </VCard>
+  </VContainer>
 </template>
 
 <script>
@@ -95,14 +94,31 @@ export default {
   max-width: 50ch;
 }
 
-.card {
+.dashboard {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin: 0;
+  overflow: visible;
+  height: 100%;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  max-height: max-content;
+  gap: 1px;
 }
 
 .item {
-  max-width: 400px;
+  padding: 5px 10px;
+  min-width: 450px;
+  max-width: 510px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+  height: max-content;
+  box-shadow: 1px -1px 2px 0 hsla(0 0% 0% / 10%);
 }
 
 .close-button {

@@ -1,11 +1,10 @@
 import * as d3 from "d3";
 
-export function legend(domain, range, options) {
-  return Legend(
-    d3.scaleLinear().domain(domain).range(range),
-    d3.interpolateHcl,
-    options,
-  );
+export function legend({ stops, min, max, options }) {
+  const scale = d3.scaleLinear([min, max]);
+  const domain = stops.map((stop) => scale(parseFloat(stop.offset) / 100));
+  const range = stops.map((stop) => stop.color);
+  return Legend(d3.scaleLinear(domain, range), options);
 }
 
 function Legend(
@@ -13,7 +12,7 @@ function Legend(
   {
     title,
     tickSize = 6,
-    width = 375,
+    width = 400,
     height = 44 + tickSize,
     marginTop = 18,
     marginRight = 5,
@@ -86,7 +85,7 @@ function Legend(
       },
     );
 
-    svg
+    const image = svg
       .append("image")
       .attr("x", marginLeft)
       .attr("y", marginTop)
