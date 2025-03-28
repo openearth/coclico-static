@@ -12,9 +12,12 @@
         {{ activeClickableDataset.title }}
       </VCardTitle>
       <VCardSubtitle>
-        {{ graphFeature?.features?.properties?.GISCO_ID }}
+        {{ graphFeature?.features?.properties?.LAU_NAME }}
         ({{ roundCoord(graphData.coords.lat) }},
         {{ roundCoord(graphData.coords.lng) }})
+        <small class="d-block">
+          {{ properties }}
+        </small>
       </VCardSubtitle>
       <app-chart />
       <div class="buttons-container">
@@ -52,10 +55,20 @@ const closePopup = () => {
   emit("close");
 };
 
+const properties = computed(() =>
+  [
+    ...store.getters["datasets/activeDatasetProperties"](
+      activeClickableDataset.value.id,
+    ),
+  ]
+    .map(({ value }) => value)
+    .join("/"),
+);
 const saveGraphOnDashboard = () => {
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
-    GISCO_ID: graphFeature.value?.features?.properties?.GISCO_ID,
+    LAU_NAME: graphFeature.value?.features?.properties?.LAU_NAME,
+    properties,
     title: activeClickableDataset.value?.title,
   });
 };

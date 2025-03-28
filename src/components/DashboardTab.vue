@@ -1,7 +1,9 @@
 <template>
   <VContainer class="dashboard">
     <VCard
-      v-for="({ graphData, title, GISCO_ID = null }, index) in graphs"
+      v-for="(
+        { graphData, title, LAU_NAME = null, properties = null }, index
+      ) in graphs"
       :key="`${graphData.id}-card-${index}`"
       class="item"
     >
@@ -15,9 +17,12 @@
           </VBtn>
         </div>
         <VCardSubtitle>
-          {{ GISCO_ID }}
+          {{ LAU_NAME }}
           ({{ roundCoord(graphData.coords.lat) }},
           {{ roundCoord(graphData.coords.lng) }})
+          <small class="d-block">
+            {{ properties }}
+          </small>
         </VCardSubtitle>
       </div>
       <Suspense>
