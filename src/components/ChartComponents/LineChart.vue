@@ -41,6 +41,9 @@ const option = computed(() => {
   return {
     ...baseOptions,
     ...props.graphData,
+    series: props.graphData.series.filter(
+      (series) => series.key !== "abs_affected",
+    ),
     xAxis: {
       ...baseOptions.xAxis,
       data: properties.value.find((prop) => prop.id === "time").values.sort(),

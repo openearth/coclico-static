@@ -1,8 +1,7 @@
 import { get, unzip } from "lodash-es";
 import { openArray } from "zarr";
 import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
-import { getPpGraphData } from "@/lib/graphs/pp/get-graph-data-pp";
-import { getBeGraphData } from "@/lib/graphs/be/get-graph-data-be";
+import { getRasterMapGraphData } from "@/lib/graphs/raster-maps-data";
 
 export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
@@ -42,7 +41,7 @@ export const getGraphType = (id) =>
  * @param values
  * @returns {{id, name, xAxis: {data: *, title: string}, yAxis: {type: string, min: number, alignTicks, max: number, interval: number, axisLabel: {formatter: function(*): string}, nameTextStyle: {color: string, fontFamily: string}, name: string, nameLocation: string}[], series: *}|{name: *, value: *}[]|{name: string, value: *}[]|[string, unknown][]}
  */
-export function getFeatureData({ datasetId, feature, properties, values }) {
+export function getFeatureData({ datasetId, feature, values }) {
   switch (datasetId) {
     case "cba": {
       return Object.entries(feature)
@@ -118,44 +117,82 @@ export async function getRasterData(dataset, coords, props) {
         throw error;
       }
     case "pp_maps":
-      return exposed({ dataset, coords, props, fn: getPpGraphData });
+      return exposed({
+        dataset,
+        coords,
+        props,
+        layerName: "pop_stats",
+        keys: ["rel_affected", "abs_affected"],
+        unit: "percentage",
+      });
     case "be_maps":
-      return exposed({ dataset, coords, props, fn: getBeGraphData });
+      return exposed({
+        dataset,
+        coords,
+        props,
+        layerName: "be_stats",
+        keys: ["rel_affected", "abs_affected"],
+        unit: "percentage",
+      });
+    case "bc_maps":
+      return exposed({
+        dataset,
+        coords,
+        props,
+        layerName: "bc_stats",
+        keys: ["total"],
+        unit: "euro",
+      });
     default:
       console.warn(`No handler for dataset id: ${id}`);
       return null;
   }
 }
+const unitFormatter = (unit, value) =>
+  unit === "percentage"
+    ? `${(parseFloat(value) * 100).toFixed(2)}%`
+    : unit === "euro"
+      ? `€${parseFloat(value).toFixed(0)}`
+      : parseFloat(value).toFixed(2);
 
-async function exposed({ dataset, coords, props, fn }) {
+async function exposed({ dataset, coords, props, layerName, keys, unit }) {
   try {
     const { id } = dataset;
-    const data = await fn(dataset, coords, props);
+    const data = await getRasterMapGraphData({
+      dataset,
+      coords,
+      props,
+      layerName,
+      keys,
+    });
     const scenarios = props.find(({ id }) => id === "scenarios").values;
     return {
       id,
       name: id,
-      series: scenarios.flatMap((scenario) => ({
-        name: scenario,
-        type: "line",
-        tooltip: {
-          valueFormatter: (value) => `${(parseFloat(value) * 100).toFixed(2)}%`,
-          formatter: (value) => `${(parseFloat(value) * 100).toFixed(2)}%`,
-        },
-        data: data
-          .filter(
-            (datum) =>
-              datum.scenario === scenario &&
-              datum.defenseLevel ===
-                props.find((prop) => prop.id === "defense level").value &&
-              datum.rp ===
-                props.find((prop) => prop.id === "return period").value,
-          )
-          .sort((a, b) => a.time - b.time)
-          .map(({ value }) => {
-            return value["rel_affected"];
-          }),
-      })),
+      series: scenarios.flatMap((scenario) =>
+        keys.flatMap((key) => ({
+          name: `${scenario} ${key}`,
+          type: "line",
+          key,
+          tooltip: {
+            valueFormatter: (value) => unitFormatter(unit, value),
+            formatter: (value) => unitFormatter(unit, value),
+          },
+          data: data
+            .filter(
+              (datum) =>
+                datum.scenario === scenario &&
+                datum.defenseLevel ===
+                  props.find((prop) => prop.id === "defense level").value &&
+                datum.rp ===
+                  props.find((prop) => prop.id === "return period").value,
+            )
+            .sort((a, b) => a.time - b.time)
+            .map(({ value }) => {
+              return value?.[key] || value;
+            }),
+        })),
+      ),
     };
   } catch (error) {
     console.error("Error while fetching data from getGraphDataPp:", error);
