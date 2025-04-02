@@ -4,7 +4,7 @@
       v-for="(
         { graphData, title, LAU_NAME = null, properties = null }, index
       ) in graphs"
-      :key="`${graphData.id}-card-${index}`"
+      :key="`${graphData.id}-${formatCoords(graphData?.coords)}-${properties}`"
       class="item"
     >
       <div>
@@ -18,8 +18,7 @@
         </div>
         <VCardSubtitle>
           {{ LAU_NAME }}
-          ({{ roundCoords(graphData.coords.lat) }},
-          {{ roundCoords(graphData.coords.lng) }})
+          {{ formatCoords(graphData?.coords) }}
           <small class="d-block">
             {{ properties }}
           </small>
@@ -63,6 +62,7 @@ import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue"
 import LineChart from "@/components/ChartComponents/LineChart.vue";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
 import { GRAPH_TYPES } from "@/lib/graphs";
+import { formatCoords } from "../lib/coords";
 
 const store = useStore();
 const graphs = computed(() => store.getters["dashboard/graphs"]);
@@ -74,9 +74,6 @@ const graphComponents = {
 };
 const removeGraph = (index) => {
   store.dispatch("dashboard/removeGraph", index);
-};
-const roundCoords = (number) => {
-  return Number(number).toFixed(3);
 };
 </script>
 

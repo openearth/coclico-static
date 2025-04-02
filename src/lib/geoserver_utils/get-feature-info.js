@@ -59,8 +59,8 @@ export default async function getFeatureInfo({
     .then(({ features }) =>
       Boolean(features.length) ? features : Promise.reject(),
     )
-    .then((features) =>
-      layers.flatMap((layer, index) => ({
+    .then((features) => ({
+      data: layers.flatMap((layer, index) => ({
         ...layer,
         value:
           keys.length === 1
@@ -72,6 +72,7 @@ export default async function getFeatureInfo({
                 ]),
               ),
       })),
-    )
+      LAU_NAME: features[0]?.properties?.LAU_NAME,
+    }))
     .catch(() => undefined);
 }

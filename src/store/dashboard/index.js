@@ -1,3 +1,6 @@
+import { formatCoords } from "@/lib/coords";
+import { toast } from "vue-sonner";
+
 export default {
   namespaced: true,
 
@@ -27,8 +30,20 @@ export default {
   },
 
   actions: {
-    addGraph({ commit }, graph) {
-      commit("ADD_GRAPH", graph);
+    addGraph({ commit, state }, graph) {
+      if (
+        !state.graphs.some(
+          (g) =>
+            g.graphData.id === graph.graphData.id &&
+            formatCoords(g.graphData.coords) ===
+              formatCoords(graph.graphData.coords) &&
+            g.properties === graph.properties,
+        )
+      ) {
+        commit("ADD_GRAPH", graph);
+      } else {
+        toast.warning("An identical graph is already saved to the dashboard.");
+      }
     },
     removeGraph({ commit }, index) {
       commit("REMOVE_GRAPH", index);

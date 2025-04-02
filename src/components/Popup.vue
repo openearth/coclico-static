@@ -12,9 +12,10 @@
         {{ activeClickableDataset.title }}
       </VCardTitle>
       <VCardSubtitle>
-        {{ graphFeature?.features?.properties?.LAU_NAME }}
-        ({{ roundCoord(graphData.coords.lat) }},
-        {{ roundCoord(graphData.coords.lng) }})
+        {{
+          graphFeature?.features?.properties?.LAU_NAME || graphData?.LAU_NAME
+        }}
+        {{ formatCoords(graphData?.coords) }}
         <small class="d-block">
           {{ properties }}
         </small>
@@ -38,7 +39,7 @@ import AppChart from "@/components/AppChart.vue";
 import { useStore } from "vuex";
 import { computed } from "vue";
 import { MapboxPopup } from "@studiometa/vue-mapbox-gl";
-import { roundCoord } from "../lib/coords";
+import { formatCoords } from "../lib/coords";
 
 defineProps({
   isOpen: Boolean,
@@ -65,10 +66,13 @@ const properties = computed(() =>
     .join("/"),
 );
 const saveGraphOnDashboard = () => {
+  console.log(graphFeature.value?.features?.properties);
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
-    LAU_NAME: graphFeature.value?.features?.properties?.LAU_NAME,
-    properties,
+    LAU_NAME:
+      graphFeature.value?.features?.properties?.LAU_NAME ||
+      graphData.value?.LAU_NAME,
+    properties: properties.value,
     title: activeClickableDataset.value?.title,
   });
 };

@@ -39,13 +39,16 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
   );
   const data = (
     await Promise.all(
-      layerChunks.map((layers) =>
-        getFeatureInfo({
-          layers,
-          url: "https://coclico.avi.deltares.nl/geoserver/slp/wms",
-          lng,
-          lat,
-        }),
+      layerChunks.map(
+        async (layers) =>
+          (
+            await getFeatureInfo({
+              layers,
+              url: "https://coclico.avi.deltares.nl/geoserver/slp/wms",
+              lng,
+              lat,
+            })
+          )?.data,
       ),
     )
   ).flat();

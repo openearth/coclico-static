@@ -176,7 +176,7 @@ async function getLineSeriesData({
 }) {
   try {
     const { id } = dataset;
-    const data = await getRasterMapGraphData({
+    const { data, LAU_NAME } = await getRasterMapGraphData({
       dataset,
       coords,
       props,
@@ -187,6 +187,7 @@ async function getLineSeriesData({
     return {
       id,
       name: id,
+      LAU_NAME,
       series: scenarios.flatMap((scenario) =>
         keys.flatMap((key) => ({
           name: `${scenario} ${key}`,
