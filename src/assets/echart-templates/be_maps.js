@@ -11,7 +11,7 @@ export default {
   },
   grid: {
     top: "10%",
-    left: "7%",
+    left: "5%",
     right: "5%",
     bottom: "10%",
     containLabel: true,
@@ -34,7 +34,7 @@ export default {
     min: (value) => Math.max(0, value.min - 0.005),
     max: (value) => value.max + 0.005,
     axisLabel: {
-      formatter: (value) => `${parseInt(value * 100)}%`,
+      formatter: (value) => `${parseFloat(value * 100).toFixed(1)}%`,
     },
     nameTextStyle: {
       color: "black",
@@ -42,7 +42,7 @@ export default {
     },
     name: "Exposed (%)",
     nameLocation: "center",
-    nameGap: 45,
+    nameGap: 50,
   },
   xAxis: {
     splitLine: {
