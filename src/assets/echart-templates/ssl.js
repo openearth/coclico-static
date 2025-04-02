@@ -15,15 +15,17 @@ export default {
   },
   grid: {
     show: true,
-    top: 30,
-    bottom: 50,
-    right: 20,
-    left: 60,
+    top: "10%",
+    left: "6%",
+    right: "5%",
+    bottom: "10%",
+    containLabel: true,
   },
   dataZoom: [
     {
       type: "inside",
       realtime: true,
+      yAxisIndex: [0],
     },
   ],
   textStyle: {
@@ -50,13 +52,14 @@ export default {
   },
   yAxis: {
     type: "value",
-    min: 0,
-    max: 5,
+    min: (value) => Math.max(value.min - 0.2, 0),
+    max: (value) => value.max + 0.2,
     axisLabel: {
       fontSize: 14,
+      formatter: (value) => `${parseFloat(value).toFixed(1)} m`,
     },
     nameLocation: "middle",
-    nameGap: 45,
+    nameGap: 50,
     nameTextStyle: {
       color: "black",
       fontSize: 14,

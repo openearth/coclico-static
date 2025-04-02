@@ -19,14 +19,18 @@
             flat
             size="small"
             class="mr-2"
-            v-for="property in properties"
-            :key="property"
+            v-for="value in Object.values(propertyValues)"
+            :key="value"
           >
-            {{ property }}
+            {{ value }}
           </VChip>
         </small>
       </VCardSubtitle>
-      <app-chart />
+      <app-chart
+        :graph-data="graphData"
+        :properties="properties"
+        :property-values="propertyValues"
+      />
       <div class="buttons-container">
         <VBtn
           class="add-to-dashboard-button-popup"
@@ -64,18 +68,22 @@ const closePopup = () => {
 const location = computed(() =>
   formatLocation(graphFeature.value, graphData.value),
 );
-
 const properties = computed(() =>
-  [
-    ...store.getters["datasets/activeDatasetProperties"](
+  store.getters["datasets/activeDatasetProperties"](
+    activeClickableDataset.value.id,
+  ),
+);
+const propertyValues = computed(
+  () =>
+    store.getters["datasets/activeDatasetValues"](
       activeClickableDataset.value.id,
-    ),
-  ].map(({ value }) => value),
+    ) || {},
 );
 const saveGraphOnDashboard = () => {
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
     location: location.value,
+    propertyValues: propertyValues.value,
     properties: properties.value,
     title: activeClickableDataset.value?.title,
   });

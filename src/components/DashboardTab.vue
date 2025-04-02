@@ -2,7 +2,14 @@
   <VContainer class="dashboard">
     <VCard
       v-for="(
-        { graphData, title, location = null, properties = null }, index
+        {
+          graphData,
+          title,
+          location = null,
+          propertyValues = {},
+          properties = {},
+        },
+        index
       ) in graphs"
       :key="`${graphData.id}-${formatCoords(graphData?.coords)}-${properties}`"
       class="item"
@@ -24,19 +31,19 @@
               flat
               size="small"
               class="mr-2"
-              v-for="property in properties"
-              :key="property"
+              v-for="value in Object.values(propertyValues)"
+              :key="value"
             >
-              {{ property }}
+              {{ value }}
             </VChip>
           </small>
         </VCardSubtitle>
       </div>
       <Suspense>
-        <component
-          :is="graphComponents[graphData.graphType]"
+        <app-chart
           :graph-data="graphData"
-          style="height: 300px"
+          :properties="properties"
+          :property-values="propertyValues"
         />
         <template #fallback>
           <VProgressCircular :size="50" color="primary" indeterminate />
@@ -63,23 +70,13 @@
 </template>
 
 <script setup>
-import { computed, markRaw } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
-import BarChart from "@/components/ChartComponents/BarChart.vue";
-import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue";
-import LineChart from "@/components/ChartComponents/LineChart.vue";
-import PieChart from "@/components/ChartComponents/PieChart.vue";
-import { GRAPH_TYPES } from "@/lib/graphs";
-import { formatCoords } from "../lib/location";
+import { formatCoords } from "@/lib/location";
+import AppChart from "@/components/AppChart.vue";
 
 const store = useStore();
 const graphs = computed(() => store.getters["dashboard/graphs"]);
-const graphComponents = {
-  [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
-  [GRAPH_TYPES.BAR_CHART]: markRaw(BarChart),
-  [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
-  [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
-};
 const removeGraph = (index) => {
   store.dispatch("dashboard/removeGraph", index);
 };
@@ -107,7 +104,7 @@ const removeGraph = (index) => {
 
 .item {
   padding: 5px 10px;
-  min-width: 450px;
+  min-width: 500px;
   max-width: 510px;
   display: flex;
   flex-direction: column;
