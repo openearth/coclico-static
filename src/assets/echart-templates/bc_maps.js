@@ -31,8 +31,8 @@ export default {
     fontFamily: "Helvetica",
   },
   yAxis: {
-    min: (value) => value.min - 100,
-    max: (value) => value.max + 100,
+    min: (value) => parseInt(Math.max(0, value.min - value.min * 0.1)),
+    max: (value) => parseInt(value.max + value.max * 0.1),
     axisLabel: {
       formatter: (value) => `€${parseInt(value)}`,
     },
