@@ -18,8 +18,8 @@
         </div>
         <VCardSubtitle>
           {{ LAU_NAME }}
-          ({{ roundCoord(graphData.coords.lat) }},
-          {{ roundCoord(graphData.coords.lng) }})
+          ({{ roundCoords(graphData.coords.lat) }},
+          {{ roundCoords(graphData.coords.lng) }})
           <small class="d-block">
             {{ properties }}
           </small>
@@ -55,41 +55,28 @@
   </VContainer>
 </template>
 
-<script>
-import { markRaw } from "vue";
-import { mapActions, mapGetters } from "vuex";
+<script setup>
+import { computed, markRaw } from "vue";
+import { useStore } from "vuex";
 import SeaLevelGraph from "@/components/ChartComponents/SeaLevelGraph.vue";
 import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue";
 import LineChart from "@/components/ChartComponents/LineChart.vue";
-import { GRAPH_TYPES } from "@/lib/graphs";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
-import { roundCoord } from "@/lib/coords";
+import { GRAPH_TYPES } from "@/lib/graphs";
 
-export default {
-  components: {
-    SeaLevelGraph,
-    FloodExtentGraph,
-    LineChart,
-  },
-  data() {
-    return {
-      open: false,
-      GRAPH_TYPES,
-      graphComponents: {
-        [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
-        [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
-        [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
-        [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
-      },
-    };
-  },
-  computed: {
-    ...mapGetters("dashboard", ["graphs"]),
-  },
-  methods: {
-    roundCoord,
-    ...mapActions("dashboard", ["removeGraph"]),
-  },
+const store = useStore();
+const graphs = computed(() => store.getters["dashboard/graphs"]);
+const graphComponents = {
+  [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
+  [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
+  [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
+  [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
+};
+const removeGraph = (index) => {
+  store.dispatch("dashboard/removeGraph", index);
+};
+const roundCoords = (number) => {
+  return Number(number).toFixed(3);
 };
 </script>
 

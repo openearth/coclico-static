@@ -13,6 +13,7 @@ import {
   TooltipComponent,
 } from "echarts/components";
 import VChart from "vue-echarts";
+import { useStore } from "vuex";
 
 const props = defineProps({
   graphData: {
@@ -32,21 +33,21 @@ use([
 const baseOptions =
   (await import(`@/assets/echart-templates/${props.graphData.id}.js`))
     .default || (await import("@/assets/echart-templates/default.js")).default;
-
+const store = useStore();
+const properties = computed(() =>
+  store.getters["datasets/activeDatasetProperties"](props.graphData.id),
+);
 const option = computed(() => {
   return {
     ...baseOptions,
     ...props.graphData,
+    series: props.graphData.series.filter(
+      (series) => series.key !== "abs_affected",
+    ),
     xAxis: {
       ...baseOptions.xAxis,
-      ...props.graphData.xAxis,
+      data: properties.value.find((prop) => prop.id === "time").values.sort(),
     },
-    yAxis: Array.isArray(props.graphData.yAxis)
-      ? props.graphData.yAxis
-      : {
-          ...baseOptions.yAxis,
-          ...props.graphData.yAxis,
-        },
   };
 });
 </script>

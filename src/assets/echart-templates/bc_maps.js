@@ -25,22 +25,22 @@ export default {
   ],
   legend: {
     show: true,
-    formatter: (value) => value.replace(" rel_affected", ""),
+    formatter: (value) => value.replace(" total", ""),
   },
   textStyle: {
     fontFamily: "Helvetica",
   },
   yAxis: {
-    min: (value) => Math.max(0, value.min - 0.005),
-    max: (value) => Math.min(1, value.max + 0.005),
+    min: (value) => parseInt(Math.max(0, value.min - value.min * 0.1)),
+    max: (value) => parseInt(value.max + value.max * 0.1),
     axisLabel: {
-      formatter: (value) => `${parseFloat(value * 100).toFixed(1)}%`,
+      formatter: (value) => `€${parseInt(value)}`,
     },
     nameTextStyle: {
       color: "black",
       fontFamily: "Helvetica",
     },
-    name: "Exposed (%)",
+    name: "Costs (€)",
     nameLocation: "center",
     nameGap: 50,
   },
