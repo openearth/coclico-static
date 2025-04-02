@@ -208,7 +208,7 @@ function close() {
   resize: both;
   overflow: scroll;
   scrollbar-width: none;
-  min-width: 450px;
+  min-width: 500px;
   min-height: 260px;
   max-height: calc(100vh - var(--drawer-block-margin) * 1.75 - 50px);
   max-width: calc(100vw - var(--drawer-inline-margin) * 3 - 100px);
