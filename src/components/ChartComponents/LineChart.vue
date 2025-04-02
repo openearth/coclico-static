@@ -30,7 +30,6 @@ use([
   LegendComponent,
 ]);
 
-const store = useStore();
 const baseOptions =
   (await import(`@/assets/echart-templates/${props.graphData.id}.js`))
     .default || (await import("@/assets/echart-templates/default.js")).default;
@@ -42,6 +41,10 @@ const values = computed(() =>
   store.getters["datasets/activeDatasetValues"]?.(activeDatasetId.value),
 );
 
+const store = useStore();
+const properties = computed(() =>
+  store.getters["datasets/activeDatasetProperties"](props.graphData.id),
+);
 const option = computed(() => {
   const highlightIndex = props.graphData.xAxis.data.findIndex(
     (datum) => datum === (values.value?.time || values.value?.rp),
@@ -52,6 +55,13 @@ const option = computed(() => {
   return {
     ...baseOptions,
     ...props.graphData,
+    series: props.graphData.series.filter(
+      (series) => series.key !== "abs_affected",
+    ),
+    yAxis: {
+      ...baseOptions.yAxis,
+      ...props.graphData?.yAxis,
+    },
     series: props.graphData.series.map((serie) => {
       return serie.name.startsWith(values.value.scenarios)
         ? {
@@ -74,14 +84,11 @@ const option = computed(() => {
     }),
     xAxis: {
       ...baseOptions.xAxis,
-      ...props.graphData.xAxis,
+      data: properties.value
+        .find((prop) => prop.id === "time")
+        ?.values?.sort?.(),
+      ...props.graphData?.xAxis,
     },
-    yAxis: Array.isArray(props.graphData.yAxis)
-      ? props.graphData.yAxis
-      : {
-          ...baseOptions.yAxis,
-          ...props.graphData.yAxis,
-        },
   };
 });
 </script>

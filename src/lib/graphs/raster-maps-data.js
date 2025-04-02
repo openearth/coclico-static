@@ -6,14 +6,24 @@ const chunkArray = (arr, size) =>
     : [arr];
 
 /**
- * Function that fetches the data for the sea level rise graph
+ * Function that fetches the data for raster maps at a given location
  * @param dataset
- * @param lng
- * @param lat
+ * @param layerName {String | null}
+ * @param lng {Number}
+ * @param lat {Number}
  * @param props
+ * @param keys {String[]}
+ * @param propertyName {String[]}
  * @returns {Promise<*>}
  */
-export async function getBeGraphData(dataset, { lng, lat }, props) {
+export async function getRasterMapGraphData({
+  dataset,
+  layerName,
+  coords: { lng, lat },
+  props,
+  keys,
+  propertyName,
+}) {
   const defenseLevel = props.find((prop) => prop.id === "defense level").value;
   const rp = props.find((prop) => prop.id === "return period").value;
   const times = props.find((prop) => prop.id === "time").values.sort();
@@ -24,15 +34,18 @@ export async function getBeGraphData(dataset, { lng, lat }, props) {
       defenseLevel,
       scenario,
       time,
-      name: `be_stats_${defenseLevel}_${rp}_${scenario}_${time}`,
+      name: `${layerName}_${defenseLevel}_${rp}_${scenario}_${time}`,
     })),
   );
-  return await getFeatureInfo({
-    layer: "be_stats",
+  return getFeatureInfo({
     layers,
-    url: "https://coclico.avi.deltares.nl/geoserver/be_maps/wms",
+    layer: layerName,
+    url: `https://coclico.avi.deltares.nl/geoserver/${dataset.id}/wms`,
     lng,
     lat,
-    keys: ["rel_affected", "abs_affected"],
+    x: 1,
+    y: 1,
+    keys,
+    propertyName,
   });
 }

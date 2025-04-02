@@ -12,7 +12,6 @@ import {
   TooltipComponent,
 } from "echarts/components";
 import { computed } from "vue";
-import { pieChartTemplate } from "@/assets/echart-templates/pie";
 import VChart from "vue-echarts";
 
 use([
@@ -38,11 +37,27 @@ const props = defineProps({
   },
 });
 
-const option = computed(() =>
-  pieChartTemplate({
-    datasetId: props.graphData.datasetId,
-    values: props.graphData.values,
-    colorPalette: props.colorPalette,
-  }),
-);
+const baseOptions =
+  props.graphData?.id || props.graphData?.datasetId
+    ? (
+        await import(
+          `@/assets/echart-templates/${props.graphData?.id || props.graphData?.datasetId}.js`
+        )
+      ).default
+    : (await import("@/assets/echart-templates/default.js")).default;
+
+const option = computed(() => {
+  return {
+    ...baseOptions,
+    ...props?.graphData,
+    legend: {
+      ...baseOptions?.legend,
+    },
+    series: baseOptions.series.map((serie) => ({
+      ...serie,
+      color: props.colorPalette,
+      data: props.graphData.values,
+    })),
+  };
+});
 </script>

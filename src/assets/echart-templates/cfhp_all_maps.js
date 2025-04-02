@@ -10,7 +10,7 @@ export default {
     },
   },
   grid: {
-    top: "10%",
+    top: "20%",
     left: "5%",
     right: "5%",
     bottom: "10%",
@@ -25,7 +25,7 @@ export default {
   ],
   legend: {
     show: true,
-    formatter: (value) => value.replace(" rel_affected", ""),
+    formatter: (value) => value.replace(" flooded", ""),
   },
   textStyle: {
     fontFamily: "Helvetica",
@@ -40,9 +40,9 @@ export default {
       color: "black",
       fontFamily: "Helvetica",
     },
-    name: "Exposed (%)",
+    name: "Flooded (%)",
     nameLocation: "center",
-    nameGap: 50,
+    nameGap: 45,
   },
   xAxis: {
     splitLine: {

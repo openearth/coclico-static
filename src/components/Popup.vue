@@ -7,10 +7,25 @@
     anchor="bottom"
     style="display: flex; justify-content: center"
   >
-    <div style="width: auto; height: auto">
+    <div>
       <VCardTitle>
         {{ activeClickableDataset.title }}
       </VCardTitle>
+      <VCardSubtitle>
+        {{ location }}
+        {{ formatCoords(graphData?.coords) }}
+        <small class="d-flex my-2">
+          <VChip
+            flat
+            size="small"
+            class="mr-2"
+            v-for="property in properties"
+            :key="property"
+          >
+            {{ property }}
+          </VChip>
+        </small>
+      </VCardSubtitle>
       <app-chart />
       <div class="buttons-container">
         <VBtn
@@ -30,6 +45,7 @@ import AppChart from "@/components/AppChart.vue";
 import { useStore } from "vuex";
 import { computed } from "vue";
 import { MapboxPopup } from "@studiometa/vue-mapbox-gl";
+import { formatCoords, formatLocation } from "@/lib/location";
 
 defineProps({
   isOpen: Boolean,
@@ -41,12 +57,26 @@ const activeClickableDataset = computed(
   () => store.getters["map/activeClickableDataset"],
 );
 const graphData = computed(() => store.getters["graphs/graphData"]);
+const graphFeature = computed(() => store.getters["graphs/graphFeature"]);
 const closePopup = () => {
   emit("close");
 };
+const location = computed(() =>
+  formatLocation(graphFeature.value, graphData.value),
+);
+
+const properties = computed(() =>
+  [
+    ...store.getters["datasets/activeDatasetProperties"](
+      activeClickableDataset.value.id,
+    ),
+  ].map(({ value }) => value),
+);
 const saveGraphOnDashboard = () => {
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
+    location: location.value,
+    properties: properties.value,
     title: activeClickableDataset.value?.title,
   });
 };
@@ -70,8 +100,6 @@ const saveGraphOnDashboard = () => {
   text-transform: none;
   font-weight: 400 !important;
   border-radius: 8px;
-  max-width: 15vw;
-  min-width: 15vw;
 }
 
 .close-button-popup {
