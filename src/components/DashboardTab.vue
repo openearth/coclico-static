@@ -1,24 +1,36 @@
 <template>
   <VContainer class="dashboard">
     <VCard
-      v-for="({ graphData, title }, index) in graphs"
-      :key="`${graphData.id}-card-${index}`"
+      v-for="(
+        { graphData, title, location = null, properties = null }, index
+      ) in graphs"
+      :key="`${graphData.id}-${formatCoords(graphData?.coords)}-${properties}`"
       class="item"
     >
-      <div class="graph-title">
-        <VCardTitle>
-          {{ title }}
-          <br />
-          <small>
-            (
-            {{ roundCoords(graphData.coords.lat) }},
-            {{ roundCoords(graphData.coords.lng) }}
-            )
+      <div>
+        <div class="graph-title">
+          <VCardTitle>
+            {{ title }}
+          </VCardTitle>
+          <VBtn class="close-button" flat icon @click="removeGraph(index)">
+            <VIcon>mdi-close</VIcon>
+          </VBtn>
+        </div>
+        <VCardSubtitle>
+          {{ location }}
+          {{ formatCoords(graphData?.coords) }}
+          <small class="d-flex my-2">
+            <VChip
+              flat
+              size="small"
+              class="mr-2"
+              v-for="property in properties"
+              :key="property"
+            >
+              {{ property }}
+            </VChip>
           </small>
-        </VCardTitle>
-        <VBtn class="close-button" flat icon @click="removeGraph(index)">
-          <VIcon>mdi-close</VIcon>
-        </VBtn>
+        </VCardSubtitle>
       </div>
       <Suspense>
         <component
@@ -53,25 +65,23 @@
 <script setup>
 import { computed, markRaw } from "vue";
 import { useStore } from "vuex";
-import SeaLevelGraph from "@/components/ChartComponents/SeaLevelGraph.vue";
+import BarChart from "@/components/ChartComponents/BarChart.vue";
 import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue";
 import LineChart from "@/components/ChartComponents/LineChart.vue";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
 import { GRAPH_TYPES } from "@/lib/graphs";
+import { formatCoords } from "../lib/location";
 
 const store = useStore();
 const graphs = computed(() => store.getters["dashboard/graphs"]);
 const graphComponents = {
   [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
-  [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
+  [GRAPH_TYPES.BAR_CHART]: markRaw(BarChart),
   [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
   [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
 };
 const removeGraph = (index) => {
   store.dispatch("dashboard/removeGraph", index);
-};
-const roundCoords = (number) => {
-  return Number(number).toFixed(3);
 };
 </script>
 
@@ -108,6 +118,7 @@ const roundCoords = (number) => {
 }
 
 .close-button {
+  max-height: 36px;
   color: rgb(var(--v-theme-grey80));
 }
 
@@ -118,5 +129,6 @@ const roundCoords = (number) => {
 
 .graph-title > .v-card-title {
   flex: 0 1 auto;
+  padding-bottom: 0;
 }
 </style>
