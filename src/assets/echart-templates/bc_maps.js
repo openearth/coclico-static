@@ -11,7 +11,7 @@ export default {
   },
   grid: {
     top: "10%",
-    left: "7%",
+    left: "5%",
     right: "5%",
     bottom: "10%",
     containLabel: true,
@@ -25,24 +25,24 @@ export default {
   ],
   legend: {
     show: true,
-    formatter: (value) => value.replace(" rel_affected", ""),
+    formatter: (value) => value.replace(" total", ""),
   },
   textStyle: {
     fontFamily: "Helvetica",
   },
   yAxis: {
-    min: (value) => Math.max(0, value.min - 0.005),
-    max: (value) => value.max + 0.005,
+    min: (value) => value.min - 100,
+    max: (value) => value.max + 100,
     axisLabel: {
-      formatter: (value) => `${parseInt(value * 100)}%`,
+      formatter: (value) => `€${parseInt(value)}`,
     },
     nameTextStyle: {
       color: "black",
       fontFamily: "Helvetica",
     },
-    name: "Exposed (%)",
+    name: "Costs (€)",
     nameLocation: "center",
-    nameGap: 45,
+    nameGap: 50,
   },
   xAxis: {
     splitLine: {

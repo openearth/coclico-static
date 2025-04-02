@@ -10,8 +10,8 @@ export default {
     },
   },
   grid: {
-    top: "10%",
-    left: "7%",
+    top: "20%",
+    left: "5%",
     right: "5%",
     bottom: "10%",
     containLabel: true,
@@ -25,22 +25,22 @@ export default {
   ],
   legend: {
     show: true,
-    formatter: (value) => value.replace(" rel_affected", ""),
+    formatter: (value) => value.replace(" flooded", ""),
   },
   textStyle: {
     fontFamily: "Helvetica",
   },
   yAxis: {
     min: (value) => Math.max(0, value.min - 0.005),
-    max: (value) => value.max + 0.005,
+    max: (value) => Math.min(1, value.max + 0.005),
     axisLabel: {
-      formatter: (value) => `${parseInt(value * 100)}%`,
+      formatter: (value) => `${parseFloat(value * 100).toFixed(1)}%`,
     },
     nameTextStyle: {
       color: "black",
       fontFamily: "Helvetica",
     },
-    name: "Exposed (%)",
+    name: "Flooded (%)",
     nameLocation: "center",
     nameGap: 45,
   },
