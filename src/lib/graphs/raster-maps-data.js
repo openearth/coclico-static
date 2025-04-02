@@ -9,10 +9,11 @@ const chunkArray = (arr, size) =>
  * Function that fetches the data for raster maps at a given location
  * @param dataset
  * @param layerName {String | null}
- * @param lng
- * @param lat
+ * @param lng {Number}
+ * @param lat {Number}
  * @param props
- * @param keys
+ * @param keys {String[]}
+ * @param propertyName {String[]}
  * @returns {Promise<*>}
  */
 export async function getRasterMapGraphData({
@@ -21,6 +22,7 @@ export async function getRasterMapGraphData({
   coords: { lng, lat },
   props,
   keys,
+  propertyName,
 }) {
   const defenseLevel = props.find((prop) => prop.id === "defense level").value;
   const rp = props.find((prop) => prop.id === "return period").value;
@@ -44,5 +46,6 @@ export async function getRasterMapGraphData({
     x: 1,
     y: 1,
     keys,
+    propertyName,
   });
 }

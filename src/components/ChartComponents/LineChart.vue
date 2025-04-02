@@ -44,9 +44,16 @@ const option = computed(() => {
     series: props.graphData.series.filter(
       (series) => series.key !== "abs_affected",
     ),
+    yAxis: {
+      ...baseOptions.yAxis,
+      ...props.graphData?.yAxis,
+    },
     xAxis: {
       ...baseOptions.xAxis,
-      data: properties.value.find((prop) => prop.id === "time").values.sort(),
+      data: properties.value
+        .find((prop) => prop.id === "time")
+        ?.values?.sort?.(),
+      ...props.graphData?.xAxis,
     },
   };
 });

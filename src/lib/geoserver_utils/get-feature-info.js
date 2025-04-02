@@ -3,6 +3,23 @@ import buildGeoServerUrl from "./build-geoserver-url";
 
 //copied from rws-viewers project
 
+/**
+ *
+ * @param url {string}
+ * @param lng {Number}
+ * @param lat {Number}
+ * @param layer {String}
+ * @param layers {String[]}
+ * @param x {Number}
+ * @param y {Number}
+ * @param bounds
+ * @param width {Number}
+ * @param height {Number}
+ * @param keys {String[]}
+ * @param propertyName {String[]}
+ * @param rest
+ * @returns {Promise<{data: *, LAU_NAME: *}>}
+ */
 export default async function getFeatureInfo({
   url,
   lng,
@@ -15,6 +32,8 @@ export default async function getFeatureInfo({
   width = 110,
   height = 110,
   keys = ["GRAY_INDEX"],
+  propertyName = [],
+  ...rest
 }) {
   let bbox = null;
   // Bounding box used with area selection.
@@ -52,6 +71,8 @@ export default async function getFeatureInfo({
     y,
     bbox,
     feature_count: names.length,
+    propertyName: [...keys, ...propertyName].join(","),
+    ...rest,
   });
 
   return fetch(geoServerUrl)
@@ -72,7 +93,9 @@ export default async function getFeatureInfo({
                 ]),
               ),
       })),
-      LAU_NAME: features[0]?.properties?.LAU_NAME,
+      ...Object.fromEntries(
+        propertyName.map((name) => [name, features[0]?.properties?.[name]]),
+      ),
     }))
     .catch(() => undefined);
 }

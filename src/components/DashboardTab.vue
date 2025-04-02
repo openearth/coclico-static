@@ -2,7 +2,7 @@
   <VContainer class="dashboard">
     <VCard
       v-for="(
-        { graphData, title, LAU_NAME = null, properties = null }, index
+        { graphData, title, location = null, properties = null }, index
       ) in graphs"
       :key="`${graphData.id}-${formatCoords(graphData?.coords)}-${properties}`"
       class="item"
@@ -17,10 +17,18 @@
           </VBtn>
         </div>
         <VCardSubtitle>
-          {{ LAU_NAME }}
+          {{ location }}
           {{ formatCoords(graphData?.coords) }}
-          <small class="d-block">
-            {{ properties }}
+          <small class="d-flex my-2">
+            <VChip
+              flat
+              size="small"
+              class="mr-2"
+              v-for="property in properties"
+              :key="property"
+            >
+              {{ property }}
+            </VChip>
           </small>
         </VCardSubtitle>
       </div>
@@ -57,18 +65,18 @@
 <script setup>
 import { computed, markRaw } from "vue";
 import { useStore } from "vuex";
-import SeaLevelGraph from "@/components/ChartComponents/SeaLevelGraph.vue";
+import BarChart from "@/components/ChartComponents/BarChart.vue";
 import FloodExtentGraph from "@/components/ChartComponents/FloodExtentGraph.vue";
 import LineChart from "@/components/ChartComponents/LineChart.vue";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
 import { GRAPH_TYPES } from "@/lib/graphs";
-import { formatCoords } from "../lib/coords";
+import { formatCoords } from "../lib/location";
 
 const store = useStore();
 const graphs = computed(() => store.getters["dashboard/graphs"]);
 const graphComponents = {
   [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
-  [GRAPH_TYPES.SEA_LEVEL_RISE]: markRaw(SeaLevelGraph),
+  [GRAPH_TYPES.BAR_CHART]: markRaw(BarChart),
   [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
   [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
 };

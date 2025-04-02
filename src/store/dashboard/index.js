@@ -1,5 +1,5 @@
-import { formatCoords } from "@/lib/coords";
 import { toast } from "vue-sonner";
+import { formatCoords } from "@/lib/location";
 
 export default {
   namespaced: true,

@@ -7,17 +7,23 @@
     anchor="bottom"
     style="display: flex; justify-content: center"
   >
-    <div style="width: auto; height: auto">
+    <div>
       <VCardTitle>
         {{ activeClickableDataset.title }}
       </VCardTitle>
       <VCardSubtitle>
-        {{
-          graphFeature?.features?.properties?.LAU_NAME || graphData?.LAU_NAME
-        }}
+        {{ location }}
         {{ formatCoords(graphData?.coords) }}
-        <small class="d-block">
-          {{ properties }}
+        <small class="d-flex my-2">
+          <VChip
+            flat
+            size="small"
+            class="mr-2"
+            v-for="property in properties"
+            :key="property"
+          >
+            {{ property }}
+          </VChip>
         </small>
       </VCardSubtitle>
       <app-chart />
@@ -39,7 +45,7 @@ import AppChart from "@/components/AppChart.vue";
 import { useStore } from "vuex";
 import { computed } from "vue";
 import { MapboxPopup } from "@studiometa/vue-mapbox-gl";
-import { formatCoords } from "../lib/coords";
+import { formatCoords, formatLocation } from "@/lib/location";
 
 defineProps({
   isOpen: Boolean,
@@ -55,23 +61,21 @@ const graphFeature = computed(() => store.getters["graphs/graphFeature"]);
 const closePopup = () => {
   emit("close");
 };
+const location = computed(() =>
+  formatLocation(graphFeature.value, graphData.value),
+);
 
 const properties = computed(() =>
   [
     ...store.getters["datasets/activeDatasetProperties"](
       activeClickableDataset.value.id,
     ),
-  ]
-    .map(({ value }) => value)
-    .join("/"),
+  ].map(({ value }) => value),
 );
 const saveGraphOnDashboard = () => {
-  console.log(graphFeature.value?.features?.properties);
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
-    LAU_NAME:
-      graphFeature.value?.features?.properties?.LAU_NAME ||
-      graphData.value?.LAU_NAME,
+    location: location.value,
     properties: properties.value,
     title: activeClickableDataset.value?.title,
   });
@@ -96,8 +100,6 @@ const saveGraphOnDashboard = () => {
   text-transform: none;
   font-weight: 400 !important;
   border-radius: 8px;
-  max-width: 15vw;
-  min-width: 15vw;
 }
 
 .close-button-popup {
