@@ -10,7 +10,7 @@ export default {
     },
   },
   grid: {
-    top: "20%",
+    top: "10%",
     left: "5%",
     right: "5%",
     bottom: "10%",
@@ -21,26 +21,28 @@ export default {
     {
       type: "inside",
       yAxisIndex: [0],
-      start: 50,
-      end: 100,
     },
   ],
   legend: {
     show: true,
+    formatter: (value) => value.replace(" rel_affected", ""),
   },
   textStyle: {
     fontFamily: "Helvetica",
   },
   yAxis: {
-    min: (value) => value.min - 0.1,
+    min: (value) => Math.max(0, value.min - 0.005),
+    max: (value) => Math.min(1, value.max + 0.005),
     axisLabel: {
-      formatter: (value) => `${parseInt(value * 100)}%`,
+      formatter: (value) => `${parseFloat(value * 100).toFixed(1)}%`,
     },
     nameTextStyle: {
       color: "black",
       fontFamily: "Helvetica",
     },
-    name: "Exposed %",
+    name: "Exposed (%)",
+    nameLocation: "center",
+    nameGap: 50,
   },
   xAxis: {
     splitLine: {

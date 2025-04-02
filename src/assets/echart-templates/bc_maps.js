@@ -10,7 +10,7 @@ export default {
     },
   },
   grid: {
-    top: "20%",
+    top: "10%",
     left: "5%",
     right: "5%",
     bottom: "10%",
@@ -21,18 +21,18 @@ export default {
     {
       type: "inside",
       yAxisIndex: [0],
-      start: 50,
-      end: 100,
     },
   ],
   legend: {
     show: true,
+    formatter: (value) => value.replace(" total", ""),
   },
   textStyle: {
     fontFamily: "Helvetica",
   },
   yAxis: {
     min: (value) => value.min - 100,
+    max: (value) => value.max + 100,
     axisLabel: {
       formatter: (value) => `€${parseInt(value)}`,
     },
@@ -40,7 +40,9 @@ export default {
       color: "black",
       fontFamily: "Helvetica",
     },
-    name: "Cost €",
+    name: "Costs (€)",
+    nameLocation: "center",
+    nameGap: 50,
   },
   xAxis: {
     splitLine: {

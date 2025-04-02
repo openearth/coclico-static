@@ -16,6 +16,7 @@ export const GRAPH_TYPES = {
  */
 const GRAPH_TYPE_MASK = {
   cfhp: GRAPH_TYPES.PIE_CHART,
+  cfhp_all_maps: GRAPH_TYPES.LINE_CHART,
   eesl: GRAPH_TYPES.LINE_CHART,
   sc: GRAPH_TYPES.LINE_CHART,
   slp: GRAPH_TYPES.SEA_LEVEL_RISE,
@@ -42,7 +43,8 @@ export const getGraphType = (id) =>
  * @returns {{id, name, xAxis: {data: *, title: string}, yAxis: {type: string, min: number, alignTicks, max: number, interval: number, axisLabel: {formatter: function(*): string}, nameTextStyle: {color: string, fontFamily: string}, name: string, nameLocation: string}[], series: *}|{name: *, value: *}[]|{name: string, value: *}[]|[string, unknown][]}
  */
 export function getFeatureData({ datasetId, feature, values }) {
-  switch (datasetId) {
+  const id = datasetId.split("_")[0];
+  switch (id) {
     case "cba": {
       return Object.entries(feature)
         .filter(
@@ -117,7 +119,7 @@ export async function getRasterData(dataset, coords, props) {
         throw error;
       }
     case "pp_maps":
-      return exposed({
+      return getLineSeriesData({
         dataset,
         coords,
         props,
@@ -126,7 +128,7 @@ export async function getRasterData(dataset, coords, props) {
         unit: "percentage",
       });
     case "be_maps":
-      return exposed({
+      return getLineSeriesData({
         dataset,
         coords,
         props,
@@ -135,13 +137,22 @@ export async function getRasterData(dataset, coords, props) {
         unit: "percentage",
       });
     case "bc_maps":
-      return exposed({
+      return getLineSeriesData({
         dataset,
         coords,
         props,
         layerName: "bc_stats",
         keys: ["total"],
         unit: "euro",
+      });
+    case "cfhp_all_maps":
+      return getLineSeriesData({
+        dataset,
+        coords,
+        props,
+        layerName: "cfhp_all_stats",
+        keys: ["flooded"],
+        unit: "percentage",
       });
     default:
       console.warn(`No handler for dataset id: ${id}`);
@@ -155,7 +166,14 @@ const unitFormatter = (unit, value) =>
       ? `€${parseFloat(value).toFixed(0)}`
       : parseFloat(value).toFixed(2);
 
-async function exposed({ dataset, coords, props, layerName, keys, unit }) {
+async function getLineSeriesData({
+  dataset,
+  coords,
+  props,
+  layerName,
+  keys,
+  unit,
+}) {
   try {
     const { id } = dataset;
     const data = await getRasterMapGraphData({

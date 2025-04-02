@@ -40,6 +40,7 @@ export async function getResourceLayers(collection, properties) {
           "geoserver_link",
         )
       : null;
+
   const mapbox =
     "mapbox" in item.assets
       ? ResourceTypeFunctionMask[item.assets.mapbox.type](
