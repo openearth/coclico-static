@@ -95,7 +95,7 @@
               <VSwitch
                 v-model="dataset.active"
                 :label="dataset.title"
-                class="mr-5"
+                class="wrap-text"
                 color="primary"
                 hide-details
                 @change="toggleDataset(dataset)"
@@ -137,7 +137,7 @@
               <VSwitch
                 v-model="dataset.active"
                 :label="dataset.title"
-                class="mr-5"
+                class = "wrap-text"
                 color="primary"
                 hide-details
                 @change="toggleDataset(dataset)"
@@ -397,5 +397,11 @@ async function toggleDataset(dataset) {
   font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
+}
+
+.wrap-text{
+  width: 260px;
+  white-space: normal !important;
+  word-break: break-word;
 }
 </style>
