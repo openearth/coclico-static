@@ -6,7 +6,7 @@
     permanent
     rail
     rail-width="100"
-    width="180"
+    width="185"
   >
     <VListItem class="image-container">
       <custom-icon class="coclico-image" name="logo" />
@@ -291,7 +291,7 @@ async function toggleDataset(dataset) {
 
 .image-container {
   margin-top: 20px;
-  padding-inline: 1rem;
+  padding-inline: 0.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
