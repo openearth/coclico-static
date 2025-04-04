@@ -217,7 +217,9 @@ const filteredDatasets = computed(() => {
       dataset.id === "cfhp" ||
       dataset.id === "cba" ||
       dataset.id === "pp_maps" ||
-      dataset.id === "be_maps",
+      dataset.id === "be_maps" ||
+      dataset.id === "cfhp_all_maps" ||
+      dataset.id === "bc_maps",
   );
 });
 const dataLayers = computed(() =>
@@ -227,7 +229,9 @@ const dataLayers = computed(() =>
       id !== "cfhp" &&
       id !== "cba" &&
       id !== "pp_maps" &&
-      id !== "be_maps",
+      id !== "be_maps" &&
+      id !== "cfhp_all_maps" &&
+      id !== "bc_maps",
   ),
 );
 
