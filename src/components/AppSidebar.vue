@@ -16,6 +16,7 @@
         v-for="theme in themes"
         :key="theme.name"
         :value="theme.name"
+        :active="showLayersCard && activeTheme === theme.name"
         class="list-item"
         color="primary"
         @click="
@@ -137,7 +138,7 @@
               <VSwitch
                 v-model="dataset.active"
                 :label="dataset.title"
-                class = "wrap-text"
+                class="wrap-text"
                 color="primary"
                 hide-details
                 @change="toggleDataset(dataset)"
@@ -173,13 +174,18 @@
 
 <script setup>
 import CustomIcon from "@/components/CustomIcon.vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useTour } from "@/lib/useTour";
 import { marked } from "marked";
 
 const store = useStore();
 const showLayersCard = ref(false);
+watch(showLayersCard, (show) => {
+  if (!show) {
+    setTimeout(() => setTheme(null), 100);
+  }
+});
 useTour({
   id: "sidebar",
   refId: "tour",
@@ -278,6 +284,14 @@ async function toggleDataset(dataset) {
         .list-item-title
     ) {
     opacity: 1;
+  }
+
+  &
+    :global(
+      .v-navigation-drawer--rail.v-navigation-drawer--is-hovering
+        + .custom-data-layers-card
+    ) {
+    transform: translateX(85px) !important;
   }
 
   & :global(.v-navigation-drawer__content) {
@@ -401,11 +415,5 @@ async function toggleDataset(dataset) {
   font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
-}
-
-.wrap-text{
-  width: 260px;
-  white-space: normal !important;
-  word-break: break-word;
 }
 </style>
