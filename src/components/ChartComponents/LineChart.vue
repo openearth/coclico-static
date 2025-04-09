@@ -36,15 +36,16 @@ use([
   TooltipComponent,
   LegendComponent,
 ]);
-
-const baseOptions =
-  props.graphData?.id || props.graphData?.datasetId
-    ? (
-        await import(
-          `@/assets/echart-templates/${props.graphData?.id || props.graphData?.datasetId}.js`
-        )
-      ).default
-    : (await import("@/assets/echart-templates/default.js")).default;
+let baseOptions = {};
+try {
+  baseOptions = (
+    await import(
+      `@/assets/echart-templates/${props.graphData?.id || props.graphData?.datasetId}.js`
+    )
+  ).default;
+} catch (e) {
+  baseOptions = (await import("@/assets/echart-templates/default.js")).default;
+}
 const xAxisData = computed(
   () =>
     props.graphData?.xAxis?.data ||

@@ -33,15 +33,15 @@ import { GRAPH_TYPES } from "@/lib/graphs";
 
 const props = defineProps({
   propertyValues: {
-    type: Array,
-    default: () => [],
+    type: Object,
+    default: () => ({}),
   },
   properties: {
     type: Object,
     default: () => ({}),
   },
   graphData: {
-    type: Object,
+    type: Object || null,
     required: true,
   },
 });

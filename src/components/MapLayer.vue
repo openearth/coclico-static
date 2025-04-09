@@ -29,7 +29,7 @@ const clickableDatasetsIds = computed(
 );
 const clickable = computed(() =>
   clickableDatasetsIds.value.some((id) =>
-    props.layer.id.toLowerCase().startsWith(id),
+    props.layer.id.toLowerCase().startsWith(id.toLowerCase()),
   ),
 );
 const highlightedId = computed(() => store.getters["map/highlightedId"]);
