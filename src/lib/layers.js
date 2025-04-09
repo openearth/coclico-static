@@ -139,16 +139,12 @@ export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
       : null;
   const definedLinePaint = definedPaint
     ? Object.fromEntries(
-        Object.entries(dataset.properties).filter(([key]) =>
-          key.startsWith("line"),
-        ),
+        Object.entries(definedPaint).filter(([key]) => key.startsWith("line")),
       )
     : {};
   const definedFillPaint = definedPaint
     ? Object.fromEntries(
-        Object.entries(dataset.properties).filter(([key]) =>
-          key.startsWith("fill"),
-        ),
+        Object.entries(definedPaint).filter(([key]) => key.startsWith("fill")),
       )
     : {};
   const fillPaint = {
