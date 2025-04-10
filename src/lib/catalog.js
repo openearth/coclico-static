@@ -22,7 +22,7 @@ export async function getCollections(catalog) {
             ? Object.entries(dataset?.summaries).map(([id, item]) => {
                 return {
                   id,
-                  description: dataset?.["summary_descriptions"]?.[id],
+                  description: dataset?.["summaries_descriptions"]?.[id],
                   values: item,
                 };
               })
