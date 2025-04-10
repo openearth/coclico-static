@@ -117,7 +117,7 @@
                 </template>
                 <template v-slot:default>
                   <VCard
-                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    class="tooltip py-2 px-8 rounded bg-grey-darken-3"
                     v-html="marked.parse(dataset.description)"
                   />
                 </template>
@@ -159,7 +159,7 @@
                 </template>
                 <template v-slot:default>
                   <VCard
-                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    class="tooltip py-2 px-8 rounded bg-grey-darken-3"
                     v-html="marked.parse(dataset.description)"
                   />
                 </template>
