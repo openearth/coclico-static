@@ -72,6 +72,11 @@ function onMapClicked(e) {
         clickableDatasetsIds: clickableDatasetsIds.value,
       });
       store.dispatch("map/setHighlightedId", hasHighlight);
+    } else if (activeClickableDataset.value.id === "ceed_maps") {
+      const lauId = queriedFeatures.find(
+        (feature) => feature.layer.id === "ceed_maps_geoserver_link",
+      ).properties.FID_LAU;
+      store.dispatch("map/setSeedLau", lauId);
     } else {
       isPopupOpen.value = false;
       store.dispatch("map/setHighlightedId");
@@ -111,6 +116,11 @@ const mapboxLayers = computed(() => store.getters["map/mapboxLayers"]);
 const hasGeoserverLink = computed(() =>
   mapboxLayers.value.some((layer) => layer.id.endsWith("_geoserver_link")),
 );
+const ceedBounds = computed(() => store.getters["map/ceed_bounds"]);
+watch(ceedBounds, (bounds) => {
+  if (clickableDatasetsIds.value.some((id) => id === "ceed_maps"))
+    map.value.fitBounds(bounds);
+});
 watch(
   () => store.getters["graphs/graphData"],
   (newVal) => {
