@@ -33,7 +33,7 @@ const props = defineProps({
   },
   propertyValues: {
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
 });
 const baseOptions =

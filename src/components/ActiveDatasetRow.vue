@@ -21,7 +21,7 @@
             location="bottom center"
           >
             <template v-slot:activator="{ props }">
-              <VIcon v-bind="props" small class="summary-info, ml-4">
+              <VIcon v-bind="props" small class="summary-info ml-4">
                 mdi-information-outline
               </VIcon>
             </template>

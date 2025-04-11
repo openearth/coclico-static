@@ -111,7 +111,7 @@
                 location="bottom center"
               >
                 <template v-slot:activator="{ props }">
-                  <VIcon class="summary-info, ml-4" small v-bind="props">
+                  <VIcon class="summary-info ml-4" small v-bind="props">
                     mdi-information-outline
                   </VIcon>
                 </template>
@@ -417,7 +417,7 @@ async function toggleDataset(dataset) {
   font-weight: 600;
 }
 
-.layer-label{
+.layer-label {
   width: 260px;
   white-space: normal !important;
   word-break: break-word;
