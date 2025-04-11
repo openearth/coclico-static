@@ -35,6 +35,7 @@ import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
 import Popup from "@/components/Popup.vue";
 import { toast } from "vue-sonner";
 import mapstyle from "@/assets/map-styles/style.json";
+import { bboxPolygon, center } from "@turf/turf";
 
 const store = useStore();
 const position = ref([]);
@@ -119,7 +120,9 @@ const hasGeoserverLink = computed(() =>
 const ceedBounds = computed(() => store.getters["map/ceed_bounds"]);
 watch(ceedBounds, (bounds) => {
   if (clickableDatasetsIds.value.some((id) => id === "ceed_maps"))
-    map.value.fitBounds(bounds);
+    map.value.fitBounds(bounds, {
+      center: center(bboxPolygon(bounds)).geometry.coordinates,
+    });
 });
 watch(
   () => store.getters["graphs/graphData"],
