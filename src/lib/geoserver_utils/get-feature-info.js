@@ -3,10 +3,28 @@ import buildGeoServerUrl from "./build-geoserver-url";
 
 //copied from rws-viewers project
 
+/**
+ *
+ * @param url {string}
+ * @param lng {Number}
+ * @param lat {Number}
+ * @param layer {String}
+ * @param layers {String[]}
+ * @param x {Number}
+ * @param y {Number}
+ * @param bounds
+ * @param width {Number}
+ * @param height {Number}
+ * @param keys {String[]}
+ * @param propertyName {String[]}
+ * @param rest
+ * @returns {Promise<{data: *, LAU_NAME: *}>}
+ */
 export default async function getFeatureInfo({
   url,
   lng,
   lat,
+  layer,
   layers,
   x = 50,
   y = 50,
@@ -14,6 +32,8 @@ export default async function getFeatureInfo({
   width = 110,
   height = 110,
   keys = ["GRAY_INDEX"],
+  propertyName = [],
+  ...rest
 }) {
   let bbox = null;
   // Bounding box used with area selection.
@@ -43,32 +63,39 @@ export default async function getFeatureInfo({
     version: "1.1.1",
     info_format: "application/json",
     crs: "EPSG:4326",
-    layers: names,
-    query_layers: names,
+    layers: layer || names,
+    query_layers: layer || names,
     width,
     height,
     x,
     y,
     bbox,
     feature_count: names.length,
+    propertyName: [...keys, ...propertyName].join(","),
+    ...rest,
   });
 
-  return (
-    fetch(geoServerUrl)
-      .then((response) => response.json())
-      .then(({ features }) => features)
-      //map and send back only the greyIndex values
-      .then((features) =>
-        layers.map((layer, index) => ({
-          ...layer,
-          value:
-            keys.length === 1
-              ? features[index].properties[keys[0]]
-              : Object.fromEntries(
-                  keys.map((key) => [key, features[index].properties[key]]),
-                ),
-        })),
-      )
-      .catch(() => undefined)
-  );
+  return fetch(geoServerUrl)
+    .then((response) => response.json())
+    .then(({ features }) =>
+      Boolean(features.length) ? features : Promise.reject(),
+    )
+    .then((features) => ({
+      data: layers.flatMap((layer, index) => ({
+        ...layer,
+        value:
+          keys.length === 1
+            ? features[index].properties[keys[0]]
+            : Object.fromEntries(
+                keys.map((key) => [
+                  key,
+                  features?.[index]?.properties?.[key] || null,
+                ]),
+              ),
+      })),
+      ...Object.fromEntries(
+        propertyName.map((name) => [name, features[0]?.properties?.[name]]),
+      ),
+    }))
+    .catch(() => undefined);
 }

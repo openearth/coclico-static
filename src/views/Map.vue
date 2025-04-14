@@ -4,12 +4,12 @@
     <VMain style="padding-inline: 0">
       <MapboxMap
         id="map"
-        ref="mapboxMap"
         key="map"
-        @mb-click="onMapClicked"
+        ref="mapboxMap"
         :access-token="accessToken"
         :preserve-drawing-buffer="true"
-        map-style="mapbox://styles/anoet/cljpm695q004t01qo5s7fhf7d"
+        :map-style="mapstyle"
+        @mb-click="onMapClicked"
       >
         <MapboxNavigationControl :visualizePitch="true" />
         <MapLayer
@@ -34,6 +34,7 @@ import { computed, onBeforeMount, onMounted, provide, ref, watch } from "vue";
 import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
 import Popup from "@/components/Popup.vue";
 import { toast } from "vue-sonner";
+import mapstyle from "@/assets/map-styles/style.json";
 
 const store = useStore();
 const position = ref([]);
@@ -52,6 +53,7 @@ function setFeatures(queriedFeatures, point, lngLat) {
     ...lngLat,
   });
 }
+
 function onMapClicked(e) {
   if (activeClickableDataset.value) {
     store.dispatch("graphs/emptyGraphData");
@@ -86,6 +88,7 @@ function onMapClicked(e) {
     }
   }
 }
+
 function closePopup() {
   isPopupOpen.value = false;
   store.dispatch("map/setHighlightedId");
@@ -95,6 +98,7 @@ function closePopup() {
     highlightedId: store.getters["map/highlightedId"],
   });
 }
+
 const activeClickableDataset = computed(
   () => store.getters["map/activeClickableDataset"],
 );
@@ -154,10 +158,12 @@ onBeforeMount(() => {
   --drawer-block-margin: 50px;
   --drawer-inline-margin: 10px;
 }
+
 #map {
   width: 100%;
   height: 100%;
 }
+
 .mapboxgl-ctrl,
 .mapboxgl-ctrl-group {
   display: flex;

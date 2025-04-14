@@ -1,26 +1,45 @@
 <template>
   <MapboxPopup
-    :key="position.join('-')"
     v-if="position && isOpen"
+    :key="position.join('-')"
+    :closeButton="false"
     :lng-lat="position"
     anchor="bottom"
     style="display: flex; justify-content: center"
-    :closeButton="false"
   >
-    <div style="width: auto; height: auto">
+    <div>
       <VCardTitle>
         {{ activeClickableDataset.title }}
       </VCardTitle>
-      <app-chart />
+      <VCardSubtitle>
+        {{ location }}
+        {{ formatCoords(graphData?.coords) }}
+        <small class="d-flex my-2">
+          <VChip
+            flat
+            size="small"
+            class="mr-2"
+            v-for="value in Object.values(propertyValues)"
+            :key="value"
+          >
+            {{ value }}
+          </VChip>
+        </small>
+      </VCardSubtitle>
+      <app-chart
+        :graph-data="graphData"
+        :properties="properties"
+        :property-values="propertyValues"
+      />
       <div class="buttons-container">
         <VBtn
+          class="add-to-dashboard-button-popup"
           flat
           @click="saveGraphOnDashboard"
-          class="add-to-dashboard-button-popup"
         >
           Add to dashboard
         </VBtn>
-        <VBtn flat @click="closePopup" class="close-button-popup"> Close </VBtn>
+        <VBtn class="close-button-popup" flat @click="closePopup"> Close</VBtn>
       </div>
     </div>
   </MapboxPopup>
@@ -30,6 +49,7 @@ import AppChart from "@/components/AppChart.vue";
 import { useStore } from "vuex";
 import { computed } from "vue";
 import { MapboxPopup } from "@studiometa/vue-mapbox-gl";
+import { formatCoords, formatLocation } from "@/lib/location";
 
 defineProps({
   isOpen: Boolean,
@@ -41,12 +61,30 @@ const activeClickableDataset = computed(
   () => store.getters["map/activeClickableDataset"],
 );
 const graphData = computed(() => store.getters["graphs/graphData"]);
+const graphFeature = computed(() => store.getters["graphs/graphFeature"]);
 const closePopup = () => {
   emit("close");
 };
+const location = computed(() =>
+  formatLocation(graphFeature.value, graphData.value),
+);
+const properties = computed(() =>
+  store.getters["datasets/activeDatasetProperties"](
+    activeClickableDataset.value.id,
+  ),
+);
+const propertyValues = computed(
+  () =>
+    store.getters["datasets/activeDatasetValues"](
+      activeClickableDataset.value.id,
+    ) || {},
+);
 const saveGraphOnDashboard = () => {
   store.dispatch("dashboard/addGraph", {
     graphData: graphData.value,
+    location: location.value,
+    propertyValues: propertyValues.value,
+    properties: properties.value,
     title: activeClickableDataset.value?.title,
   });
 };
@@ -70,8 +108,6 @@ const saveGraphOnDashboard = () => {
   text-transform: none;
   font-weight: 400 !important;
   border-radius: 8px;
-  max-width: 15vw;
-  min-width: 15vw;
 }
 
 .close-button-popup {

@@ -55,11 +55,13 @@ onBeforeUnmount(async () => {
 function onLayerClicked(e) {
   emit("click", e.features[0]);
 }
+
 function onMouseenter() {
   if (clickable.value) {
     map.value.getCanvas().style.cursor = "pointer";
   }
 }
+
 function onMouseleave() {
   map.value.getCanvas().style.cursor = "";
 }

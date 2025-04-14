@@ -98,7 +98,7 @@ export default {
           coords,
           graphType,
         });
-        if (!data.values.length) {
+        if (!data.values?.length) {
           commit("EMPTY_GRAPH_DATA");
           commit("ADD_GRAPH_FEATURE");
           return;

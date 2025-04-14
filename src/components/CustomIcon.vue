@@ -1,8 +1,8 @@
 <template>
   <span
-    class="icon"
     v-if="icon"
     :class="{ 'icon--large': size === 'large' }"
+    class="icon"
     role="presentation"
   >
     <span>

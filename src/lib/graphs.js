@@ -1,24 +1,25 @@
 import { get, unzip } from "lodash-es";
 import { openArray } from "zarr";
 import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
-import { getPpGraphData } from "@/lib/graphs/pp/get-graph-data-pp";
-import { getBeGraphData } from "@/lib/graphs/be/get-graph-data-pp";
+import { getRasterMapGraphData } from "@/lib/graphs/raster-maps-data";
 
 export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
   LINE_CHART: "line-chart",
-  SEA_LEVEL_RISE: "sea-level-rise",
+  BAR_CHART: "bar-chart",
   PIE_CHART: "pie-chart",
 };
+
 /**
  * Graph type mask
  * @type {{cfhp: string, eesl: string, sc: string, slp: string, ssl: string, cba: string}}
  */
 const GRAPH_TYPE_MASK = {
   cfhp: GRAPH_TYPES.PIE_CHART,
+  cfhp_all_maps: GRAPH_TYPES.LINE_CHART,
   eesl: GRAPH_TYPES.LINE_CHART,
   sc: GRAPH_TYPES.LINE_CHART,
-  slp: GRAPH_TYPES.SEA_LEVEL_RISE,
+  slp: GRAPH_TYPES.BAR_CHART,
   ssl: GRAPH_TYPES.LINE_CHART,
   cba: GRAPH_TYPES.PIE_CHART,
   pp_maps: GRAPH_TYPES.LINE_CHART,
@@ -33,19 +34,6 @@ const GRAPH_TYPE_MASK = {
 export const getGraphType = (id) =>
   GRAPH_TYPE_MASK?.[id] || GRAPH_TYPES.LINE_CHART;
 
-// const valueLabels = {
-//   cfhp: {
-//     more05: "% flood > 0.5m",
-//     less05: "% flood < 0.5m",
-//     nans: "% not flooded",
-//   },
-// };
-// const getValueLabels = (datasetId, key) => {
-//   if (valueLabels?.[datasetId]) {
-//     Object.entries(valueLabels[datasetId]).find(([k]) => k === key)[1];
-//   }
-// };
-
 /**
  * Get graph feature data for a dataset with a WMTS geoserver_link
  * @param datasetId
@@ -54,8 +42,9 @@ export const getGraphType = (id) =>
  * @param values
  * @returns {{id, name, xAxis: {data: *, title: string}, yAxis: {type: string, min: number, alignTicks, max: number, interval: number, axisLabel: {formatter: function(*): string}, nameTextStyle: {color: string, fontFamily: string}, name: string, nameLocation: string}[], series: *}|{name: *, value: *}[]|{name: string, value: *}[]|[string, unknown][]}
  */
-export function getFeatureData({ datasetId, feature, properties, values }) {
-  switch (datasetId) {
+export function getFeatureData({ datasetId, feature, values }) {
+  const id = datasetId.split("_")[0];
+  switch (id) {
     case "cba": {
       return Object.entries(feature)
         .filter(
@@ -121,7 +110,7 @@ export async function getRasterData(dataset, coords, props) {
     case "slp":
       try {
         return {
-          values: await getSlpGraphData(dataset, coords, props),
+          series: await getSlpGraphData(dataset, coords, props),
           time: props.find(({ id }) => id === "time").values.sort(),
           scenarios: props.find(({ id }) => id === "scenarios").values,
         };
@@ -130,55 +119,89 @@ export async function getRasterData(dataset, coords, props) {
         throw error;
       }
     case "pp_maps":
-      return exposed({ dataset, coords, props, fn: getPpGraphData });
+      return getLineSeriesData({
+        dataset,
+        coords,
+        props,
+        layerName: "pop_stats",
+        keys: ["rel_affected", "abs_affected"],
+        propertyName: ["LAU_NAME", "GISCO_ID"],
+        unit: "percentage",
+      });
     case "be_maps":
-      return exposed({ dataset, coords, props, fn: getBeGraphData });
+      return getLineSeriesData({
+        dataset,
+        coords,
+        props,
+        layerName: "be_stats",
+        keys: ["rel_affected", "abs_affected"],
+        propertyName: ["LAU_NAME", "GISCO_ID"],
+        unit: "percentage",
+      });
+    case "bc_maps":
+      return getLineSeriesData({
+        dataset,
+        coords,
+        props,
+        layerName: "bc_stats",
+        keys: ["total"],
+        propertyName: ["LAU_NAME", "GISCO_ID"],
+        unit: "euro",
+      });
+    case "cfhp_all_maps":
+      return getLineSeriesData({
+        dataset,
+        coords,
+        props,
+        layerName: "cfhp_all_stats",
+        keys: ["flooded"],
+        propertyName: ["LAU_NAME", "GISCO_ID"],
+        unit: "percentage",
+      });
     default:
       console.warn(`No handler for dataset id: ${id}`);
       return null;
   }
 }
+const unitFormatter = (unit, value) =>
+  unit === "percentage"
+    ? `${(parseFloat(value) * 100).toFixed(2)}%`
+    : unit === "euro"
+      ? `€${parseFloat(value).toFixed(0)}`
+      : parseFloat(value).toFixed(2);
 
-async function exposed({ dataset, coords, props, fn }) {
+async function getLineSeriesData({
+  dataset,
+  coords,
+  props,
+  layerName,
+  keys,
+  propertyName,
+  unit,
+}) {
   try {
     const { id } = dataset;
-    const data = await fn(dataset, coords, props);
+    const { data, ...rest } = await getRasterMapGraphData({
+      dataset,
+      coords,
+      props,
+      layerName,
+      keys,
+      propertyName,
+    });
     const scenarios = props.find(({ id }) => id === "scenarios").values;
     return {
       id,
       name: id,
-      xAxis: {
-        data: props.find((prop) => prop.id === "time").values.sort(),
-        title: "Year",
-      },
-      yAxis: ["rel_affected", "abs_affected"].flatMap((type) => ({
-        type: "value",
-        min: 0,
-        max: Math.max(...data.map(({ value }) => value[type])),
-        axisLabel: {
-          formatter: (value) =>
-            type.startsWith("rel")
-              ? `${parseInt(value * 100)}%`
-              : `${value / 1000}k`,
-        },
-        nameTextStyle: {
-          color: "black",
-          fontFamily: "Helvetica",
-        },
-        name: type.startsWith("rel") ? "Percentage" : "Amount",
-        nameLocation: "start",
-      })),
+      ...rest,
       series: scenarios.flatMap((scenario) =>
-        ["rel_affected", "abs_affected"].flatMap((type) => ({
-          name: `${scenario} ${type.startsWith("rel") ? "%" : "#"}`,
-          type: type.startsWith("rel") ? "line" : "line",
-          yAxisIndex: type.startsWith("rel") ? 0 : 1,
+        keys.flatMap((key) => ({
+          name: `${scenario} ${key}`,
+          type: "line",
+          key,
           tooltip: {
-            valueFormatter: function (value) {
-              return type.startsWith("rel")
-                ? `${parseFloat(value * 100).toFixed(2)}%`
-                : `${parseFloat(value).toFixed(2)} people`;
-            },
+            valueFormatter: (value) => unitFormatter(unit, value),
+            formatter: (value) => unitFormatter(unit, value),
           },
           data: data
             .filter(
@@ -191,7 +214,7 @@ async function exposed({ dataset, coords, props, fn }) {
             )
             .sort((a, b) => a.time - b.time)
             .map(({ value }) => {
-              return value[type];
+              return value?.[key] || value;
             }),
         })),
       ),

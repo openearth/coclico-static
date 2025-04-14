@@ -1,31 +1,4 @@
-const typeOptions = (datasetId) => {
-  switch (datasetId) {
-    case "cfhp":
-      return {
-        title: {
-          text: "Coastal Flood Hazard Probability",
-          left: "center",
-        },
-      };
-    case "cba":
-      return {
-        title: {
-          text: "Cost Benefit Analysis",
-          left: "center",
-        },
-      };
-    default:
-      return {
-        title: {
-          text: datasetId,
-          left: "center",
-        },
-      };
-  }
-};
-
 export const pieChartTemplate = ({
-  datasetId,
   values,
   colorPalette = ["#307fb6", "#5e9dc4", "#abcfe5"],
 }) => {
@@ -49,6 +22,5 @@ export const pieChartTemplate = ({
         },
       },
     ],
-    ...typeOptions(datasetId),
   };
 };

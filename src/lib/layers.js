@@ -2,7 +2,6 @@ import getCatalog from "@/lib/request/get-catalog";
 
 /**
  * ENUM of ResourceType To Layer Function
- * @type {{"application/vnd.apache.parquet": (function(*, *): {id: *, type: string, source: {type: string, tiles: [any], minZoom: number, maxZoom: number}, "source-layer": *|null, paint: {"fill-color": string, "fill-opacity": number}}), "image/tiff; application=geotiff; profile=cloud-optimized": (function({id: *, assets: *, tileSize?: number}, *): {id: *, type: string, source: {type: string, tiles: [*], tileSize: number}}), "image/png": (function({id: *, assets: *, tileSize?: number}, *): {id: *, type: string, source: {type: string, tiles: [*], tileSize: number}}), "application/png": (function({id: *, assets: *, tileSize?: number}, *): {id: *, type: string, source: {type: string, tiles: [*], tileSize: number}}), vector: (function({id: *, properties: *, assets: *}, *): {id: *, type: *, source: {type: *, url: *}, "source-layer": *, paint: *}), geojson: (function({id: *, properties: *, assets: *}, *): {id: *, type: *, source: {type: *, url: *}, "source-layer": *, paint: *})}}
  */
 const ResourceTypeFunctionMask = {
   "application/vnd.apache.parquet": buildVectorTileMapboxLayer,
@@ -19,7 +18,7 @@ const ResourceTypeFunctionMask = {
  * It checks if the resource is a raster or vector tile or geojson object and returns the corresponding object to be added to the map as a layer.
  * @param {Object} collection
  * @param {Object} [properties]
- * @returns {Promise<*[]>}
+ * @returns {Promise<*[]> | undefined}
  */
 export async function getResourceLayers(collection, properties) {
   if (!collection?.assets) throw new Error("Collection resource has no assets");
@@ -39,7 +38,8 @@ export async function getResourceLayers(collection, properties) {
           collection,
           "geoserver_link",
         )
-      : null;
+      : [];
+
   const mapbox =
     "mapbox" in item.assets
       ? ResourceTypeFunctionMask[item.assets.mapbox.type](
@@ -47,7 +47,7 @@ export async function getResourceLayers(collection, properties) {
           "mapbox",
           properties,
         )
-      : null;
+      : [];
   const visual =
     "visual" in item.assets
       ? ResourceTypeFunctionMask[item.assets.visual.type](
@@ -55,12 +55,13 @@ export async function getResourceLayers(collection, properties) {
           "visual",
           properties,
         )
-      : null;
-
+      : [];
   return [
-    ...(mapbox ? [mapbox] : []),
-    ...(visual ? [visual] : []),
-    ...(transparentLayer ? [transparentLayer] : []),
+    ...(Array.isArray(mapbox) ? mapbox : [mapbox]),
+    ...(Array.isArray(visual) ? visual : [visual]),
+    ...(Array.isArray(transparentLayer)
+      ? transparentLayer
+      : [transparentLayer]),
   ];
 }
 
@@ -130,24 +131,36 @@ export function buildRasterMapboxLayer(
  * @param dataset
  * @param assetKey
  * @param {Object}props
- * @returns {{id: *, type: string, source: {type: string, tiles: *[], minZoom: number, maxZoom: number}, "source-layer": *, paint: (*|{"fill-color": string, "fill-opacity": number})}}
  */
 export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
-  const paint =
+  const definedPaint =
     "properties" in dataset && "deltares:paint" in dataset.properties
       ? dataset.properties["deltares:paint"]
-      : {
-          "fill-color": "#0080ff",
-          "fill-opacity": [
-            "case",
-            ["boolean", ["feature-state", "hover"], false],
-            0.25,
-            0,
-          ],
-          ...(assetKey !== "geoserver_link"
-            ? { "fill-outline-color": "#000000" }
-            : {}),
-        };
+      : null;
+  const definedLinePaint = definedPaint
+    ? Object.fromEntries(
+        Object.entries(definedPaint).filter(([key]) => key.startsWith("line")),
+      )
+    : {};
+  const definedFillPaint = definedPaint
+    ? Object.fromEntries(
+        Object.entries(definedPaint).filter(([key]) => key.startsWith("fill")),
+      )
+    : {};
+  const fillPaint = {
+    "fill-color": "#0080ff",
+    "fill-opacity": [
+      "case",
+      ["boolean", ["feature-state", "hover"], false],
+      0.25,
+      0,
+    ],
+    ...definedFillPaint,
+  };
+  const linePaint = {
+    "line-color": "#000000",
+    ...definedLinePaint,
+  };
 
   const asset = dataset?.assets?.[assetKey];
   if (!asset) throw new Error("Asset not found in resource");
@@ -159,18 +172,37 @@ export function buildVectorTileMapboxLayer(dataset, assetKey, props) {
       ? `_${Object.values(props).join("_").toLowerCase().trim()}`
       : "";
 
-  return {
-    id: `${dataset.id}_${assetKey}${suffix}`,
-    type: "fill",
-    source: {
-      type: "vector",
-      tiles: [asset.href],
-      minZoom: 0,
-      maxZoom: 22,
+  return [
+    {
+      id: `${dataset.id}_${assetKey}${suffix}`,
+      type: "fill",
+      source: {
+        type: "vector",
+        tiles: [asset.href],
+        minZoom: 0,
+        maxZoom: 22,
+      },
+      "source-layer": layerName,
+      paint: fillPaint,
     },
-    "source-layer": layerName,
-    paint,
-  };
+    ...(props
+      ? [
+          {
+            id: `${dataset.id}_${assetKey}${suffix}-line`,
+            type: "line",
+            source: {
+              type: "vector",
+              tiles: [asset.href],
+              minZoom: 0,
+              maxZoom: 22,
+            },
+            "source-layer": layerName,
+            layout: { "line-join": "round" },
+            paint: linePaint,
+          },
+        ]
+      : []),
+  ];
 }
 
 /**
@@ -206,8 +238,7 @@ export function matchLayerIdToProperties(dataset, activeProperties) {
  */
 export function hasLegend(dataset) {
   // const isVector = "geoserver_link" in dataset.assets;
-  const hasGradient = "deltares:linearGradient" in dataset;
-  return hasGradient;
+  return "deltares:linearGradient" in dataset;
 }
 
 /**

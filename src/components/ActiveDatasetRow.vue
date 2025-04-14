@@ -1,36 +1,45 @@
 <template>
   <VRow>
     <VCol
-      class="pb-0 pt-0"
-      cols="6"
       v-for="property in properties"
       :key="property.id"
+      class="pb-0 pt-0"
+      cols="6"
     >
       <VRow class="align-center">
-        <VCol cols="9" class="mr-0">
-          <span class="summary-info">{{ property.id }}</span>
+        <VCol class="mr-0" cols="9">
+          <span class="summary-info">
+            {{ property.id }}
+          </span>
         </VCol>
         <VCol v-if="property.description" cols="3" class="pa-4">
-          <VTooltip
-            location="bottom"
+          <VMenu
+            open-on-hover
+            open-delay="100"
+            close-delay="100"
             max-width="450px"
-            :text="property.description"
+            location="bottom center"
           >
             <template v-slot:activator="{ props }">
-              <VIcon v-bind="props" small class="summary-info, ml-4"
-                >mdi-information-outline</VIcon
-              >
+              <VIcon v-bind="props" small class="summary-info, ml-4">
+                mdi-information-outline
+              </VIcon>
             </template>
-          </VTooltip>
+            <template v-slot:default>
+              <VCard
+                class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                v-html="marked.parse(property.description)"
+              />
+            </template>
+          </VMenu>
         </VCol>
       </VRow>
       <VSelect
-        :value="property.value"
         :items="property.values"
-        class="select"
-        @update:modelValue="(value) => updateProperty(property.id, value)"
+        :value="property.value"
         variant="outlined"
-      ></VSelect>
+        @update:modelValue="(value) => updateProperty(property.id, value)"
+      />
     </VCol>
   </VRow>
 </template>
@@ -38,6 +47,7 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed } from "vue";
+import { marked } from "marked";
 
 const props = defineProps({
   datasetId: {
@@ -61,8 +71,18 @@ const updateProperty = async (property, value) => {
 };
 </script>
 
-<style>
+<style scoped>
 .summary-info {
   color: #a9b0b5;
+}
+
+:deep(.v-select__menu-icon) {
+  background: radial-gradient(
+    circle,
+    hsla(0 0% 100% / 100%) 30%,
+    hsla(0 0% 100% / 0%) 100%
+  );
+  opacity: 1;
+  border-radius: 50%;
 }
 </style>
