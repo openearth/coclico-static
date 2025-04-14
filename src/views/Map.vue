@@ -35,6 +35,7 @@ import { MapboxMap, MapboxNavigationControl } from "@studiometa/vue-mapbox-gl";
 import Popup from "@/components/Popup.vue";
 import { toast } from "vue-sonner";
 import mapstyle from "@/assets/map-styles/style.json";
+import { bboxPolygon, center } from "@turf/turf";
 
 const store = useStore();
 const position = ref([]);
@@ -72,6 +73,11 @@ function onMapClicked(e) {
         clickableDatasetsIds: clickableDatasetsIds.value,
       });
       store.dispatch("map/setHighlightedId", hasHighlight);
+    } else if (activeClickableDataset.value.id === "ceed_maps") {
+      const lauId = queriedFeatures.find(
+        (feature) => feature.layer.id === "ceed_maps_geoserver_link",
+      ).properties.FID_LAU;
+      store.dispatch("map/setSeedLau", lauId);
     } else {
       isPopupOpen.value = false;
       store.dispatch("map/setHighlightedId");
@@ -111,6 +117,13 @@ const mapboxLayers = computed(() => store.getters["map/mapboxLayers"]);
 const hasGeoserverLink = computed(() =>
   mapboxLayers.value.some((layer) => layer.id.endsWith("_geoserver_link")),
 );
+const ceedBounds = computed(() => store.getters["map/ceed_bounds"]);
+watch(ceedBounds, (bounds) => {
+  if (clickableDatasetsIds.value.some((id) => id === "ceed_maps"))
+    map.value.fitBounds(bounds, {
+      center: center(bboxPolygon(bounds)).geometry.coordinates,
+    });
+});
 watch(
   () => store.getters["graphs/graphData"],
   (newVal) => {
