@@ -1,4 +1,4 @@
-import { get, unzip } from "lodash-es";
+import { get } from "lodash-es";
 import { openArray } from "zarr";
 import { getSlpGraphData } from "@/lib/graphs/slp/get-graph-data-slp";
 import { getRasterMapGraphData } from "@/lib/graphs/raster-maps-data";
@@ -252,8 +252,74 @@ export async function getZarrData(dataset, features, props) {
     dataset?.["cube:dimensions"]?.[plotSeries]?.values,
   );
   const summaryList = dataset?.summaries;
+  console.log({
+    url,
+    datasetName,
+    plotType,
+    variables,
+    xAxis,
+    path,
+    variableUnit,
+    cubeDimensions,
+    plotSeries,
+    dimensionNames,
+    summaryList,
+    features,
+  });
+  const slicer = variables?.[path]?.dimensions
+    .map((dimension) => {
+      if (dimension === "stations") {
+        return null;
+      }
+      if (
+        Object.keys(cubeDimensions).some((cubeDimension) =>
+          dimension.includes(cubeDimension),
+        )
+      ) {
+        dimension = Object.keys(cubeDimensions).find((cubeDimension) =>
+          dimension.includes(cubeDimension),
+        );
+      }
+      if (dimension === plotSeries || dimension === xAxis) {
+        return cubeDimensions[dimension]?.values.map(
+          (value) => `${dimension}-${value}`,
+        );
+      }
+      return Object.entries(props)
+        .filter(([key]) => key === dimension)
+        .map(([key, value]) => {
+          if (/^\d+$/.test(value)) {
+            value = Number(value).toFixed(1).toString();
+          }
+          return [key, value].join("-");
+        });
+    })
+    .filter(Boolean);
+  const dataEntries = Object.entries(features.properties).filter(([key]) =>
+    slicer.every((prop) => prop.some((value) => key.includes(value))),
+  );
+  const data = cubeDimensions[plotSeries]?.values.map((name) => ({
+    name,
+    type: plotType,
+    data: dataEntries
+      .filter(([key]) => key.includes(name))
+      .sort((a, b) => {
+        const keyA = cubeDimensions[xAxis].values.findIndex((value) =>
+          a[0].includes(value),
+        );
+        const keyB = cubeDimensions[xAxis].values.findIndex((value) =>
+          b[0].includes(value),
+        );
+        return keyA - keyB;
+      })
+      .map(([, value]) => value),
+  }));
+
   const slice = Object.values(variables?.[path]?.dimensions).map(
     (dimension) => {
+      const variable = Object.entries(variables).find(([key, variable]) =>
+        variable.dimensions.includes(dimension),
+      );
       if (dimension === "stations") {
         return features?.properties?.locationId || 0;
       } else if (dimension === "nscenarios" && plotSeries !== "scenarios") {
@@ -277,16 +343,16 @@ export async function getZarrData(dataset, features, props) {
 
   if (plotType !== "bar") {
     try {
-      const res = await openArray({
-        store: url,
-        path: path,
-        mode: "r",
-      });
-
-      const data = await res.get(slice);
-      if (data.data.length > data.data[0].length || datasetName === "sc") {
-        data.data = unzip(data.data);
-      }
+      // const res = await openArray({
+      //   store: url,
+      //   path: path,
+      //   mode: "r",
+      // });
+      //
+      // const data = await res.get(slice);
+      // if (data.data.length > data.data[0].length || datasetName === "sc") {
+      //   data.data = unzip(data.data);
+      // }
 
       let series = [
         {
@@ -296,16 +362,16 @@ export async function getZarrData(dataset, features, props) {
         },
       ];
 
-      if (typeof data.data[0].length === "undefined") {
-        series[0].data = Array.from(data.data);
-        series[0].type = plotType;
-        series[0].name = "default";
-      } else {
-        series = data.data.map((serie) => ({
-          type: "line",
-          data: Array.from(serie).map((value) => value || 0),
-        }));
-      }
+      // if (typeof data.data[0].length === "undefined") {
+      //   series[0].data = Array.from(data.data);
+      //   series[0].type = plotType;
+      //   series[0].name = "default";
+      // } else {
+      //   series = data.data.map((serie) => ({
+      //     type: "line",
+      //     data: Array.from(serie).map((value) => value || 0),
+      //   }));
+      // }
       if (cubeDimensions[xAxis].description === "decade window") {
         const startDateYear = new Date(cubeDimensions[xAxis].extent[0]);
         const endDateYear = new Date(cubeDimensions[xAxis].extent[1]);
@@ -318,27 +384,27 @@ export async function getZarrData(dataset, features, props) {
           decadeWindowSeries.push(y);
         }
         cubeDimensions[xAxis].values = decadeWindowSeries;
-      } else if (
-        cubeDimensions[xAxis].description === "time" &&
-        !Boolean(cubeDimensions[xAxis]?.values?.length)
-      ) {
-        cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent;
       }
-      const summary = summaryList.find(
-        (summary) => summary.id === plotSeries || summary.id === "rp",
-      );
-      console.log({ summary, dimensionNames });
-      series = series.map((serie, i, series) => ({
-        ...serie,
-        name:
-          dimensionNames.length === series.length
-            ? String(dimensionNames[i][1])
-            : `${summary.id} ${String(summary?.allowedValues?.[i] || summary?.values[i])}`,
-      }));
+      // else if (
+      //   cubeDimensions[xAxis].description === "time" &&
+      //   !Boolean(cubeDimensions[xAxis]?.values?.length)
+      // ) {
+      //   cubeDimensions[xAxis].values = cubeDimensions[xAxis].extent;
+      // }
+      // const summary = summaryList.find(
+      //   (summary) => summary.id === plotSeries || summary.id === "rp",
+      // );
+      // series = series.map((serie, i, series) => ({
+      //   ...serie,
+      //   name:
+      //     dimensionNames.length === series.length
+      //       ? String(dimensionNames[i][1])
+      //       : `${summary.id} ${String(summary?.allowedValues?.[i] || summary?.values[i])}`,
+      // }));
       return {
         id: datasetName,
         name: datasetName,
-        series,
+        series: data,
         xAxis: {
           type: "category",
           data: cubeDimensions[xAxis].values,
