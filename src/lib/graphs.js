@@ -163,6 +163,7 @@ export async function getRasterData(dataset, coords, props) {
       return null;
   }
 }
+
 const unitFormatter = (unit, value) =>
   unit === "percentage"
     ? `${(parseFloat(value) * 100).toFixed(2)}%`
@@ -204,18 +205,17 @@ async function getLineSeriesData({
             formatter: (value) => unitFormatter(unit, value),
           },
           data: data
-            .filter(
-              (datum) =>
+            .filter((datum) => {
+              return (
                 datum.scenario === scenario &&
                 datum.defenseLevel ===
                   props.find((prop) => prop.id === "defense level").value &&
                 datum.rp ===
-                  props.find((prop) => prop.id === "return period").value,
-            )
+                  props.find((prop) => prop.id === "return period").value
+              );
+            })
             .sort((a, b) => a.time - b.time)
-            .map(({ value }) => {
-              return value?.[key] || value;
-            }),
+            .map(({ value, ...rest }) => value?.[key] || value),
         })),
       ),
     };
