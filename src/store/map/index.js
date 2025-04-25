@@ -70,7 +70,8 @@ export default {
       const layers = await getResourceLayers(dataset, properties);
       if (
         !state.clickableDatasetsIds.includes(id) &&
-        !dataset?.keywords?.includes("Background Layers")
+        !dataset?.keywords?.includes("Background Layers") &&
+        dataset.id !== "cet"
       ) {
         commit("ADD_CLICKABLE_LAYER", id);
       }
