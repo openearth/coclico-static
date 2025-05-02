@@ -37,6 +37,10 @@ export async function getRasterMapGraphData({
       name: `${layerName}_${defenseLevel}_${rp}_${scenario}_${time}`,
     })),
   );
+  const feature_count = props.reduce(
+    (acc, curr) => acc * curr.values.length,
+    1,
+  );
   return getFeatureInfo({
     layers,
     layer: layerName,
@@ -47,5 +51,13 @@ export async function getRasterMapGraphData({
     y: 1,
     keys,
     propertyName,
-  });
+    ...(layerName ? { feature_count } : {}),
+  }).then((features) => ({
+    data: features.map((feature) => ({
+      ...feature.properties,
+      value: Object.fromEntries(
+        keys.map((key) => [key, feature.properties[key]]),
+      ),
+    })),
+  }));
 }

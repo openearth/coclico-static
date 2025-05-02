@@ -125,7 +125,14 @@ export async function getRasterData(dataset, coords, props) {
         props,
         layerName: "pop_stats",
         keys: ["rel_affected", "abs_affected"],
-        propertyName: ["LAU_NAME", "GISCO_ID"],
+        propertyName: [
+          "LAU_NAME",
+          "GISCO_ID",
+          "return_period",
+          "scenario",
+          "time",
+          "map_type",
+        ],
         unit: "percentage",
       });
     case "be_maps":
@@ -135,7 +142,14 @@ export async function getRasterData(dataset, coords, props) {
         props,
         layerName: "be_stats",
         keys: ["rel_affected", "abs_affected"],
-        propertyName: ["LAU_NAME", "GISCO_ID"],
+        propertyName: [
+          "LAU_NAME",
+          "GISCO_ID",
+          "return_period",
+          "scenario",
+          "time",
+          "map_type",
+        ],
         unit: "percentage",
       });
     case "bc_maps":
@@ -145,7 +159,14 @@ export async function getRasterData(dataset, coords, props) {
         props,
         layerName: "bc_stats",
         keys: ["total"],
-        propertyName: ["LAU_NAME", "GISCO_ID"],
+        propertyName: [
+          "LAU_NAME",
+          "GISCO_ID",
+          "return_period",
+          "scenario",
+          "time",
+          "map_type",
+        ],
         unit: "euro",
       });
     case "cfhp_all_maps":
@@ -155,7 +176,14 @@ export async function getRasterData(dataset, coords, props) {
         props,
         layerName: "cfhp_all_stats",
         keys: ["flooded"],
-        propertyName: ["LAU_NAME", "GISCO_ID"],
+        propertyName: [
+          "LAU_NAME",
+          "GISCO_ID",
+          "return_period",
+          "scenario",
+          "time",
+          "map_type",
+        ],
         unit: "percentage",
       });
     default:
@@ -191,6 +219,7 @@ async function getLineSeriesData({
       propertyName,
     });
     const scenarios = props.find(({ id }) => id === "scenarios").values;
+
     return {
       id,
       name: id,
@@ -205,15 +234,14 @@ async function getLineSeriesData({
             formatter: (value) => unitFormatter(unit, value),
           },
           data: data
-            .filter((datum) => {
-              return (
+            .filter(
+              (datum) =>
                 datum.scenario === scenario &&
-                datum.defenseLevel ===
+                (datum?.defenseLevel || datum?.map_type) ===
                   props.find((prop) => prop.id === "defense level").value &&
-                datum.rp ===
-                  props.find((prop) => prop.id === "return period").value
-              );
-            })
+                (datum.rp || datum?.return_period) ===
+                  props.find((prop) => prop.id === "return period").value,
+            )
             .sort((a, b) => a.time - b.time)
             .map(({ value, ...rest }) => value?.[key] || value),
         })),
