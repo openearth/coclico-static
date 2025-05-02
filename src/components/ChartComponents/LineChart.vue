@@ -25,7 +25,7 @@ const props = defineProps({
   },
   propertyValues: {
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
 });
 use([

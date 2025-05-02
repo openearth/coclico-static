@@ -1,4 +1,5 @@
-import { getResourceLayers } from "@/lib/layers";
+import { buildRasterMapboxLayer, getResourceLayers } from "@/lib/layers";
+import getCatalog from "@/lib/request/get-catalog";
 
 export default {
   namespaced: true,
@@ -7,8 +8,12 @@ export default {
     seaLevelRiseData: {},
     clickableDatasetsIds: [], // Not all layers are clickable. Only the ones in user stories.
     highlightedId: "",
+    ceed_lau: "",
+    ceed_bounds: null,
   },
   getters: {
+    ceed_bounds: (state) => state.ceed_bounds,
+    ceed_lau: (state) => state.ceed_lau,
     highlightedId: (state) => state.highlightedId,
     mapboxLayers(state) {
       return state.mapboxLayers;
@@ -24,6 +29,12 @@ export default {
     },
   },
   mutations: {
+    SET_CEED_BOUNDS(state, bounds) {
+      state.ceed_bounds = bounds;
+    },
+    SET_CEED_LAU(state, lau) {
+      state.ceed_lau = lau;
+    },
     SET_HIGHLIGHTED_ID(state, id) {
       state.highlightedId = id;
     },
@@ -50,6 +61,23 @@ export default {
     },
   },
   actions: {
+    async setSeedLau({ commit, dispatch, rootGetters }, ceed_lau) {
+      commit("SET_CEED_LAU", ceed_lau);
+      const collection = rootGetters["datasets/activeDatasets"].find(
+        ({ id }) => id === "ceed_maps",
+      );
+      const link = collection.links.find((link) =>
+        link.href.endsWith(`${ceed_lau}.json`),
+      );
+      const item = {
+        ...(await getCatalog(encodeURI(link.href))),
+        id: collection.id,
+      };
+      const layer = buildRasterMapboxLayer(item, "visual", { ceed_lau });
+      commit("REMOVE_MAPBOX_LAYER", "ceed_maps_visual");
+      dispatch("addMapboxLayer", layer);
+      commit("SET_CEED_BOUNDS", item.bbox);
+    },
     setHighlightedId({ commit }, id) {
       commit("SET_HIGHLIGHTED_ID", id || "");
     },
@@ -65,13 +93,22 @@ export default {
     },
     async loadDatasetOnMap({ commit, dispatch, rootGetters, state }, id) {
       if (!rootGetters["datasets/isActiveDataset"](id)) return;
-      const dataset = rootGetters["datasets/dataset"](id);
+      const dataset =
+        id === "ceed_maps"
+          ? rootGetters["datasets/dataset"]("LAU_CM")
+          : rootGetters["datasets/dataset"](id);
       const properties = rootGetters["datasets/activeDatasetValues"](id);
-      const layers = await getResourceLayers(dataset, properties);
+      let layers = await getResourceLayers(dataset, properties);
+      if (id === "ceed_maps") {
+        layers = layers.map((layer) => ({
+          ...layer,
+          id: layer.id.replace("LAU_CM_visual_", "ceed_maps_geoserver_link"),
+        }));
+      }
       if (
         !state.clickableDatasetsIds.includes(id) &&
-        !dataset?.keywords?.includes("Background Layers") &&
-        dataset.id !== "cet"
+        (!dataset?.keywords?.includes("Background Layers") || id === "ceed_maps") &&
+        id !== "cet"
       ) {
         commit("ADD_CLICKABLE_LAYER", id);
       }

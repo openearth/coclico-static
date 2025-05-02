@@ -111,13 +111,13 @@
                 location="bottom center"
               >
                 <template v-slot:activator="{ props }">
-                  <VIcon class="summary-info, ml-4" small v-bind="props">
+                  <VIcon class="summary-info ml-4" small v-bind="props">
                     mdi-information-outline
                   </VIcon>
                 </template>
                 <template v-slot:default>
                   <VCard
-                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    class="tooltip py-2 px-8 rounded bg-grey-darken-3"
                     v-html="marked.parse(dataset.description)"
                   />
                 </template>
@@ -159,7 +159,7 @@
                 </template>
                 <template v-slot:default>
                   <VCard
-                    class="tooltip py-2 px-4 rounded bg-grey-darken-3"
+                    class="tooltip py-2 px-8 rounded bg-grey-darken-3"
                     v-html="marked.parse(dataset.description)"
                   />
                 </template>
@@ -417,7 +417,7 @@ async function toggleDataset(dataset) {
   font-weight: 600;
 }
 
-.layer-label{
+.layer-label {
   width: 260px;
   white-space: normal !important;
   word-break: break-word;
