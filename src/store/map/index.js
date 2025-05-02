@@ -107,8 +107,8 @@ export default {
       }
       if (
         !state.clickableDatasetsIds.includes(id) &&
-        (!dataset?.keywords?.includes("Background Layers") ||
-          id === "ceed_maps")
+        (!dataset?.keywords?.includes("Background Layers") || id === "ceed_maps") &&
+        id !== "cet"
       ) {
         commit("ADD_CLICKABLE_LAYER", id);
       }
