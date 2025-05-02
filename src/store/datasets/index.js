@@ -134,9 +134,9 @@ export default {
       const properties = getters
         .activeDatasetProperties(dataset)
         .map((prop) => (prop.id === property ? { ...prop, value } : prop));
+      commit("UPDATE_DATASET_PROPERTIES", { id: dataset, properties });
       dispatch("graphs/emptyGraphData", null, { root: true });
       dispatch("graphs/setGraphData", null, { root: true });
-      commit("UPDATE_DATASET_PROPERTIES", { id: dataset, properties });
     },
     addActiveDataset({ state, commit }, id) {
       const dataset = state.datasets.find((dataset) => dataset.id === id);
