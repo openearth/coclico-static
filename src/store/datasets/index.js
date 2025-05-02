@@ -127,11 +127,16 @@ export default {
         count: countActiveDatasets,
       });
     },
-    updateDatasetProperty({ getters, commit }, { dataset, property, value }) {
+    updateDatasetProperty(
+      { getters, commit, dispatch },
+      { dataset, property, value },
+    ) {
       const properties = getters
         .activeDatasetProperties(dataset)
         .map((prop) => (prop.id === property ? { ...prop, value } : prop));
       commit("UPDATE_DATASET_PROPERTIES", { id: dataset, properties });
+      dispatch("graphs/emptyGraphData", null, { root: true });
+      dispatch("graphs/setGraphData", null, { root: true });
     },
     addActiveDataset({ state, commit }, id) {
       const dataset = state.datasets.find((dataset) => dataset.id === id);

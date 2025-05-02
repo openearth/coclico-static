@@ -80,22 +80,5 @@ export default async function getFeatureInfo({
     .then(({ features }) =>
       Boolean(features.length) ? features : Promise.reject(),
     )
-    .then((features) => ({
-      data: layers.flatMap((layer, index) => ({
-        ...layer,
-        value:
-          keys.length === 1
-            ? features[index].properties[keys[0]]
-            : Object.fromEntries(
-                keys.map((key) => [
-                  key,
-                  features?.[index]?.properties?.[key] || null,
-                ]),
-              ),
-      })),
-      ...Object.fromEntries(
-        propertyName.map((name) => [name, features[0]?.properties?.[name]]),
-      ),
-    }))
     .catch(() => undefined);
 }
