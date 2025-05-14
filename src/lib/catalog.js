@@ -1,5 +1,10 @@
 import getCatalog from "@/lib/request/get-catalog";
 
+/**
+ *
+ * @param catalog
+ * @returns {Promise<Awaited<{[p: string]: any}>[]>}
+ */
 export async function getCollections(catalog) {
   const collections = catalog.links.filter((el) => el.rel === "child");
 
