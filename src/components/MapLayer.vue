@@ -37,8 +37,7 @@ const highlightedId = computed(() => store.getters["map/highlightedId"]);
 onMounted(() => {
   if (!props.layer.id.endsWith("_geoserver_link")) return;
   map.value.on("mousemove", props.layer.id, (e) => {
-    if (Boolean(highlightedId.value) || clickableDatasetsIds.value[0] === "cba")
-      return;
+    if (Boolean(highlightedId.value)) return;
     setHighlight({
       map: map.value,
       queriedFeatures: e.features,
