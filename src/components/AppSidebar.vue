@@ -13,7 +13,7 @@
     </VListItem>
     <VListItem>
       <span class="counter">
-        <VChip prepend-icon="mdi-chart-line">
+        <VChip prepend-icon="mdi-comment-account-outline">
           {{ activeUserStories.length }} / 1
         </VChip>
         <VChip prepend-icon="mdi-layers-triple-outline">
