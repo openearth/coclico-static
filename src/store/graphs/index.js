@@ -84,7 +84,7 @@ export default {
       );
       if (!currentDataset) return;
       const activeProps = rootGetters["datasets/activeDatasetValues"](dataset);
-      const graphType = getGraphType(dataset);
+      const graphType = getGraphType(currentDataset);
       const layerType = getLayerType(graphFeature?.features?.layer);
       if (layerType === "clickable" && graphFeature?.features) {
         const properties =
