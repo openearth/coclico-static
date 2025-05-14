@@ -7,32 +7,31 @@ export const GRAPH_TYPES = {
   FLOOD_EXTEND: "flood-extend-graph",
   LINE_CHART: "line-chart",
   BAR_CHART: "bar-chart",
+  STACKED_BAR_CHART: "stacked-bar-chart",
   PIE_CHART: "pie-chart",
 };
 
 /**
  * Graph type mask
- * @type {{cfhp: string, eesl: string, sc: string, slp: string, ssl: string, cba: string}}
+ * @type {{pie: string, line: string, stacked_series: string, bar: string}}
  */
 const GRAPH_TYPE_MASK = {
-  cfhp: GRAPH_TYPES.PIE_CHART,
-  cfhp_all_maps: GRAPH_TYPES.LINE_CHART,
-  eesl: GRAPH_TYPES.LINE_CHART,
-  sc: GRAPH_TYPES.LINE_CHART,
-  slp: GRAPH_TYPES.BAR_CHART,
-  ssl: GRAPH_TYPES.LINE_CHART,
-  cba: GRAPH_TYPES.PIE_CHART,
-  pp_maps: GRAPH_TYPES.LINE_CHART,
-  be_maps: GRAPH_TYPES.LINE_CHART,
+  pie: GRAPH_TYPES.PIE_CHART,
+  line: GRAPH_TYPES.LINE_CHART,
+  stacked_series: GRAPH_TYPES.STACKED_BAR_CHART,
+  bar: GRAPH_TYPES.BAR_CHART,
 };
 
 /**
  * Get graph type
- * @param id
+ * @param dataset
  * @returns {*|string}
  */
-export const getGraphType = (id) =>
-  GRAPH_TYPE_MASK?.[id] || GRAPH_TYPES.LINE_CHART;
+export const getGraphType = (dataset) => {
+  return (
+    GRAPH_TYPE_MASK?.[dataset?.["deltares:plotType"]] || GRAPH_TYPES.LINE_CHART
+  );
+};
 
 /**
  * Get graph feature data for a dataset with a WMTS geoserver_link
@@ -261,6 +260,30 @@ async function getLineSeriesData({
  * @returns {Promise<{id: *, name: *, series: [{type: string, data: *[]}], xAxis: {type: string, data: *[]}}|{}|{id: *, name: *, series: [{data: *[], type: *, name: string}], xAxis: {type: string, data, title: string}, yAxis: {title: string}}>}
  */
 export async function getZarrData(dataset, features, props) {
+  const plotType = dataset?.["deltares:plotType"];
+
+  switch (plotType) {
+    case "line":
+      try {
+        return getZarrLineData(dataset, features, props);
+      } catch (error) {
+        console.error("Error fetching line data:", error);
+        return {};
+      }
+    case "bar": {
+      try {
+        return await getZarrBarData(dataset, features, props);
+      } catch (error) {
+        console.error("Error fetching bar data:", error);
+        return {};
+      }
+    }
+    default:
+      return {};
+  }
+}
+
+async function getZarrBarData(dataset, features, props) {
   const url = dataset?.assets?.data?.href;
   const datasetName = dataset?.id;
   const plotType = dataset?.["deltares:plotType"];
@@ -269,143 +292,151 @@ export async function getZarrData(dataset, features, props) {
   let path = Object.entries(variables)
     .filter(([, { type }]) => type === "data")
     .map(([key]) => key);
-  path = plotType === "bar" ? path : path[0];
+  const plotSeries = get(dataset, "deltares:plotSeries");
+  const summaryList = dataset?.summaries;
+
+  const slice = Object.values(variables?.[path[0]]?.dimensions).map(
+    (dimension) => {
+      if (dimension === "stations") {
+        return features?.properties?.locationId || 0;
+      } else if (dimension === "nscenarios" && plotSeries !== "scenarios") {
+        return summaryList
+          .find((object) => object.id === "scenarios")
+          ?.values.findIndex((scenario) => scenario === props.scenarios);
+      } else if (
+        dimension === "rp" &&
+        (plotSeries !== "scenarios" || xAxis === "time")
+      ) {
+        return summaryList
+          .find((object) => object.id === "rp")
+          .values.findIndex((object) => {
+            return object === props.rp;
+          });
+      } else {
+        return 0;
+      }
+    },
+  );
+
+  const xAxisdata = [];
+  const series = [];
+  for (const p of path) {
+    try {
+      const res = await openArray({
+        store: url,
+        path: p,
+        mode: "r",
+      });
+      const data = await res.get(slice);
+      series.push(data);
+      xAxisdata.push(p);
+    } catch (error) {
+      console.error("Error fetching bar data:", error);
+    }
+  }
+  const colorPalette = ["#004c6d", "#3d708f", "#6996b3", "#94bed9"];
+  return {
+    id: datasetName,
+    name: datasetName,
+    colorPalette,
+    series: {
+      type: "bar",
+      data: series.map((value, index) => ({
+        value,
+        itemStyle: {
+          color: colorPalette[index % colorPalette.length],
+        },
+      })),
+    },
+    xAxis: {
+      type: "category",
+      data: xAxisdata,
+    },
+  };
+}
+
+function getZarrLineData(dataset, features, props) {
+  const datasetName = dataset?.id;
+  const plotType = dataset?.["deltares:plotType"];
+  const variables = dataset?.["cube:variables"];
+  const xAxis = dataset?.["deltares:plotxAxis"];
+  let path = Object.entries(variables)
+    .filter(([, { type }]) => type === "data")
+    .map(([key]) => key);
   const variableUnit = Object.entries(
     get(dataset, `["cube:variables"].${path}.unit`),
   );
   const cubeDimensions = get(dataset, "cube:dimensions");
   const plotSeries = get(dataset, "deltares:plotSeries");
 
-  const summaryList = dataset?.summaries;
-
-  if (plotType !== "bar") {
-    try {
-      if (cubeDimensions[xAxis].description === "decade window") {
-        const startDateYear = new Date(cubeDimensions[xAxis].extent[0]);
-        const endDateYear = new Date(cubeDimensions[xAxis].extent[1]);
-        const decadeWindowSeries = [];
-        for (
-          let y = startDateYear.getFullYear();
-          y <= endDateYear.getFullYear();
-          y += 10
-        ) {
-          decadeWindowSeries.push(y);
-        }
-        cubeDimensions[xAxis].values = decadeWindowSeries;
-      }
-      const slice = variables?.[path]?.dimensions
-        .filter((dimension) => dimension !== "stations")
-        .map(
-          (dimension) =>
-            Object.keys(cubeDimensions).find((cubeDimension) =>
-              dimension.includes(cubeDimension),
-            ) || dimension,
-        )
-        .map((dimension) =>
-          dimension === plotSeries || dimension === xAxis
-            ? cubeDimensions[dimension]?.values.map(
-                (value) => `${dimension}-${value}`,
-              )
-            : Object.entries(props)
-                .filter(([key]) => key === dimension)
-                .map(([key, value]) => {
-                  if (/^\d+$/.test(String(value))) {
-                    value = Number(value).toFixed(1).toString();
-                  }
-                  return [key, value].join("-");
-                }),
-        );
-      const data = cubeDimensions[plotSeries]?.values.map((name) => ({
-        name,
-        type: plotType,
-        data: Object.entries(features.properties)
-          .filter(
-            ([key]) =>
-              key.includes(name) &&
-              slice.every((prop) => prop.some((value) => key.includes(value))),
-          )
-          .sort(([keyA], [keyB]) => {
-            const keyAIndex = cubeDimensions[xAxis].values.findIndex((value) =>
-              keyA.includes(value),
-            );
-            const keyBIndex = cubeDimensions[xAxis].values.findIndex((value) =>
-              keyB.includes(value),
-            );
-            return keyAIndex - keyBIndex;
-          })
-          .map(([, value]) => value),
-      }));
-      return {
-        id: datasetName,
-        name: datasetName,
-        series: data,
-        xAxis: {
-          type: "category",
-          data: cubeDimensions[xAxis].values,
-          title: `${xAxis}`,
-        },
-        yAxis: {
-          title: `${variableUnit[0][1]}`,
-        },
-      };
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return {};
+  if (cubeDimensions[xAxis].description === "decade window") {
+    const startDateYear = new Date(cubeDimensions[xAxis].extent[0]);
+    const endDateYear = new Date(cubeDimensions[xAxis].extent[1]);
+    const decadeWindowSeries = [];
+    for (
+      let y = startDateYear.getFullYear();
+      y <= endDateYear.getFullYear();
+      y += 10
+    ) {
+      decadeWindowSeries.push(y);
     }
-  } else if (plotType === "bar") {
-    const slice = Object.values(variables?.[path]?.dimensions).map(
-      (dimension) => {
-        const variable = Object.entries(variables).find(([key, variable]) =>
-          variable.dimensions.includes(dimension),
-        );
-        if (dimension === "stations") {
-          return features?.properties?.locationId || 0;
-        } else if (dimension === "nscenarios" && plotSeries !== "scenarios") {
-          return summaryList
-            .find((object) => object.id === "scenarios")
-            ?.values.findIndex((scenario) => scenario === props.scenarios);
-        } else if (
-          dimension === "rp" &&
-          (plotSeries !== "scenarios" || xAxis === "time")
-        ) {
-          return summaryList
-            .find((object) => object.id === "rp")
-            .values.findIndex((object) => {
-              return object === props.rp;
-            });
-        } else {
-          return null;
-        }
-      },
-    );
-
-    const xAxisdata = [];
-    const series = [];
-    for (const p of path) {
-      try {
-        const res = await openArray({
-          store: url,
-          path: p,
-          mode: "r",
-        });
-        const zarrData = await res.get(slice);
-        series.push(zarrData);
-        xAxisdata.push(p);
-      } catch (error) {
-        console.error("Error fetching bar data:", error);
-      }
-    }
-    return {
-      id: datasetName,
-      name: datasetName,
-      series: [{ type: "bar", data: series }],
-      xAxis: {
-        type: "category",
-        data: xAxisdata,
-      },
-    };
+    cubeDimensions[xAxis].values = decadeWindowSeries;
   }
-  return {};
+  const slice = variables?.[path]?.dimensions
+    .filter((dimension) => dimension !== "stations")
+    .map(
+      (dimension) =>
+        Object.keys(cubeDimensions).find((cubeDimension) =>
+          dimension.includes(cubeDimension),
+        ) || dimension,
+    )
+    .map((dimension) =>
+      dimension === plotSeries || dimension === xAxis
+        ? cubeDimensions[dimension]?.values.map(
+            (value) => `${dimension}-${value}`,
+          )
+        : Object.entries(props)
+            .filter(([key]) => key === dimension)
+            .map(([key, value]) => {
+              if (/^\d+$/.test(String(value))) {
+                value = Number(value).toFixed(1).toString();
+              }
+              return [key, value].join("-");
+            }),
+    );
+  const data = cubeDimensions[plotSeries]?.values.map((name) => ({
+    name,
+    type: plotType,
+    data: Object.entries(features.properties)
+      .filter(
+        ([key]) =>
+          key.includes(name) &&
+          slice.every((prop) => prop.some((value) => key.includes(value))),
+      )
+      .sort(([keyA], [keyB]) => {
+        const keyAIndex = cubeDimensions[xAxis].values.findIndex((value) =>
+          keyA.includes(value),
+        );
+        const keyBIndex = cubeDimensions[xAxis].values.findIndex((value) =>
+          keyB.includes(value),
+        );
+        return keyAIndex - keyBIndex;
+      })
+      .map(([, value]) => value),
+  }));
+  return {
+    id: datasetName,
+    name: datasetName,
+    series: data,
+    xAxis: {
+      type: "category",
+      data: cubeDimensions[xAxis].values,
+      title: `${xAxis}`,
+    },
+    yAxis: {
+      title: `${variableUnit[0][1]}`,
+    },
+  };
 }
 
 export function getGraphTypeData({
