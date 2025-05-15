@@ -132,8 +132,7 @@ export default {
           ...dataset,
           isUserStory:
             dataset.keywords?.includes("User Stories") ||
-            dataset.id === "slp" ||
-            dataset.id === "cfhp" ||
+            dataset.id === "cfhp_all_maps" ||
             dataset.id === "be_maps",
         })),
       );
