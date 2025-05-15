@@ -147,7 +147,7 @@ export async function getRasterData(dataset, coords, props) {
             return `${unitFormatter({
               unit,
               value,
-            })} / ${unitFormatter({ unit: "integer", value: serie.sourceData[index].abs_affected })}`;
+            })} (${unitFormatter({ unit: "integer", value: serie.sourceData[index].abs_affected })})`;
           },
         },
       };
