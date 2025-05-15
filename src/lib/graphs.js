@@ -117,14 +117,16 @@ export async function getRasterData(dataset, coords, props) {
         console.error("Error while fetching data from getGraphDataSlp:", error);
         throw error;
       }
-    case "pp_maps":
-      return getLineSeriesData({
+    case "pp_maps": {
+      const unit = "percentage";
+      const data = await getLineSeriesData({
         dataset,
         coords,
         props,
         layerName: "pop_stats",
-        keys: ["rel_affected", "abs_affected"],
+        keys: ["rel_affected"],
         propertyName: [
+          "abs_affected",
           "LAU_NAME",
           "GISCO_ID",
           "return_period",
@@ -132,16 +134,34 @@ export async function getRasterData(dataset, coords, props) {
           "time",
           "map_type",
         ],
-        unit: "percentage",
+        unit,
       });
-    case "be_maps":
-      return getLineSeriesData({
+      return {
+        ...data,
+        tooltip: {
+          valueFormatter: (value, index) => {
+            const serie = data.series.find(
+              (serie) => serie.data[index] === value,
+            );
+            if (!serie) return unitFormatter({ unit, value });
+            return `${unitFormatter({
+              unit,
+              value,
+            })} (${unitFormatter({ unit: "integer", value: serie.sourceData[index].abs_affected })})`;
+          },
+        },
+      };
+    }
+    case "be_maps": {
+      const unit = "percentage";
+      const data = await getLineSeriesData({
         dataset,
         coords,
         props,
         layerName: "be_stats",
-        keys: ["rel_affected", "abs_affected"],
+        keys: ["rel_affected"],
         propertyName: [
+          "abs_affected",
           "LAU_NAME",
           "GISCO_ID",
           "return_period",
@@ -149,8 +169,24 @@ export async function getRasterData(dataset, coords, props) {
           "time",
           "map_type",
         ],
-        unit: "percentage",
+        unit,
       });
+      return {
+        ...data,
+        tooltip: {
+          valueFormatter: (value, index) => {
+            const serie = data.series.find(
+              (serie) => serie.data[index] === value,
+            );
+            if (!serie) return unitFormatter({ unit, value });
+            return `${unitFormatter({
+              unit,
+              value,
+            })} (${unitFormatter({ unit: "integer", value: serie.sourceData[index].abs_affected })})`;
+          },
+        },
+      };
+    }
     case "bc_maps":
       return getLineSeriesData({
         dataset,
@@ -191,12 +227,18 @@ export async function getRasterData(dataset, coords, props) {
   }
 }
 
-const unitFormatter = (unit, value) =>
-  unit === "percentage"
-    ? `${(parseFloat(value) * 100).toFixed(2)}%`
-    : unit === "euro"
-      ? `€${parseFloat(value).toFixed(0)}`
-      : parseFloat(value).toFixed(2);
+const unitFormatter = ({ unit, value }) => {
+  switch (unit) {
+    case "percentage":
+      return `${(parseFloat(value) * 100).toFixed(2)}%`;
+    case "euro":
+      return `€${parseFloat(value).toFixed(0)}`;
+    case "integer":
+      return parseFloat(value).toFixed(0);
+    default:
+      return parseFloat(value).toFixed(2);
+  }
+};
 
 async function getLineSeriesData({
   dataset,
@@ -218,33 +260,36 @@ async function getLineSeriesData({
       propertyName,
     });
     const scenarios = props.find(({ id }) => id === "scenarios").values;
+    const series = scenarios.flatMap((scenario) =>
+      keys.flatMap((key) => {
+        const sourceData = data
+          .filter(
+            (datum) =>
+              datum.scenario === scenario &&
+              (datum?.defenseLevel || datum?.map_type) ===
+                props.find((prop) => prop.id === "defense level").value &&
+              (datum.rp || datum?.return_period) ===
+                props.find((prop) => prop.id === "return period").value,
+          )
+          .sort((a, b) => a.time - b.time);
+        return {
+          name: `${scenario} ${keys.length > 1 ? ` ${key}` : ""}`,
+          type: "line",
+          sourceData: sourceData,
+          key,
+          data: sourceData.map(({ value, ...rest }) => value?.[key] || value),
+        };
+      }),
+    );
 
     return {
       id,
       name: id,
       ...rest,
-      series: scenarios.flatMap((scenario) =>
-        keys.flatMap((key) => ({
-          name: `${scenario} ${key}`,
-          type: "line",
-          key,
-          tooltip: {
-            valueFormatter: (value) => unitFormatter(unit, value),
-            formatter: (value) => unitFormatter(unit, value),
-          },
-          data: data
-            .filter(
-              (datum) =>
-                datum.scenario === scenario &&
-                (datum?.defenseLevel || datum?.map_type) ===
-                  props.find((prop) => prop.id === "defense level").value &&
-                (datum.rp || datum?.return_period) ===
-                  props.find((prop) => prop.id === "return period").value,
-            )
-            .sort((a, b) => a.time - b.time)
-            .map(({ value, ...rest }) => value?.[key] || value),
-        })),
-      ),
+      tooltip: {
+        valueFormatter: (value) => unitFormatter({ unit, value }),
+      },
+      series,
     };
   } catch (error) {
     console.error("Error while fetching data from getGraphDataPp:", error);
