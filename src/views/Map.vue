@@ -59,6 +59,11 @@ function onMapClicked(e) {
   if (activeClickableDataset.value) {
     store.dispatch("graphs/emptyGraphData");
     const { lng, lat } = e.lngLat;
+    map.value.flyTo({
+      center: [lng, lat],
+      offset: [-250, 250],
+      speed: 1,
+    });
     position.value = [lng, lat];
     const queriedFeatures = map.value.queryRenderedFeatures(e.point);
     setFeatures(queriedFeatures, e.point, e.lngLat);
