@@ -39,11 +39,24 @@ watch(minzoom, () => {
   map.value.zoomTo(minzoom.value + 0.1);
 });
 onMounted(() => {
+
+  if (!props.layer.id.endsWith("_geoserver_link")) return;
+  map.value.on("mousemove", props.layer.id, (e) => {
+    if (Boolean(highlightedId.value)) return;
+    setHighlight({
+      map: map.value,
+      queriedFeatures: e.features,
+      clickableDatasetsIds: clickableDatasetsIds.value,
+      event: "hover",
+    });
+  });
+
   if (props.layer?.source?.url?.startsWith("mapbox")) {
     map.value.on("data", getMinZoom);
   }
   if (!id.value.endsWith("_geoserver_link")) return;
   map.value.on("mousemove", id.value, onMouseMove);
+
 });
 
 onBeforeUnmount(async () => {
