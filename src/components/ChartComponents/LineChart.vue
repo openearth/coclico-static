@@ -62,28 +62,30 @@ const option = computed(() => {
   return {
     ...baseOptions,
     ...props.graphData,
-    series: props.graphData.series
-      .filter((series) => series.key !== "abs_affected")
-      .map((serie) => {
-        return serie.name.startsWith(props.propertyValues?.scenarios)
-          ? {
-              ...serie,
-              data: serie.data.map((datum, index) =>
-                index === highlightIndex
-                  ? {
-                      value: datum,
-                      symbolSize: 10,
-                    }
-                  : datum,
-              ),
-            }
-          : {
-              ...serie,
-              lineStyle: {
-                type: hasHighlight ? "dashed" : "solid",
-              },
-            };
-      }),
+    tooltip: {
+      ...baseOptions.tooltip,
+      ...props.graphData?.tooltip,
+    },
+    series: props.graphData.series.map((serie) => {
+      return serie.name.startsWith(props.propertyValues?.scenarios)
+        ? {
+            ...serie,
+            data: serie.data.map((datum, index) =>
+              index === highlightIndex
+                ? {
+                    value: datum,
+                    symbolSize: 10,
+                  }
+                : datum,
+            ),
+          }
+        : {
+            ...serie,
+            lineStyle: {
+              type: hasHighlight ? "dashed" : "solid",
+            },
+          };
+    }),
     yAxis: {
       ...baseOptions.yAxis,
       ...props.graphData?.yAxis,

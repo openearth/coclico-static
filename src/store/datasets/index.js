@@ -27,10 +27,30 @@ export default {
         dataset?.keywords?.includes(state.activeTheme),
       );
     },
+    activeDatasetsInTheme(state) {
+      return (name) =>
+        state.datasets.filter(
+          (dataset) => dataset?.keywords?.includes(name) && dataset.active,
+        ).length;
+    },
     activeDatasets(state) {
       return state.activeDatasetIds.map((id) => {
         return state.datasets.find((dataset) => dataset.id === id);
       });
+    },
+    activeUserStories(state) {
+      return state.activeDatasetIds
+        .map((id) => {
+          return state.datasets.find((dataset) => dataset.id === id);
+        })
+        .filter((dataset) => dataset.isUserStory);
+    },
+    activeDatalayers(state) {
+      return state.activeDatasetIds
+        .map((id) => {
+          return state.datasets.find((dataset) => dataset.id === id);
+        })
+        .filter((dataset) => !dataset.isUserStory);
     },
     activeDatasetIds(state) {
       return state.activeDatasetIds;
@@ -55,18 +75,11 @@ export default {
     ADD_THEME(state, themeObject) {
       state.themes = [...state.themes, themeObject];
     },
-    //Add or remove number of selected datasets of the theme.
-    UPDATE_NUMBER_OF_ACTIVE_DATASETS_ON_THEME(state, { name, count }) {
-      state.themes = state.themes.map((themeObject) => {
-        if (themeObject.name === name) {
-          return { ...themeObject, count: count };
-        } else {
-          return themeObject;
-        }
-      });
-    },
     ADD_DATASET(state, dataset) {
-      state.datasets = [...state.datasets, dataset];
+      state.datasets = [
+        ...state.datasets,
+        ...(Array.isArray(dataset) ? dataset : [dataset]),
+      ];
     },
     ADD_DATASET_PROPERTIES(state, payload) {
       state.properties = [
@@ -113,19 +126,19 @@ export default {
         commit("ADD_THEME", { name: keyword, count: 0 }),
       );
       const collections = await getCollections(catalog);
-      collections.forEach((collection) => commit("ADD_DATASET", collection));
+      commit(
+        "ADD_DATASET",
+        collections.map((dataset) => ({
+          ...dataset,
+          isUserStory:
+            dataset.keywords?.includes("User Stories") ||
+            dataset.id === "cfhp_all_maps" ||
+            dataset.id === "be_maps",
+        })),
+      );
     },
     setActiveTheme({ commit }, theme) {
       commit("SET_ACTIVE_THEME", theme);
-    },
-    updateThemeObject({ commit, getters }) {
-      const countActiveDatasets = getters.datasetsInActiveTheme.filter(
-        (dataset) => dataset.active === true,
-      ).length;
-      commit("UPDATE_NUMBER_OF_ACTIVE_DATASETS_ON_THEME", {
-        name: getters.activeTheme,
-        count: countActiveDatasets,
-      });
     },
     updateDatasetProperty(
       { getters, commit, dispatch },
