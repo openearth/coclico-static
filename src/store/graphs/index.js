@@ -36,41 +36,21 @@ export default {
       { commit, dispatch, rootGetters },
       { queriedFeatures, datasetId, lat, lng, point },
     ) {
-      const properties = rootGetters["datasets/activeDatasetValues"](datasetId);
-      switch (datasetId) {
-        case "cba":
-          commit("ADD_GRAPH_FEATURE", {
-            dataset: datasetId,
-            lng,
-            lat,
-            features:
-              queriedFeatures.find((feature) =>
-                Object.keys(feature).some((key) =>
-                  key
-                    .toLowerCase()
-                    .includes(properties.scenarios.toLowerCase()),
-                ),
-              ) || queriedFeatures[0],
-          });
-          break;
-        default:
-          commit("ADD_GRAPH_FEATURE", {
-            dataset: datasetId,
-            lng,
-            lat,
-            features:
-              queriedFeatures?.find((feature) =>
-                feature?.layer?.id.endsWith("_geoserver_link"),
-              ) ||
-              queriedFeatures?.find((feature) =>
-                rootGetters["map/clickableDatasetsIds"].some((id) =>
-                  feature.layer.id.startsWith(id),
-                ),
-              ),
-            point,
-          });
-          break;
-      }
+      commit("ADD_GRAPH_FEATURE", {
+        dataset: datasetId,
+        lng,
+        lat,
+        features:
+          queriedFeatures?.find((feature) =>
+            feature?.layer?.id.endsWith("_geoserver_link"),
+          ) ||
+          queriedFeatures?.find((feature) =>
+            rootGetters["map/clickableDatasetsIds"].some((id) =>
+              feature.layer.id.startsWith(id),
+            ),
+          ),
+        point,
+      });
       dispatch("setGraphData");
     },
     async setGraphData({ rootGetters, getters, commit }) {
@@ -84,7 +64,7 @@ export default {
       );
       if (!currentDataset) return;
       const activeProps = rootGetters["datasets/activeDatasetValues"](dataset);
-      const graphType = getGraphType(dataset);
+      const graphType = getGraphType(currentDataset);
       const layerType = getLayerType(graphFeature?.features?.layer);
       if (layerType === "clickable" && graphFeature?.features) {
         const properties =

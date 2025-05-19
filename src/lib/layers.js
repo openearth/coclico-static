@@ -319,10 +319,19 @@ export function setHighlight({
     feature?.layer?.id ||
     map.getLayer(`${clickableDatasetsIds?.[0]}_geoserver_link`)?.id;
   if (!layerId) return;
-  const giscoId = feature?.properties?.["GISCO_ID"] || null;
+  const areaIds = {
+    GISCO_ID: feature?.properties?.["GISCO_ID"],
+    NUTS_ID: feature?.properties?.["NUTS_ID"],
+  };
+  const area = {
+    id: Object.values(areaIds).find((id) => id),
+    property: Object.entries(areaIds).find(([, id]) => id)?.[0],
+  };
+
+  if (!area.id || !area.property) return;
   map.setPaintProperty(layerId, "fill-opacity", [
     "case",
-    ["boolean", ["==", ["get", "GISCO_ID"], giscoId], false],
+    ["boolean", ["==", ["get", area.property], area.id], false],
     event === "click" ? 0.5 : 0.2,
     0,
   ]);

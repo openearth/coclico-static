@@ -25,7 +25,7 @@ const props = defineProps({
   },
   propertyValues: {
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
 });
 use([
@@ -36,15 +36,16 @@ use([
   TooltipComponent,
   LegendComponent,
 ]);
-
-const baseOptions =
-  props.graphData?.id || props.graphData?.datasetId
-    ? (
-        await import(
-          `@/assets/echart-templates/${props.graphData?.id || props.graphData?.datasetId}.js`
-        )
-      ).default
-    : (await import("@/assets/echart-templates/default.js")).default;
+let baseOptions = {};
+try {
+  baseOptions = (
+    await import(
+      `@/assets/echart-templates/${props.graphData?.id || props.graphData?.datasetId}.js`
+    )
+  ).default;
+} catch (e) {
+  baseOptions = (await import("@/assets/echart-templates/default.js")).default;
+}
 const xAxisData = computed(
   () =>
     props.graphData?.xAxis?.data ||
@@ -61,28 +62,30 @@ const option = computed(() => {
   return {
     ...baseOptions,
     ...props.graphData,
-    series: props.graphData.series
-      .filter((series) => series.key !== "abs_affected")
-      .map((serie) => {
-        return serie.name.startsWith(props.propertyValues?.scenarios)
-          ? {
-              ...serie,
-              data: serie.data.map((datum, index) =>
-                index === highlightIndex
-                  ? {
-                      value: datum,
-                      symbolSize: 10,
-                    }
-                  : datum,
-              ),
-            }
-          : {
-              ...serie,
-              lineStyle: {
-                type: hasHighlight ? "dashed" : "solid",
-              },
-            };
-      }),
+    tooltip: {
+      ...baseOptions.tooltip,
+      ...props.graphData?.tooltip,
+    },
+    series: props.graphData.series.map((serie) => {
+      return serie.name.startsWith(props.propertyValues?.scenarios)
+        ? {
+            ...serie,
+            data: serie.data.map((datum, index) =>
+              index === highlightIndex
+                ? {
+                    value: datum,
+                    symbolSize: 10,
+                  }
+                : datum,
+            ),
+          }
+        : {
+            ...serie,
+            lineStyle: {
+              type: hasHighlight ? "dashed" : "solid",
+            },
+          };
+    }),
     yAxis: {
       ...baseOptions.yAxis,
       ...props.graphData?.yAxis,

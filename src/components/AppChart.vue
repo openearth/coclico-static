@@ -26,6 +26,7 @@
 <script setup>
 import { computed, markRaw } from "vue";
 import FloodExtentGraph from "./ChartComponents/FloodExtentGraph.vue";
+import StackedBarChart from "./ChartComponents/StackedBarChart.vue";
 import BarChart from "./ChartComponents/BarChart.vue";
 import LineChart from "./ChartComponents/LineChart.vue";
 import PieChart from "@/components/ChartComponents/PieChart.vue";
@@ -33,15 +34,15 @@ import { GRAPH_TYPES } from "@/lib/graphs";
 
 const props = defineProps({
   propertyValues: {
-    type: Array,
-    default: () => [],
+    type: Object,
+    default: () => ({}),
   },
   properties: {
     type: Object,
     default: () => ({}),
   },
   graphData: {
-    type: Object,
+    type: Object || null,
     required: true,
   },
 });
@@ -51,6 +52,7 @@ const graphComponent = computed(
       [GRAPH_TYPES.FLOOD_EXTEND]: markRaw(FloodExtentGraph),
       [GRAPH_TYPES.PIE_CHART]: markRaw(PieChart),
       [GRAPH_TYPES.BAR_CHART]: markRaw(BarChart),
+      [GRAPH_TYPES.STACKED_BAR_CHART]: markRaw(StackedBarChart),
       [GRAPH_TYPES.LINE_CHART]: markRaw(LineChart),
     })[props.graphData?.graphType],
 );

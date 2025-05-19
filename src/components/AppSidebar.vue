@@ -11,6 +11,16 @@
     <VListItem class="image-container">
       <custom-icon class="coclico-image" name="logo" />
     </VListItem>
+    <VListItem>
+      <span class="counter">
+        <VChip prepend-icon="mdi-comment-account-outline">
+          {{ activeUserStories.length }} / 1
+        </VChip>
+        <VChip prepend-icon="mdi-layers-triple-outline">
+          {{ activeDatalayers.length }} / 3
+        </VChip>
+      </span>
+    </VListItem>
     <VList ref="tour" nav>
       <VListItem
         v-for="theme in themes"
@@ -25,7 +35,13 @@
         "
       >
         <VListImg class="pa-2 list-item-img">
-          <VBadge v-if="theme.count" :content="theme.count" color="primary">
+          <VBadge
+            v-if="store.getters['datasets/activeDatasetsInTheme'](theme.name)"
+            :content="
+              store.getters['datasets/activeDatasetsInTheme'](theme.name)
+            "
+            color="primary"
+          >
             <custom-icon :name="theme.name" class="item-image" />
           </VBadge>
 
@@ -84,11 +100,11 @@
       </VRow>
     </VListItem>
     <VList>
-      <VListItem v-if="filteredDatasets?.length">
+      <VListItem v-if="userStories?.length">
         <VCardTitle class="layer-card-title"> User stories</VCardTitle>
         <VList class="layer-list">
           <VListItem
-            v-for="dataset in filteredDatasets"
+            v-for="dataset in userStories"
             :key="dataset.id"
             :aria-label="dataset.title"
           >
@@ -111,7 +127,7 @@
                 location="bottom center"
               >
                 <template v-slot:activator="{ props }">
-                  <VIcon class="summary-info, ml-4" small v-bind="props">
+                  <VIcon class="summary-info ml-4" small v-bind="props">
                     mdi-information-outline
                   </VIcon>
                 </template>
@@ -178,6 +194,7 @@ import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useTour } from "@/lib/useTour";
 import { marked } from "marked";
+import { toast } from "vue-sonner";
 
 const store = useStore();
 const showLayersCard = ref(false);
@@ -202,7 +219,12 @@ useTour({
     showLayersCard.value = false;
   },
 });
-
+const activeDatalayers = computed(
+  () => store.getters["datasets/activeDatalayers"],
+);
+const activeUserStories = computed(
+  () => store.getters["datasets/activeUserStories"],
+);
 const activeTheme = computed(() => store.getters["datasets/activeTheme"]);
 const datasetsInActiveTheme = computed(
   () => store.getters["datasets/datasetsInActiveTheme"],
@@ -216,29 +238,11 @@ const sidebarStyle = computed(() => {
     borderRight: showLayersCard.value ? "2px solid #e4e4e4" : "2px solid white",
   };
 });
-const filteredDatasets = computed(() => {
-  return datasetsInActiveTheme.value.filter(
-    (dataset) =>
-      dataset.id === "slp" ||
-      dataset.id === "cfhp" ||
-      dataset.id === "cba" ||
-      dataset.id === "pp_maps" ||
-      dataset.id === "be_maps" ||
-      dataset.id === "cfhp_all_maps" ||
-      dataset.id === "bc_maps",
-  );
-});
+const userStories = computed(() =>
+  datasetsInActiveTheme.value.filter((dataset) => dataset.isUserStory),
+);
 const dataLayers = computed(() =>
-  datasetsInActiveTheme.value.filter(
-    ({ id }) =>
-      id !== "slp" &&
-      id !== "cfhp" &&
-      id !== "cba" &&
-      id !== "pp_maps" &&
-      id !== "be_maps" &&
-      id !== "cfhp_all_maps" &&
-      id !== "bc_maps",
-  ),
+  datasetsInActiveTheme.value.filter((dataset) => !dataset.isUserStory),
 );
 
 function toggleLayersCard(theme) {
@@ -255,9 +259,27 @@ function close() {
 }
 
 async function toggleDataset(dataset) {
+  if (
+    !dataset.isUserStory &&
+    activeDatalayers.value.length > 2 &&
+    !activeDatalayers.value.some((layer) => layer.id === dataset.id)
+  ) {
+    toast.warning(
+      "You can only show 3 data layers at a time. Please hide one before showing another.",
+    );
+    dataset.active = false;
+    return;
+  }
+  if (dataset.isUserStory && activeUserStories.value.length > 0) {
+    activeUserStories.value.forEach((story) => {
+      if (story.id !== dataset.id) {
+        story.active = false;
+        store.dispatch("datasets/toggleActiveDataset", story.id);
+      }
+    });
+  }
   await store.dispatch("datasets/toggleActiveDataset", dataset.id);
   await store.dispatch("map/loadDatasetOnMap", dataset.id);
-  await store.dispatch("datasets/updateThemeObject");
 }
 </script>
 
@@ -309,6 +331,17 @@ async function toggleDataset(dataset) {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.counter {
+  display: grid;
+  grid-auto-flow: row;
+  place-items: center;
+  gap: 0.5rem;
+
+  span {
+    font-size: 0.8rem;
+  }
 }
 
 .coclico-image {
@@ -417,7 +450,7 @@ async function toggleDataset(dataset) {
   font-weight: 600;
 }
 
-.layer-label{
+.layer-label {
   width: 260px;
   white-space: normal !important;
   word-break: break-word;

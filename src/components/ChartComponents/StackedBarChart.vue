@@ -13,6 +13,7 @@ import {
 } from "echarts/components";
 import { computed } from "vue";
 import VChart from "vue-echarts";
+import { useStore } from "vuex";
 
 use([
   CanvasRenderer,
@@ -43,9 +44,35 @@ try {
     )
   ).default;
 } catch (e) {
-  console.info(e);
   baseOptions = (await import("@/assets/echart-templates/default.js")).default;
 }
+const store = useStore();
+const properties = computed(() =>
+  store.getters["datasets/activeDatasetProperties"](
+    props.graphData?.id || props.graphData?.datasetId,
+  ),
+);
+const series = computed(() =>
+  props.graphData?.series.map((item) =>
+    item.stack === props.propertyValues.scenarios &&
+    item.name.startsWith("High")
+      ? {
+          ...item,
+          markArea: {
+            itemStyle: {
+              opacity: 0.25,
+            },
+            data: [
+              [
+                { xAxis: props.propertyValues.time },
+                { xAxis: props.propertyValues.time },
+              ],
+            ],
+          },
+        }
+      : item,
+  ),
+);
 const option = computed(() => {
   return {
     ...baseOptions,
@@ -55,10 +82,10 @@ const option = computed(() => {
       color: props.graphData?.colorPalette,
       data: props.graphData?.scenarios?.map((scenario) => `High ${scenario}`),
     },
-    series: props.graphData?.series,
+    series: series.value,
     xAxis: {
       ...baseOptions.xAxis,
-      ...props.graphData.xAxis,
+      data: properties.value.find((prop) => prop.id === "time").values.sort(),
     },
   };
 });

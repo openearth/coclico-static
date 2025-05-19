@@ -47,7 +47,14 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
               url: "https://coclico.avi.deltares.nl/geoserver/slp/wms",
               lng,
               lat,
-            })
+            }).then((features) => ({
+              data: layers.flatMap((layer, index) => {
+                return {
+                  ...layer,
+                  value: features[index].properties["GRAY_INDEX"],
+                };
+              }),
+            }))
           )?.data,
       ),
     )
