@@ -19,10 +19,12 @@
             flat
             size="small"
             class="mr-2"
-            v-for="value in Object.values(propertyValues)"
-            :key="value"
+            v-for="(value, key) in propertyValues"
+            :key="key"
           >
-            {{ value }}
+            {{
+              propertiesMap[key]?.labels?.[value] || value
+            }}
           </VChip>
         </small>
       </VCardSubtitle>
@@ -73,6 +75,13 @@ const properties = computed(() =>
     activeClickableDataset.value.id,
   ),
 );
+const propertiesMap = computed(() => {
+  const map = {};
+  properties.value?.forEach((prop) => {
+    map[prop.id] = prop;
+  });
+  return map;
+});
 const propertyValues = computed(
   () =>
     store.getters["datasets/activeDatasetValues"](
