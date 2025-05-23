@@ -35,6 +35,17 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const labelsMap = computed(() => {
+  const map = {};
+  for (const prop of props.properties || []) {
+    Object.entries(prop.labels || {}).forEach(([key, label]) => {
+      map[key] = label;
+    });
+  }
+  return map;
+});
+
 let baseOptions = {};
 try {
   baseOptions = (
@@ -59,6 +70,19 @@ const option = computed(() => {
     xAxis: {
       ...baseOptions.xAxis,
       ...props.graphData.xAxis,
+      type: "category",
+      name: "",
+      data: (props.graphData.xAxis?.data || []).map((label) =>
+        label
+          .split(" ")
+          .map((part) => labelsMap.value[part] || part)
+          .join(" ")
+      ),
+        axisLabel: {
+          overflow: 'break',
+          interval: 0,
+          formatter: (value) => value.replace(" (", "\n("),
+        },
     },
   };
 });

@@ -80,7 +80,6 @@ const option = computed(() => {
     series: props.graphData.series.map((serie) => {
       const isHighlighted = serie.name.startsWith(props.propertyValues?.scenarios);
 
-      // ✨ New: Parse and relabel compound names
       const readableName = serie.name
         .split(" ")
         .map((part) => labelsMap.value[part] || part)
