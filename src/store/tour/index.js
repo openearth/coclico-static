@@ -2,7 +2,7 @@ export default {
   namespaced: true,
   state: {
     isOnTour: false,
-    tourStep: 0,
+    tourStep: undefined,
     tourSteps: [],
   },
   getters: {
@@ -26,20 +26,30 @@ export default {
   },
   actions: {
     addTourStep({ commit, state }, step) {
-      const idx =
-        step.index || state.tourSteps.findIndex(({ id }) => id === step.id);
+      const existingIndex = state.tourSteps.findIndex(
+        ({ id }) => id === step.id,
+      );
+
       if (!step?.index) {
         step.index = state.tourSteps.length;
       }
-      const steps = (
-        idx
-          ? [
-              ...state.tourSteps.slice(0, idx),
-              step,
-              ...state.tourSteps.slice(idx + 1),
-            ]
-          : [...state.tourSteps, step]
-      ).sort((a, b) => a.index - b.index);
+
+      let steps;
+      if (existingIndex !== -1) {
+        // Replace existing step
+        steps = [
+          ...state.tourSteps.slice(0, existingIndex),
+          step,
+          ...state.tourSteps.slice(existingIndex + 1),
+        ];
+      } else {
+        // Add new step
+        steps = [...state.tourSteps, step];
+      }
+
+      // Sort by index to ensure proper order
+      steps = steps.sort((a, b) => a.index - b.index);
+
       commit("SET_TOUR_STEPS", steps);
     },
     setTourSteps({ commit }, steps) {
@@ -47,6 +57,7 @@ export default {
     },
     startTour({ commit }) {
       commit("SET_TOUR", true);
+      commit("SET_TOUR_STEP", 0);
     },
     stopTour({ commit }) {
       commit("SET_TOUR", false);

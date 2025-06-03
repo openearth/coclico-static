@@ -26,6 +26,7 @@
 
 <script setup>
 import { useStore } from "vuex";
+import { useTour } from "@/lib/useTour";
 import AppSidebar from "@/components/AppSidebar.vue";
 import DatasetCard from "@/components/DatasetCard.vue";
 import MapLayer from "@/components/MapLayer.vue";
@@ -168,6 +169,17 @@ onMounted(() => {
 
 onBeforeMount(() => {
   store.dispatch("map/setSeaLevelRiseData", seaLevelRiseData.value);
+});
+
+useTour({
+  id: "welcome",
+  refId: "welcome",
+  title: "Welcome",
+  location: "top right",
+  index: 1,
+  description: `Welcome to the CoCliCo. This is a tool to help you explore the data and find the information you need.`,
+  onTourStep: () => {},
+  onAfterTourStep: () => {},
 });
 </script>
 

@@ -11,7 +11,7 @@
     <VListItem class="image-container">
       <custom-icon class="coclico-image" name="logo" />
     </VListItem>
-    <VListItem>
+    <VListItem ref="counter">
       <span class="counter">
         <VChip prepend-icon="mdi-comment-account-outline">
           {{ activeUserStories.length }} / 1
@@ -56,6 +56,7 @@
         class="list-item"
         href="https://www.openearth.nl/coclico-workbench/"
         target="_blank"
+        ref="handbook"
       >
         <VListImg class="list-item-img">
           <VIcon color="black" size="1.5rem">
@@ -68,6 +69,7 @@
         class="list-item"
         href="https://coclicoservices.eu/"
         target="_blank"
+        ref="website"
       >
         <VListImg class="list-item-img">
           <VIcon color="black" size="1.5rem">mdi-web</VIcon>
@@ -85,106 +87,108 @@
     temporary
     width="400"
   >
-    <VListItem>
-      <VRow>
-        <VCol cols="10">
-          <VCardTitle class="dataset-card-theme-title">
-            {{ activeTheme }}
-          </VCardTitle>
-        </VCol>
-        <VCol class="column-right" cols="2">
-          <VBtn class="close-button" flat icon @click="close">
-            <VIcon>mdi-close</VIcon>
-          </VBtn>
-        </VCol>
-      </VRow>
-    </VListItem>
-    <VList>
-      <VListItem v-if="userStories?.length">
-        <VCardTitle class="layer-card-title"> User stories</VCardTitle>
-        <VList class="layer-list">
-          <VListItem
-            v-for="dataset in userStories"
-            :key="dataset.id"
-            :aria-label="dataset.title"
-          >
-            <template v-slot:prepend>
-              <VSwitch
-                v-model="dataset.active"
-                :label="dataset.title"
-                class="layer-label"
-                color="primary"
-                hide-details
-                @change="toggleDataset(dataset)"
-              />
-            </template>
-            <template v-slot:append>
-              <VMenu
-                open-on-hover
-                open-delay="100"
-                close-delay="100"
-                max-width="300px"
-                location="bottom center"
-              >
-                <template v-slot:activator="{ props }">
-                  <VIcon class="summary-info ml-4" small v-bind="props">
-                    mdi-information-outline
-                  </VIcon>
-                </template>
-                <template v-slot:default>
-                  <VCard
-                    class="tooltip py-2 px-8 rounded bg-grey-darken-3"
-                    v-html="marked.parse(dataset.description)"
-                  />
-                </template>
-              </VMenu>
-            </template>
-          </VListItem>
-        </VList>
+    <div ref="layersPanel">
+      <VListItem>
+        <VRow>
+          <VCol cols="10">
+            <VCardTitle class="dataset-card-theme-title">
+              {{ activeTheme }}
+            </VCardTitle>
+          </VCol>
+          <VCol class="column-right" cols="2">
+            <VBtn class="close-button" flat icon @click="close">
+              <VIcon>mdi-close</VIcon>
+            </VBtn>
+          </VCol>
+        </VRow>
       </VListItem>
-      <VListItem v-if="dataLayers?.length">
-        <VCardTitle class="layer-card-title"> Data layers</VCardTitle>
-        <VList class="layer-list">
-          <VListItem
-            v-for="dataset in dataLayers"
-            :key="dataset.id"
-            :aria-label="dataset.title"
-          >
-            <template v-slot:prepend>
-              <VSwitch
-                v-model="dataset.active"
-                :label="dataset.title"
-                class="layer-label"
-                color="primary"
-                hide-details
-                @change="toggleDataset(dataset)"
-              ></VSwitch>
-            </template>
-            <template v-slot:append>
-              <VMenu
-                open-on-hover
-                open-delay="100"
-                close-delay="100"
-                max-width="300px"
-                location="bottom center"
-              >
-                <template v-slot:activator="{ props }">
-                  <VIcon class="summary-info, ml-4" small v-bind="props">
-                    mdi-information-outline
-                  </VIcon>
-                </template>
-                <template v-slot:default>
-                  <VCard
-                    class="tooltip py-2 px-8 rounded bg-grey-darken-3"
-                    v-html="marked.parse(dataset.description)"
-                  />
-                </template>
-              </VMenu>
-            </template>
-          </VListItem>
-        </VList>
-      </VListItem>
-    </VList>
+      <VList>
+        <VListItem v-if="userStories?.length" ref="userStories">
+          <VCardTitle class="layer-card-title"> User stories</VCardTitle>
+          <VList class="layer-list">
+            <VListItem
+              v-for="dataset in userStories"
+              :key="dataset.id"
+              :aria-label="dataset.title"
+            >
+              <template v-slot:prepend>
+                <VSwitch
+                  v-model="dataset.active"
+                  :label="dataset.title"
+                  class="layer-label"
+                  color="primary"
+                  hide-details
+                  @change="toggleDataset(dataset)"
+                />
+              </template>
+              <template v-slot:append>
+                <VMenu
+                  open-on-hover
+                  open-delay="100"
+                  close-delay="100"
+                  max-width="300px"
+                  location="bottom center"
+                >
+                  <template v-slot:activator="{ props }">
+                    <VIcon class="summary-info ml-4" small v-bind="props">
+                      mdi-information-outline
+                    </VIcon>
+                  </template>
+                  <template v-slot:default>
+                    <VCard
+                      class="tooltip py-2 px-8 rounded bg-grey-darken-3"
+                      v-html="marked.parse(dataset.description)"
+                    />
+                  </template>
+                </VMenu>
+              </template>
+            </VListItem>
+          </VList>
+        </VListItem>
+        <VListItem v-if="dataLayers?.length" ref="dataLayers">
+          <VCardTitle class="layer-card-title"> Data layers</VCardTitle>
+          <VList class="layer-list">
+            <VListItem
+              v-for="dataset in dataLayers"
+              :key="dataset.id"
+              :aria-label="dataset.title"
+            >
+              <template v-slot:prepend>
+                <VSwitch
+                  v-model="dataset.active"
+                  :label="dataset.title"
+                  class="layer-label"
+                  color="primary"
+                  hide-details
+                  @change="toggleDataset(dataset)"
+                ></VSwitch>
+              </template>
+              <template v-slot:append>
+                <VMenu
+                  open-on-hover
+                  open-delay="100"
+                  close-delay="100"
+                  max-width="300px"
+                  location="bottom center"
+                >
+                  <template v-slot:activator="{ props }">
+                    <VIcon class="summary-info, ml-4" small v-bind="props">
+                      mdi-information-outline
+                    </VIcon>
+                  </template>
+                  <template v-slot:default>
+                    <VCard
+                      class="tooltip py-2 px-8 rounded bg-grey-darken-3"
+                      v-html="marked.parse(dataset.description)"
+                    />
+                  </template>
+                </VMenu>
+              </template>
+            </VListItem>
+          </VList>
+        </VListItem>
+      </VList>
+    </div>
   </VNavigationDrawer>
 </template>
 
@@ -203,22 +207,7 @@ watch(showLayersCard, (show) => {
     setTimeout(() => setTheme(null), 100);
   }
 });
-useTour({
-  id: "sidebar",
-  refId: "tour",
-  title: "Themes",
-  location: "end center",
-  index: 0,
-  description: `Select a theme to view the available datasets.
-   Toggle user stories and data layers on and off to display them on the map.
-   Click on the layer to view spatial data.`,
-  onTourStep: () => {
-    showLayersCard.value = true;
-  },
-  onAfterTourStep: () => {
-    showLayersCard.value = false;
-  },
-});
+
 const activeDatalayers = computed(
   () => store.getters["datasets/activeDatalayers"],
 );
@@ -281,6 +270,108 @@ async function toggleDataset(dataset) {
   await store.dispatch("datasets/toggleActiveDataset", dataset.id);
   await store.dispatch("map/loadDatasetOnMap", dataset.id);
 }
+
+useTour({
+  id: "sidebar",
+  refId: "tour",
+  title: "Themes",
+  location: "end center",
+  index: 2,
+  description: `Select a theme to view the available datasets.
+   Toggle user stories and data layers on and off to display them on the map.
+   Click on the layer to view spatial data.`,
+  onTourStep: () => {
+    showLayersCard.value = true;
+    setTheme(themes.value[2].name);
+  },
+});
+
+useTour({
+  id: "panel",
+  refId: "layersPanel",
+  title: "Layers",
+  location: "bottom center",
+  index: 3,
+  description: `Toggle user stories and data layers on and off to display them on the map.
+   Click on the layer to view spatial data.`,
+  onTourStep: () => {
+    showLayersCard.value = true;
+    setTheme(themes.value[2].name);
+  },
+});
+
+useTour({
+  id: "user-stories",
+  refId: "userStories",
+  title: "User stories",
+  location: "bottom center",
+  index: 4,
+  description: `Toggle user stories on and off to display them on the map.
+   Click on the user story to view spatial data.`,
+  onTourStep: () => {
+    showLayersCard.value = true;
+    setTheme(themes.value[2].name);
+  },
+});
+
+useTour({
+  id: "data-layers",
+  refId: "dataLayers",
+  title: "Data layers",
+  location: "bottom center",
+  index: 5,
+  description: `Toggle data layers on and off to display them on the map.`,
+  onTourStep: () => {
+    showLayersCard.value = true;
+    setTheme(themes.value[2].name);
+  },
+  onAfterTourStep: () => {
+    showLayersCard.value = false;
+  },
+});
+
+useTour({
+  id: "background-layers",
+  refId: "layersPanel",
+  title: "Background layers",
+  location: "bottom center",
+  index: 6,
+  description: `Toggle background layers on and off to display them on the map.`,
+  onTourStep: () => {
+    showLayersCard.value = true;
+    setTheme(themes.value[themes.value.length - 1].name);
+  },
+  onAfterTourStep: () => {
+    showLayersCard.value = false;
+  },
+});
+
+useTour({
+  id: "counter",
+  refId: "counter",
+  title: "Limitations",
+  location: "bottom center",
+  index: 7,
+  description: `This is a counter for the number of user stories and data layers.`,
+});
+
+useTour({
+  id: "handbook",
+  refId: "handbook",
+  title: "Handbook",
+  description: `This is the handbook of the CoCliCo project.`,
+  location: "end center",
+  index: 8,
+});
+
+useTour({
+  id: "website",
+  refId: "website",
+  title: "Website",
+  description: `This is the website of the CoCliCo project.`,
+  location: "end center",
+  index: 9,
+});
 </script>
 
 <style lang="scss" scoped>

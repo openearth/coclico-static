@@ -9,6 +9,9 @@ import {
 import { useElementBounding } from "@vueuse/core";
 import { useStore } from "vuex";
 
+// Cache for shared template refs to avoid duplicates
+const templateRefCache = new Map<string, any>();
+
 /**
  *
  * @param id ID to identify this step
@@ -41,11 +44,26 @@ export function useTour<T>({
   const instance = getCurrentInstance();
   if (instance) {
     const store = useStore();
-    const tour = useTemplateRef<HTMLElement>(refId);
+
+    // Use cached template ref or create new one
+    let tour = templateRefCache.get(refId);
+    if (!tour) {
+      tour = useTemplateRef<HTMLElement>(refId);
+      templateRefCache.set(refId, tour);
+    }
+
     const bounds = reactive(useElementBounding(tour));
     const isOnTour = computed(() => store.getters["tour/isOnTour"]);
     const isCurrentStep = computed(
       () => store.getters["tour/tourStepId"] === id,
+    );
+
+    watch(
+      () => store.getters["tour/tourStepId"],
+      () => {
+        bounds.update();
+      },
+      { immediate: true },
     );
     watch(
       isCurrentStep,
@@ -59,6 +77,7 @@ export function useTour<T>({
       },
       { immediate: true },
     );
+
     watch(
       isOnTour,
       (isOnTour, wasOnTour) => {

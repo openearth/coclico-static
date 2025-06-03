@@ -1,5 +1,5 @@
 <template>
-  <VCard ref="tour" :class="{ open: isOpen }" class="custom-dataset-card">
+  <VCard ref="dataset" :class="{ open: isOpen }" class="custom-dataset-card">
     <VTabs
       v-model="tab"
       align-tabs="center"
@@ -79,20 +79,6 @@ const activeDatasets = computed(() =>
 );
 const graphs = computed(() => store.getters["dashboard/graphs"]);
 
-useTour({
-  id: "dataset",
-  refId: "tour",
-  title: "Active Data Layers & Dashboard",
-  description: `This window displays the active data layers and allows you to view saved graphs on the dashboard.\n\n
-  It opens and closes either automatically or by pressing one of the tabs.`,
-  onTourStep: () => {
-    open();
-  },
-  onAfterTourStep: () => {
-    close();
-  },
-});
-
 watch(tab, () => {
   open();
 });
@@ -130,6 +116,32 @@ function open() {
 function close() {
   isOpen.value = false;
 }
+
+useTour({
+  id: "dataset",
+  refId: "dataset",
+  title: "Active Data Layers",
+  description: `This window displays the active data layers.`,
+  index: 10,
+  onTourStep: () => {
+    open();
+    tab.value = "option-1";
+  },
+});
+
+useTour({
+  id: "dashboard",
+  refId: "dataset",
+  title: "Dashboard",
+  description: `This window displays the saved graphs on the dashboard.`,
+  index: 11,
+  onTourStep: () => {
+    tab.value = "option-2";
+  },
+  onAfterTourStep: () => {
+    close();
+  },
+});
 </script>
 
 <style lang="scss" scoped>
