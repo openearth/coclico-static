@@ -72,15 +72,17 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 
 const store = useStore();
 const isOnTour = computed(() => store.getters["tour/isOnTour"]);
 const current = computed(() => store.getters["tour/currentTourStep"]);
+
 const hasPreviousTourStep = computed(
   () => store.getters["tour/hasPreviousTourStep"],
 );
 const hasNextTourStep = computed(() => store.getters["tour/hasNextTourStep"]);
+
 const cutout = computed(() => {
   return {
     top: `${current.value?.bounds?.y}px`,
