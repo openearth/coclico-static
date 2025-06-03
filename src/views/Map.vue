@@ -174,13 +174,25 @@ onBeforeMount(() => {
 useTour({
   id: "welcome",
   refId: "welcome",
-  title: "01/10 - Welcome",
-  location: "top right",
+  title: "01/11 - Welcome",
+  location: "center",
   index: 1,
   description: `Hi! Welcome at the open-source Coastal Climate Core (CoCliCo) Services web platform. This tour will take you along the platforms key features. We are committed to inform users on present-day and future coastal risks, with the goal to improve decision-making on risk management and adaptation. The web platform visualizes state-of-the-art science from hazards to risk & adaptation in a consistent manner. It is carefully designed with both smaller and larger scale stakeholders, i.e. municipalities as well as governmental agencies. For more information on the CoCliCo project please visit: https://coclicoservices.eu/about/.`,
   onTourStep: () => {},
   onAfterTourStep: () => {},
 });
+
+useTour({
+  id: "more",
+  refId: "more",
+  title: "11/11 - Need more information?",
+  location: "center",
+  index: 11,
+  description: `Thank you for visiting the CoCliCo web platform. As informed before, CoCliCo entails more than just this page. Please make sure you will get most of what’s available by leveraging all the information that we outlined in this tour. In case you have questions or comments, feel free to reach out to any of the project partners or drop a message in the contact form on the official website. CoCliCo will be migrating as climate service into the European Digital Twin of the Ocean (EDITO) in the near future to ensure continuity.`,
+  onTourStep: () => {},
+  onAfterTourStep: () => {},
+});
+
 </script>
 
 <style>

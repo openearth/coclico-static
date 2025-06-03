@@ -274,7 +274,7 @@ async function toggleDataset(dataset) {
 useTour({
   id: "sidebar",
   refId: "tour",
-  title: "02/10 - Themes",
+  title: "02/11 - Themes",
   location: "end center",
   index: 2,
   description: `CoCliCo is divided into four themes: Sea Levels, Natural Hazards,  Exposure & Vulnerability and Risk & Adaptation. On each of these themes, a dedicated team of scientists worked hard to provide insights into the latest available information relevant for risk management and adaptation. Select a theme to view the available data and user stories.`,
@@ -287,7 +287,7 @@ useTour({
 useTour({
   id: "user-stories",
   refId: "userStories",
-  title: "03/10 - User stories",
+  title: "03/11 - User stories",
   location: "bottom center",
   index: 3,
   description: `User stories represent post-processed information that comes from aggregating various datasets on a specific geospatial unit (country, regional or municipality level). These were carefully co-designed by our science teams and stakeholders. Toggle user stories on and off to display them on the map. A brief summary of information is again provided in the “i”-button.`,
@@ -300,7 +300,7 @@ useTour({
 useTour({
   id: "data-layers",
   refId: "dataLayers",
-  title: "04/10 - Data layers",
+  title: "04/11 - Data layers",
   location: "bottom center",
   index: 4,
   description: `Data layers represent the data directly available from the efforts by the science teams in CoCliCo. Toggle data layers on and off to display them on the map. A brief overview on the information related to the data layer could be retrieved by the “i”-button next to it. There is always more information available in the Handbook [https://www.openearth.nl/coclico-workbench/], explained later in this tour.`,
@@ -316,7 +316,7 @@ useTour({
 useTour({
   id: "background-layers",
   refId: "layersPanel",
-  title: "05/10 - Background layers",
+  title: "05/11 - Background layers",
   location: "bottom center",
   index: 5,
   description: `CoCliCo provides user story information on three geospatial units; country (NUTS0), regional (NUTS2) and municipality (LAU) level. These layers can be toggled on and off for navigational purposes. Only the “coastal” units are delimited, meaning area that could potentially be influenced by coastal hazards and sea level rise.`,
@@ -332,7 +332,7 @@ useTour({
 useTour({
   id: "counter",
   refId: "counter",
-  title: "06/10 - Limitations on visualizations",
+  title: "06/11 - Limitations on visualizations",
   location: "bottom center",
   index: 6,
   description: `We have limited your visualization flexibility a bit by only allowing one user story to be toggled on at a time for clarity purposes. Besides this, you can at most toggle on three data layers simultaneously. Beyond this amount of layers visible on the platform, we feel the message of the user stories and data layers becomes blurred and difficult to interpret.`,
@@ -341,7 +341,7 @@ useTour({
 useTour({
   id: "handbook",
   refId: "handbook",
-  title: "07/10 - Handbook",
+  title: "07/11 - Handbook",
   location: "end center",
   index: 7,
   description: `CoCliCo is more than only the web platform! It contains a passive data repository and a workbench as well. Regarding the former, there are 44 cloud-native datasets in the CoCliCo STAC catalog. Only the most relevant ones and most suitable for interaction are presented in the web platform but we encourage you to take a look at the others. The workbench allows you to interact directly with all the data in the catalog (and hence in the platform as well) through an (online or offline) coding environment. The handbook details how to use the repository and the workbench. It also elaborates on targeted users and provides more contextual information to understand the data layers and user stories.`,
@@ -350,7 +350,7 @@ useTour({
 useTour({
   id: "website",
   refId: "website",
-  title: "08/10 - Project website",
+  title: "08/11 - Project website",
   description: `To get more information on CoCliCo in general, please visit the website by clicking here. Among other things you will find the complete project description, a list of the involved partners and details about the work packages. Also the full publications, papers and policy briefs can be found here. There’s also a possibility to get in touch with the CoCliCo consortium through an online form.`,
   location: "end center",
   index: 8,
