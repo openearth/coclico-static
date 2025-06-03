@@ -59,5 +59,8 @@ export async function getRasterMapGraphData({
         keys.map((key) => [key, feature.properties[key]]),
       ),
     })),
+    ...Object.fromEntries(
+      propertyName.map((name) => [name, features[0]?.properties?.[name]]),
+    ),
   }));
 }
