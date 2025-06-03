@@ -120,9 +120,10 @@ function close() {
 useTour({
   id: "dataset",
   refId: "dataset",
-  title: "Active Data Layers",
-  description: `This window displays the active data layers.`,
-  index: 10,
+  title: "09/10 - Active data layers",
+  description: `Once a dataset or user story is toggled on (as indicated in previous steps), it will appear on the map with the variables presented in the dropdown menus in this active data layer window. You can change the map view by selecting different combinations of variables. Each parameter contains a small description on what it entails, available through the “i”-buttons. If possible, the layer card informs you whether could click the map for more information.
+If a layer is clickable, a graph pops up once you click on an area or marked point on the map. The graph is interactive, meaning you could toggle on and off some of the lines, you can zoom as well as hover over the points to get their respective values. The solid line with the large dot represents the combination of variables you have selected on the active data layer card and hence shown on the map.`,
+  index: 9,
   onTourStep: () => {
     open();
     tab.value = "option-1";
@@ -132,9 +133,9 @@ useTour({
 useTour({
   id: "dashboard",
   refId: "dataset",
-  title: "Dashboard",
-  description: `This window displays the saved graphs on the dashboard.`,
-  index: 11,
+  title: "10/10 - Dashboard",
+  description: `In case you want to save the graph, you can add it to the dashboard. Here, you can keep all the graphs that you want to store for your analysis. In this way, you could for instance compare different combinations of variables for the same area of interest, or you could compare different areas with each other, using the same variables. You can remove your graph(s) by clicking the “x”-button(s) on the top right.`,
+  index: 10,
   onTourStep: () => {
     tab.value = "option-2";
   },
