@@ -35,8 +35,10 @@
         </VCol>
       </VRow>
       <VSelect
-        :items="property.values"
-        :value="property.value"
+        :items="property.values.map(v => ({ value: v, title: property.labels?.[v] || v }))"
+        :model-value="property.value"
+        item-title="title"
+        item-value="value"
         variant="outlined"
         @update:modelValue="(value) => updateProperty(property.id, value)"
       />

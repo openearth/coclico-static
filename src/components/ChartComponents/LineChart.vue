@@ -51,6 +51,17 @@ const xAxisData = computed(
     props.graphData?.xAxis?.data ||
     props.properties.find((prop) => prop.id === "time")?.values?.sort?.(),
 );
+
+const labelsMap = computed(() => {
+  const map = {};
+  for (const prop of props.properties || []) {
+    Object.entries(prop.labels || {}).forEach(([key, label]) => {
+      map[key] = label;
+    });
+  }
+  return map;
+});
+
 const option = computed(() => {
   const highlightIndex = xAxisData.value.findIndex(
     (datum) =>
@@ -67,20 +78,26 @@ const option = computed(() => {
       ...props.graphData?.tooltip,
     },
     series: props.graphData.series.map((serie) => {
-      return serie.name.startsWith(props.propertyValues?.scenarios)
+      const isHighlighted = serie.name.startsWith(props.propertyValues?.scenarios);
+
+      const readableName = serie.name
+        .split(" ")
+        .map((part) => labelsMap.value[part] || part)
+        .join(" ");
+  console.log(serie.name, "→", readableName)
+      return isHighlighted
         ? {
             ...serie,
+            name: readableName,
             data: serie.data.map((datum, index) =>
               index === highlightIndex
-                ? {
-                    value: datum,
-                    symbolSize: 10,
-                  }
+                ? { value: datum, symbolSize: 10 }
                 : datum,
             ),
           }
         : {
             ...serie,
+            name: readableName,
             lineStyle: {
               type: hasHighlight ? "dashed" : "solid",
             },
