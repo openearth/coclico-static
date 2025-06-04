@@ -193,7 +193,7 @@ export async function getRasterData(dataset, coords, props) {
         coords,
         props,
         layerName: "bc_stats",
-        keys: ["total"],
+        keys: ["buildings"],
         propertyName: [
           "LAU_NAME",
           "GISCO_ID",
