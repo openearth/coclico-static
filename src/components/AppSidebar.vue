@@ -103,11 +103,15 @@
         </VRow>
       </VListItem>
       <VList>
-        <VListItem v-if="userStories?.length" ref="userStories">
+        <VListItem
+          v-if="store.getters['datasets/userStoriesInActiveTheme']?.length"
+        >
           <VCardTitle class="layer-card-title"> User stories</VCardTitle>
           <VList class="layer-list">
             <VListItem
-              v-for="dataset in userStories"
+              v-for="dataset in store.getters[
+                'datasets/userStoriesInActiveTheme'
+              ]"
               :key="dataset.id"
               :aria-label="dataset.title"
             >
@@ -145,11 +149,15 @@
             </VListItem>
           </VList>
         </VListItem>
-        <VListItem v-if="dataLayers?.length" ref="dataLayers">
+        <VListItem
+          v-if="store.getters['datasets/dataLayersInActiveTheme']?.length"
+        >
           <VCardTitle class="layer-card-title"> Data layers</VCardTitle>
           <VList class="layer-list">
             <VListItem
-              v-for="dataset in dataLayers"
+              v-for="dataset in store.getters[
+                'datasets/dataLayersInActiveTheme'
+              ]"
               :key="dataset.id"
               :aria-label="dataset.title"
             >
@@ -215,9 +223,6 @@ const activeUserStories = computed(
   () => store.getters["datasets/activeUserStories"],
 );
 const activeTheme = computed(() => store.getters["datasets/activeTheme"]);
-const datasetsInActiveTheme = computed(
-  () => store.getters["datasets/datasetsInActiveTheme"],
-);
 const themes = computed(() => store.getters["datasets/themes"]);
 const sidebarStyle = computed(() => {
   return {
@@ -227,12 +232,6 @@ const sidebarStyle = computed(() => {
     borderRight: showLayersCard.value ? "2px solid #e4e4e4" : "2px solid white",
   };
 });
-const userStories = computed(() =>
-  datasetsInActiveTheme.value.filter((dataset) => dataset.isUserStory),
-);
-const dataLayers = computed(() =>
-  datasetsInActiveTheme.value.filter((dataset) => !dataset.isUserStory),
-);
 
 function toggleLayersCard(theme) {
   showLayersCard.value =

@@ -125,10 +125,14 @@ const hasGeoserverLink = computed(() =>
 );
 const ceedBounds = computed(() => store.getters["map/ceed_bounds"]);
 watch(ceedBounds, (bounds) => {
-  if (clickableDatasetsIds.value.some((id) => id === "ceed_maps"))
+  if (clickableDatasetsIds.value.some((id) => id === "ceed_maps")) {
     map.value.fitBounds(bounds, {
       center: center(bboxPolygon(bounds)).geometry.coordinates,
     });
+    toast.promise(() => new Promise((resolve) => setTimeout(resolve, 10000)), {
+      loading: "Loading this layer may take a while...",
+    });
+  }
 });
 watch(
   () => store.getters["graphs/graphData"],
@@ -192,7 +196,6 @@ useTour({
   onTourStep: () => {},
   onAfterTourStep: () => {},
 });
-
 </script>
 
 <style>
