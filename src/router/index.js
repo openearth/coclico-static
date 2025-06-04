@@ -1,6 +1,7 @@
 import { createMemoryHistory, createRouter } from "vue-router";
 import Map from "../views/Map.vue";
 import Stories from "../views/Stories.vue";
+import Disclaimer from '@/components/Disclaimer.vue';
 
 const routes = [
   {
@@ -17,6 +18,11 @@ const routes = [
     path: "/stories",
     name: "stories",
     component: Stories,
+  },
+  {
+    path: '/terms-of-use',
+    name: 'disclaimer',
+    component: Disclaimer
   },
 ];
 

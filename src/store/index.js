@@ -3,6 +3,7 @@ import graphs from "./graphs";
 import dashboard from "./dashboard";
 import datasets from "./datasets";
 import tour from "./tour";
+import disclaimer from "./disclaimer";
 
 import { createStore } from "vuex";
 
@@ -13,5 +14,6 @@ export default createStore({
     dashboard,
     datasets,
     tour,
+    disclaimer
   },
 });
