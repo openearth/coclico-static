@@ -19,14 +19,6 @@ export default {
     activeTheme(state) {
       return state.activeTheme;
     },
-    datasetsInActiveTheme(state) {
-      if (!state.activeTheme) {
-        return state.datasets;
-      }
-      return state.datasets.filter((dataset) =>
-        dataset?.keywords?.includes(state.activeTheme),
-      );
-    },
     activeDatasetsInTheme(state) {
       return (name) =>
         state.datasets.filter(
@@ -44,6 +36,25 @@ export default {
           return state.datasets.find((dataset) => dataset.id === id);
         })
         .filter((dataset) => dataset.isUserStory);
+    },
+    userStoriesInActiveTheme(state, getters) {
+      if (!state.activeTheme) {
+        return state.datasets;
+      }
+      return state.datasets.filter(
+        (dataset) =>
+          dataset?.keywords?.includes(state.activeTheme) && dataset.isUserStory,
+      );
+    },
+    dataLayersInActiveTheme(state, getters) {
+      if (!state.activeTheme) {
+        return state.datasets;
+      }
+      return state.datasets.filter(
+        (dataset) =>
+          dataset?.keywords?.includes(state.activeTheme) &&
+          !dataset.isUserStory,
+      );
     },
     activeDatalayers(state) {
       return state.activeDatasetIds

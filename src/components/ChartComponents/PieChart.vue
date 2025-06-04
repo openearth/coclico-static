@@ -13,6 +13,7 @@ import {
 } from "echarts/components";
 import { computed } from "vue";
 import VChart from "vue-echarts";
+import { useStore } from "vuex";
 
 use([
   CanvasRenderer,
@@ -37,6 +38,22 @@ const props = defineProps({
   },
 });
 
+const store = useStore();
+
+const properties = computed(() =>
+  store.getters["datasets/activeDatasetProperties"](props.graphData.datasetId)
+);
+
+const labelsMap = computed(() => {
+  const map = {};
+  for (const prop of properties.value || []) {
+    Object.entries(prop.labels || {}).forEach(([key, label]) => {
+      map[key] = label;
+    });
+  }
+  return map;
+});
+
 const baseOptions =
   props.graphData?.id || props.graphData?.datasetId
     ? (
@@ -56,7 +73,10 @@ const option = computed(() => {
     series: baseOptions.series.map((serie) => ({
       ...serie,
       color: props.colorPalette,
-      data: props.graphData.values,
+      data: props.graphData.values.map((item) => ({
+        ...item,
+        name: labelsMap.value[item.name] || item.name,
+      })),
     })),
   };
 });

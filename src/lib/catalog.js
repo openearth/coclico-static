@@ -29,6 +29,7 @@ export async function getCollections(catalog) {
                   id,
                   description: dataset?.["summaries_descriptions"]?.[id],
                   values: item,
+                  labels:  dataset?.["summaries_labels"]?.[id],
                 };
               })
             : [],

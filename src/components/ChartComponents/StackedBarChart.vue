@@ -52,40 +52,66 @@ const properties = computed(() =>
     props.graphData?.id || props.graphData?.datasetId,
   ),
 );
-const series = computed(() =>
-  props.graphData?.series.map((item) =>
-    item.stack === props.propertyValues.scenarios &&
-    item.name.startsWith("High")
-      ? {
-          ...item,
-          markArea: {
-            itemStyle: {
-              opacity: 0.25,
-            },
-            data: [
-              [
-                { xAxis: props.propertyValues.time },
-                { xAxis: props.propertyValues.time },
+
+const labelsMap = computed(() => {
+  const map = {};
+  for (const prop of properties.value || []) {
+    Object.entries(prop.labels || {}).forEach(([key, label]) => {
+      map[key] = label;
+    });
+  }
+  return map;
+});
+
+const readableSeries = computed(() =>
+  props.graphData?.series.map((item) => {
+    const readableName = item.name
+      .split(" ")
+      .map((part) => labelsMap.value[part] || part)
+      .join(" ");
+
+    return {
+      ...item,
+      name: readableName,
+      ...(item.stack === props.propertyValues.scenarios &&
+      item.name.startsWith("High")
+        ? {
+            markArea: {
+              itemStyle: { opacity: 0.25 },
+              data: [
+                [
+                  { xAxis: props.propertyValues.time },
+                  { xAxis: props.propertyValues.time },
+                ],
               ],
-            ],
-          },
-        }
-      : item,
-  ),
+            },
+          }
+        : {}),
+    };
+  })
 );
+
 const option = computed(() => {
   return {
     ...baseOptions,
     ...props?.graphData,
+    series: readableSeries.value,
     legend: {
       ...baseOptions?.legend,
       color: props.graphData?.colorPalette,
-      data: props.graphData?.scenarios?.map((scenario) => `High ${scenario}`),
+      data: readableSeries.value.map((s) => s.name),
     },
-    series: series.value,
     xAxis: {
       ...baseOptions.xAxis,
-      data: properties.value.find((prop) => prop.id === "time").values.sort(),
+      data: properties.value
+        .find((prop) => prop.id === "time")
+        .values.sort()
+        .map((val) => labelsMap.value[val] || val),
+      axisLabel: {
+        rotate: 45,
+        interval: 0,
+      },
+      nameGap: 40
     },
   };
 });

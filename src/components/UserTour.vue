@@ -72,16 +72,30 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 
 const store = useStore();
 const isOnTour = computed(() => store.getters["tour/isOnTour"]);
 const current = computed(() => store.getters["tour/currentTourStep"]);
+
 const hasPreviousTourStep = computed(
   () => store.getters["tour/hasPreviousTourStep"],
 );
 const hasNextTourStep = computed(() => store.getters["tour/hasNextTourStep"]);
+
 const cutout = computed(() => {
+  if (current.value?.location === 'center') {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const width = 10;
+    const height = 10;
+    return {
+      top: `${vh / 2 - height / 2}px`,
+      left: `${vw / 2 - width / 2}px`,
+      width: `${width}px`,
+      height: `${height}px`,
+    };
+  }
   return {
     top: `${current.value?.bounds?.y}px`,
     left: `${current.value?.bounds?.x}px`,
