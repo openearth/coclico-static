@@ -21,36 +21,38 @@
         </VChip>
       </span>
     </VListItem>
-    <VList ref="tour" nav>
-      <VListItem
-        v-for="theme in themes"
-        :key="theme.name"
-        :value="theme.name"
-        :active="showLayersCard && activeTheme === theme.name"
-        class="list-item"
-        color="primary"
-        @click="
-          toggleLayersCard(theme.name);
-          setTheme(theme.name);
-        "
-      >
-        <VListImg class="pa-2 list-item-img">
-          <VBadge
-            v-if="store.getters['datasets/activeDatasetsInTheme'](theme.name)"
-            :content="
-              store.getters['datasets/activeDatasetsInTheme'](theme.name)
-            "
-            color="primary"
-          >
-            <custom-icon :name="theme.name" class="item-image" />
-          </VBadge>
+    <VList nav>
+      <div ref="themes">
+        <VListItem
+          v-for="theme in themes"
+          :key="theme.name"
+          :value="theme.name"
+          :active="showLayersCard && activeTheme === theme.name"
+          class="list-item"
+          color="primary"
+          @click="
+            toggleLayersCard(theme.name);
+            setTheme(theme.name);
+          "
+        >
+          <VListImg class="pa-2 list-item-img">
+            <VBadge
+              v-if="store.getters['datasets/activeDatasetsInTheme'](theme.name)"
+              :content="
+                store.getters['datasets/activeDatasetsInTheme'](theme.name)
+              "
+              color="primary"
+            >
+              <custom-icon :name="theme.name" class="item-image" />
+            </VBadge>
 
-          <custom-icon v-else :name="theme.name" class="item-image" />
-        </VListImg>
-        <VListItemTitle class="list-item-title">
-          {{ theme.name }}
-        </VListItemTitle>
-      </VListItem>
+            <custom-icon v-else :name="theme.name" class="item-image" />
+          </VListImg>
+          <VListItemTitle class="list-item-title">
+            {{ theme.name }}
+          </VListItemTitle>
+        </VListItem>
+      </div>
       <VDivider class="my-8" />
       <VListItem
         class="list-item"
@@ -273,7 +275,7 @@ async function toggleDataset(dataset) {
 
 useTour({
   id: "sidebar",
-  refId: "tour",
+  refId: "themes",
   title: "02/11 - Themes",
   location: "end center",
   index: 2,
@@ -303,7 +305,7 @@ useTour({
   title: "04/11 - Data layers",
   location: "bottom center",
   index: 4,
-  description: `Data layers represent the data directly available from the efforts by the science teams in CoCliCo. Toggle data layers on and off to display them on the map. A brief overview on the information related to the data layer could be retrieved by the “i”-button next to it. There is always more information available in the Handbook [https://www.openearth.nl/coclico-workbench/], explained later in this tour.`,
+  description: `Data layers represent the data directly available from the efforts by the science teams in CoCliCo. Toggle data layers on and off to display them on the map. A brief overview on the information related to the data layer could be retrieved by the “i”-button next to it. There is always more information available in the Handbook <a href="https://www.openearth.nl/coclico-workbench/" target="_blank" rel="noopener noreferrer">https://www.openearth.nl/coclico-workbench</a>, explained later in this tour.`,
   onTourStep: () => {
     showLayersCard.value = true;
     setTheme(themes.value[2].name);
@@ -344,7 +346,7 @@ useTour({
   title: "07/11 - Handbook",
   location: "end center",
   index: 7,
-  description: `CoCliCo is more than only the web platform! It contains a passive data repository and a workbench as well. Regarding the former, there are 44 cloud-native datasets in the CoCliCo STAC catalog. Only the most relevant ones and most suitable for interaction are presented in the web platform but we encourage you to take a look at the others. The workbench allows you to interact directly with all the data in the catalog (and hence in the platform as well) through an (online or offline) coding environment. The handbook details how to use the repository and the workbench. It also elaborates on targeted users and provides more contextual information to understand the data layers and user stories.`,
+  description: `CoCliCo is more than only the web platform! It contains a passive data repository and a workbench as well. Regarding the former, there are 44 cloud-native datasets in the CoCliCo STAC catalog. Only the most relevant ones and most suitable for interaction are presented in the web platform but we encourage you to take a look at the others.<br><br>The workbench allows you to interact directly with all the data in the catalog (and hence in the platform as well) through an (online or offline) coding environment. The handbook details how to use the repository and the workbench. It also elaborates on targeted users and provides more contextual information to understand the data layers and user stories.`,
 });
 
 useTour({
