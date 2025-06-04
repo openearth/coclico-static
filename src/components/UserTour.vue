@@ -32,11 +32,8 @@
         <div :style="cutout" class="cutout" v-bind="props" />
       </template>
 
-      <v-card
-        :text="current?.description"
-        :title="current?.title"
-        max-width="500px"
-      >
+      <v-card :title="current?.title" max-width="500px">
+        <v-card-text v-html="current?.description" />
         <VCardActions class="flex justify-space-around">
           <VBtn
             :disabled="!hasPreviousTourStep"
