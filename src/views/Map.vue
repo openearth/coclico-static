@@ -181,7 +181,7 @@ useTour({
   title: "01/11 - Welcome",
   location: "center",
   index: 1,
-  description: `Hi! Welcome at the open-source Coastal Climate Core (CoCliCo) Services web platform. This tour will take you along the platforms key features. We are committed to inform users on present-day and future coastal risks, with the goal to improve decision-making on risk management and adaptation. The web platform visualizes state-of-the-art science from hazards to risk & adaptation in a consistent manner. It is carefully designed with both smaller and larger scale stakeholders, i.e. municipalities as well as governmental agencies. For more information on the CoCliCo project please visit: https://coclicoservices.eu/about/.`,
+  description: `Hi! Welcome at the open-source Coastal Climate Core (CoCliCo) Services web platform. This tour will take you along the platforms key features. We are committed to inform users on present-day and future coastal risks, with the goal to improve decision-making on risk management and adaptation. The web platform visualizes state-of-the-art science from hazards to risk & adaptation in a consistent manner. It is carefully designed with both smaller and larger scale stakeholders, i.e. municipalities as well as governmental agencies. For more information on the CoCliCo project please visit: <a href="https://coclicoservices.eu/about/" target="_blank" rel="noopener noreferrer">https://coclicoservices.eu/about/</a>.`,
   onTourStep: () => {},
   onAfterTourStep: () => {},
 });
