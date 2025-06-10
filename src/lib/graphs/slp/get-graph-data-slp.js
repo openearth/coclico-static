@@ -23,10 +23,11 @@ const getEnsembleLabel = (ensemble) =>
 export async function getSlpGraphData(dataset, { lng, lat }, props) {
   const scenarios = props.find((prop) => prop.id === "scenarios").values;
   const time = props.find((prop) => prop.id === "time").values;
-  const ensemble = props.find((prop) => prop.id === "ensemble").values;
+  const ensembles = props.find((prop) => prop.id === "ensemble").values;
+  const ensemble = props.find((props) => props.id === "ensemble").value;
   const layerChunks = chunkArray(
     scenarios.flatMap((scenario) =>
-      ensemble.flatMap((ensemble) =>
+      ensembles.flatMap((ensemble) =>
         time.flatMap((time) => ({
           scenario,
           ensemble,
@@ -60,31 +61,28 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
     )
   ).flat();
   const colors = ["#000000", "#173c66", "#f79320", "#951b1e"];
-  return scenarios.flatMap((scenario, index) =>
-    ensemble.map((ensemble) => ({
-      name: `${getEnsembleLabel(ensemble)} ${scenario}`,
-      type: "bar",
-      stack: scenario,
-      color: colors[index % colors.length],
-      itemStyle:
-        index === 0
-          ? {
-              borderWidth: "transparent",
-              borderColor: "transparent",
-            }
-          : {
-              borderWidth: 0.2,
-              borderColor: "#000000",
-            },
-      data: data
-        .filter(
-          (datum) => datum.scenario === scenario && datum.ensemble === ensemble,
-        )
-        .sort((a, b) => a.time - b.time)
-        .map(({ value }) => value),
-      animation: false,
-      silent: true,
-      barWidth: 3,
-    })),
-  );
+  return scenarios.flatMap((scenario, index) => ({
+    name: `${scenario}`,
+    type: "bar",
+    stack: scenario,
+    color: colors[index % colors.length],
+    itemStyle:
+      index === 0
+        ? {
+            borderWidth: "transparent",
+            borderColor: "transparent",
+          }
+        : {
+            borderWidth: 0.2,
+            borderColor: "#000000",
+          },
+    data: data
+      .filter(
+        (datum) => datum.scenario === scenario && datum.ensemble === ensemble,
+      )
+      .sort((a, b) => a.time - b.time)
+      .map(({ value }) => value),
+    silent: true,
+    barWidth: 3,
+  }));
 }
