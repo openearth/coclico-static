@@ -73,7 +73,7 @@ const readableSeries = computed(() =>
     return {
       ...item,
       name: readableName,
-      ...(item.stack === props.propertyValues.scenarios &&
+      ...(props.propertyValues.scenarios.includes(item.stack) &&
       item.name.startsWith("High")
         ? {
             markArea: {

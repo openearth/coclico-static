@@ -67,15 +67,10 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
       stack: scenario,
       color: colors[index % colors.length],
       itemStyle:
-        index === 0
-          ? {
-              borderWidth: "transparent",
-              borderColor: "transparent",
-            }
-          : {
-              borderWidth: 0.2,
-              borderColor: "#000000",
-            },
+        {
+          borderWidth: 0.2,
+          borderColor: "#FFFFFF",
+        },
       data: data
         .filter(
           (datum) => datum.scenario === scenario && datum.ensemble === ensemble,
@@ -83,8 +78,7 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
         .sort((a, b) => a.time - b.time)
         .map(({ value }) => value),
       animation: false,
-      silent: true,
-      barWidth: 3,
+      silent: true
     })),
   );
 }
