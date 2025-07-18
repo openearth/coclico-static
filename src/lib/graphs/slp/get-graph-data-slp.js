@@ -24,6 +24,8 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
   const scenarios = props.find((prop) => prop.id === "scenarios").values;
   const time = props.find((prop) => prop.id === "time").values;
   const ensemble = props.find((prop) => prop.id === "ensemble").values;
+  const preferredOrder = ["ssp126", "ssp245", "ssp585", "high_end"];
+  scenarios.sort((a, b) => preferredOrder.indexOf(a) - preferredOrder.indexOf(b));
   const layerChunks = chunkArray(
     scenarios.flatMap((scenario) =>
       ensemble.flatMap((ensemble) =>
@@ -59,7 +61,7 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
       ),
     )
   ).flat();
-  const colors = ["#000000", "#173c66", "#f79320", "#951b1e"];
+  const colors = [ "#173c66", "#f79320", "#951b1e", "#000000" ];
   return scenarios.flatMap((scenario, index) =>
     ensemble.map((ensemble) => ({
       name: `${getEnsembleLabel(ensemble)} ${scenario}`,
