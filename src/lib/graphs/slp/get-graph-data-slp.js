@@ -63,7 +63,7 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
   ).flat();
   const colors = [ "#173c66", "#f79320", "#951b1e", "#000000" ];
   return scenarios.flatMap((scenario, index) =>
-    ensemble.map((ensemble) => ({
+    [...ensemble].reverse().map((ensemble) => ({
       name: `${getEnsembleLabel(ensemble)} ${scenario}`,
       type: "bar",
       stack: scenario,
