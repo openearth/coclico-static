@@ -73,6 +73,7 @@ const readableSeries = computed(() =>
     return {
       ...item,
       name: readableName,
+      showInLegend: item.showInLegend,
       ...(props.propertyValues.scenarios.includes(item.stack) &&
       item.name.startsWith("High")
         ? {
@@ -92,14 +93,15 @@ const readableSeries = computed(() =>
 );
 
 const option = computed(() => {
+  const legendSeries = readableSeries.value.filter((s) => s.showInLegend);
   return {
     ...baseOptions,
     ...props?.graphData,
     series: readableSeries.value,
     legend: {
       ...baseOptions?.legend,
-      color: props.graphData?.colorPalette,
-      data: readableSeries.value.map((s) => s.name),
+      data: legendSeries.map((s) => s.name),
+      formatter: (name) => name.replace(/^High /, "")
     },
     xAxis: {
       ...baseOptions.xAxis,

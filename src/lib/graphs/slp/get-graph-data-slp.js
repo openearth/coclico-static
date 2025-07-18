@@ -78,7 +78,8 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
         .sort((a, b) => a.time - b.time)
         .map(({ value }) => value),
       animation: false,
-      silent: true
+      silent: true,
+      showInLegend: getEnsembleLabel(ensemble) === "High"
     })),
   );
 }
