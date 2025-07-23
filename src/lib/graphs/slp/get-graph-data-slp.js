@@ -109,11 +109,22 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
           (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
         )?.value;
 
+          const medium = data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_m" && d.time === t
+        )?.value;
+
         const high = data.find(
           (d) => d.scenario === scenario && d.ensemble === "msl_h" && d.time === t
         )?.value;
 
-        return high != null && low != null ? high - low : null;
+        return high != null && low != null
+          ? {
+              value: high - low,
+              low,
+              medium,
+              high,
+            }
+          : null;
       }),
     };
 

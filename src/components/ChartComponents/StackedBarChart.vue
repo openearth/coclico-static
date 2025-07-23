@@ -104,6 +104,24 @@ const option = computed(() => {
         .filter(s => !s.name.endsWith('_offset'))
         .map(s => s.name),
     },
+    tooltip: {
+      trigger: "axis",
+      confine: false,
+      formatter: function (params) {
+        const formatValue = (value) =>
+          typeof value === "number" ? value.toFixed(2) : "–";
+
+        let tooltip = `<b>${params[0].axisValue}</b><br/>`;
+
+        params.forEach((param) => {
+          const { low, medium, high } = param.data || {};
+          const formatted = `(${formatValue(low)} : ${formatValue(medium)} : ${formatValue(high)})`;
+          tooltip += `${param.seriesName}: ${formatted} m<br/>`;
+        });
+
+        return tooltip;
+      },
+    },
     xAxis: {
       ...baseOptions.xAxis,
       data: properties.value
