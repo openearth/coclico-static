@@ -24,6 +24,8 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
   const scenarios = props.find((prop) => prop.id === "scenarios").values;
   const time = props.find((prop) => prop.id === "time").values;
   const ensemble = props.find((prop) => prop.id === "ensemble").values;
+  const preferredOrder = ["ssp126", "ssp245", "ssp585", "high_end"];
+  scenarios.sort((a, b) => preferredOrder.indexOf(a) - preferredOrder.indexOf(b));
   const layerChunks = chunkArray(
     scenarios.flatMap((scenario) =>
       ensemble.flatMap((ensemble) =>
@@ -59,32 +61,74 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
       ),
     )
   ).flat();
-  const colors = ["#000000", "#173c66", "#f79320", "#951b1e"];
-  return scenarios.flatMap((scenario, index) =>
-    ensemble.map((ensemble) => ({
-      name: `${getEnsembleLabel(ensemble)} ${scenario}`,
+  const scenarioColors = {
+    ssp126: "#173c66",
+    ssp245: "#f79320",
+    ssp585: "#951b1e",
+    high_end: "#000000",
+  };
+
+  const ensembleByName = {
+    Low: "msl_l",
+    Medium: "msl_m",
+    High: "msl_h",
+  };
+
+  return scenarios.flatMap((scenario) => {
+    const baseSeries = {
+      name: `${scenario}_offset`,
       type: "bar",
       stack: scenario,
-      color: colors[index % colors.length],
-      itemStyle:
-        index === 0
+      itemStyle: {
+        color: "transparent",  // invisible offset
+        borderWidth: 0,
+      },
+      emphasis: { disabled: true },
+      tooltip: { show: false },
+      data: time.map((t) =>
+        data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
+        )?.value ?? 0
+      ),
+    };
+
+    const visibleSeries = {
+      name: scenario === "high_end" ? "High End" : scenario.toUpperCase(),
+      scenarioId: scenario,
+      type: "bar",
+      stack: scenario,
+      barGap: 0,
+      barCategoryGap: "50%",
+      barWidth: 5,
+      itemStyle: {
+        borderWidth: 0.2,
+        borderColor: "#FFFFFF",
+        color: scenarioColors[scenario],
+      },
+      data: time.map((t) => {
+        const low = data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
+        )?.value;
+
+          const medium = data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_m" && d.time === t
+        )?.value;
+
+        const high = data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_h" && d.time === t
+        )?.value;
+
+        return high != null && low != null
           ? {
-              borderWidth: "transparent",
-              borderColor: "transparent",
+              value: high - low,
+              low,
+              medium,
+              high,
             }
-          : {
-              borderWidth: 0.2,
-              borderColor: "#000000",
-            },
-      data: data
-        .filter(
-          (datum) => datum.scenario === scenario && datum.ensemble === ensemble,
-        )
-        .sort((a, b) => a.time - b.time)
-        .map(({ value }) => value),
-      animation: false,
-      silent: true,
-      barWidth: 3,
-    })),
-  );
+          : null;
+      }),
+    };
+
+    return [baseSeries, visibleSeries];
+  });
 }

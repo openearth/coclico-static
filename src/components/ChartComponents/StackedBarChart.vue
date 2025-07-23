@@ -65,15 +65,16 @@ const labelsMap = computed(() => {
 
 const readableSeries = computed(() =>
   props.graphData?.series.map((item) => {
-    const readableName = item.name
-      .split(" ")
-      .map((part) => labelsMap.value[part] || part)
-      .join(" ");
+    const readableName =
+      item.scenarioId && labelsMap.value[item.scenarioId]
+        ? labelsMap.value[item.scenarioId]
+        : item.name;
 
     return {
       ...item,
       name: readableName,
-      ...(item.stack === props.propertyValues.scenarios &&
+      showInLegend: item.showInLegend,
+      ...(props.propertyValues.scenarios.includes(item.stack) &&
       item.name.startsWith("High")
         ? {
             markArea: {
@@ -92,14 +93,34 @@ const readableSeries = computed(() =>
 );
 
 const option = computed(() => {
+  const legendSeries = readableSeries.value.filter((s) => s.showInLegend);
   return {
     ...baseOptions,
     ...props?.graphData,
     series: readableSeries.value,
     legend: {
       ...baseOptions?.legend,
-      color: props.graphData?.colorPalette,
-      data: readableSeries.value.map((s) => s.name),
+      data: readableSeries.value
+        .filter((s) => typeof s.name === "string" && !s.name.endsWith("_offset"))
+        .map((s) => s.name),
+    },
+    tooltip: {
+      trigger: "axis",
+      confine: false,
+      formatter: function (params) {
+        const formatValue = (value) =>
+          typeof value === "number" ? value.toFixed(2) : "–";
+
+        let tooltip = `<b>${params[0].axisValue}</b><br/>`;
+
+        params.forEach((param) => {
+          const { low, medium, high } = param.data || {};
+          const formatted = `(${formatValue(low)} : ${formatValue(medium)} : ${formatValue(high)})`;
+          tooltip += `${param.seriesName}: ${formatted} m<br/>`;
+        });
+
+        return tooltip;
+      },
     },
     xAxis: {
       ...baseOptions.xAxis,
