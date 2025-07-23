@@ -94,6 +94,7 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
 
     const visibleSeries = {
       name: scenario === "high_end" ? "High End" : scenario.toUpperCase(),
+      scenarioId: scenario,
       type: "bar",
       stack: scenario,
       barGap: 0,

@@ -65,10 +65,10 @@ const labelsMap = computed(() => {
 
 const readableSeries = computed(() =>
   props.graphData?.series.map((item) => {
-    const readableName = item.name
-      .split(" ")
-      .map((part) => labelsMap.value[part] || part)
-      .join(" ");
+    const readableName =
+      item.scenarioId && labelsMap.value[item.scenarioId]
+        ? labelsMap.value[item.scenarioId]
+        : item.name;
 
     return {
       ...item,
@@ -101,8 +101,8 @@ const option = computed(() => {
     legend: {
       ...baseOptions?.legend,
       data: readableSeries.value
-        .filter(s => !s.name.endsWith('_offset'))
-        .map(s => s.name),
+        .filter((s) => typeof s.name === "string" && !s.name.endsWith("_offset"))
+        .map((s) => s.name),
     },
     tooltip: {
       trigger: "axis",
