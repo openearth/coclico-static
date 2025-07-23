@@ -61,27 +61,58 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
       ),
     )
   ).flat();
-  const colors = [ "#173c66", "#f79320", "#951b1e", "#000000" ];
-  return scenarios.flatMap((scenario, index) =>
-    [...ensemble].reverse().map((ensemble) => ({
-      name: `${getEnsembleLabel(ensemble)} ${scenario}`,
+  const scenarioColors = {
+    ssp126: "#173c66",
+    ssp245: "#f79320",
+    ssp585: "#951b1e",
+    high_end: "#000000",
+  };
+
+  const ensembleByName = {
+    Low: "msl_l",
+    Medium: "msl_m",
+    High: "msl_h",
+  };
+
+  return scenarios.map((scenario) => {
+    // For each time step, find low/medium/high
+    const timeValues = time.map((t) => {
+      const low = data.find(
+        (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
+      )?.value;
+
+      const high = data.find(
+        (d) => d.scenario === scenario && d.ensemble === "msl_h" && d.time === t
+      )?.value;
+
+      return high != null && low != null ? high - low : null;
+    });
+
+    const baseValues = time.map((t) =>
+      data.find(
+        (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
+      )?.value ?? 0
+    );
+
+    return {
+      name: scenario === "high_end" ? "High End" : scenario.toUpperCase(),
       type: "bar",
       stack: scenario,
-      color: colors[index % colors.length],
-      itemStyle:
-        {
-          borderWidth: 0.2,
-          borderColor: "#FFFFFF",
-        },
-      data: data
-        .filter(
-          (datum) => datum.scenario === scenario && datum.ensemble === ensemble,
-        )
-        .sort((a, b) => a.time - b.time)
-        .map(({ value }) => value),
-      animation: false,
-      silent: true,
-      showInLegend: getEnsembleLabel(ensemble) === "High"
-    })),
-  );
+      barGap: 0,
+      itemStyle: {
+        borderWidth: 0.2,
+        borderColor: "#FFFFFF",
+      },
+      barCategoryGap: "50%",
+      barWidth: 5,
+      data: timeValues,
+      color: scenarioColors[scenario],
+      // 👇 This moves the bar up to start at the low value
+      encode: {
+        y: 1,
+      },
+      // 👇 This applies the low values as a base
+      base: baseValues,
+    };
+  });
 }

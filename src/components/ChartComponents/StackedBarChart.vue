@@ -100,8 +100,7 @@ const option = computed(() => {
     series: readableSeries.value,
     legend: {
       ...baseOptions?.legend,
-      data: legendSeries.map((s) => s.name),
-      formatter: (name) => name.replace(/^High /, "")
+      data: readableSeries.value.map((s) => s.name),
     },
     xAxis: {
       ...baseOptions.xAxis,
