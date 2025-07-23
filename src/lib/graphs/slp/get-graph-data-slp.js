@@ -74,45 +74,49 @@ export async function getSlpGraphData(dataset, { lng, lat }, props) {
     High: "msl_h",
   };
 
-  return scenarios.map((scenario) => {
-    // For each time step, find low/medium/high
-    const timeValues = time.map((t) => {
-      const low = data.find(
-        (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
-      )?.value;
+  return scenarios.flatMap((scenario) => {
+    const baseSeries = {
+      name: `${scenario}_offset`,
+      type: "bar",
+      stack: scenario,
+      itemStyle: {
+        color: "transparent",  // invisible offset
+        borderWidth: 0,
+      },
+      emphasis: { disabled: true },
+      tooltip: { show: false },
+      data: time.map((t) =>
+        data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
+        )?.value ?? 0
+      ),
+    };
 
-      const high = data.find(
-        (d) => d.scenario === scenario && d.ensemble === "msl_h" && d.time === t
-      )?.value;
-
-      return high != null && low != null ? high - low : null;
-    });
-
-    const baseValues = time.map((t) =>
-      data.find(
-        (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
-      )?.value ?? 0
-    );
-
-    return {
+    const visibleSeries = {
       name: scenario === "high_end" ? "High End" : scenario.toUpperCase(),
       type: "bar",
       stack: scenario,
       barGap: 0,
+      barCategoryGap: "50%",
+      barWidth: 5,
       itemStyle: {
         borderWidth: 0.2,
         borderColor: "#FFFFFF",
+        color: scenarioColors[scenario],
       },
-      barCategoryGap: "50%",
-      barWidth: 5,
-      data: timeValues,
-      color: scenarioColors[scenario],
-      // 👇 This moves the bar up to start at the low value
-      encode: {
-        y: 1,
-      },
-      // 👇 This applies the low values as a base
-      base: baseValues,
+      data: time.map((t) => {
+        const low = data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_l" && d.time === t
+        )?.value;
+
+        const high = data.find(
+          (d) => d.scenario === scenario && d.ensemble === "msl_h" && d.time === t
+        )?.value;
+
+        return high != null && low != null ? high - low : null;
+      }),
     };
+
+    return [baseSeries, visibleSeries];
   });
 }

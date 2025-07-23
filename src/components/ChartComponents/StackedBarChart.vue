@@ -100,7 +100,9 @@ const option = computed(() => {
     series: readableSeries.value,
     legend: {
       ...baseOptions?.legend,
-      data: readableSeries.value.map((s) => s.name),
+      data: readableSeries.value
+        .filter(s => !s.name.endsWith('_offset'))
+        .map(s => s.name),
     },
     xAxis: {
       ...baseOptions.xAxis,
