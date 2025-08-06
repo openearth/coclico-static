@@ -28,6 +28,13 @@
             unless stated differently. Reuse of the information presented on this website is only permitted with 
             proper source attribution.
           </p>
+          <p>
+            Special attention needs to be paid to the results presented in the platform. These reflect policy-based
+            protection standards aggregated at the provincial (NUTS2) level, based on the coastal defence database
+            developed within the project. In some regions, such as the North-sea coastline in Germany, no precise
+            value of protection standard was found and only the flood map without explicitly incorporating defenses
+            has been computed. Further research may update coastal flooding scenarios using updated protection standards.
+          </p>
 
           <h3 class="mt-4 font-italic">Privacy</h3>
           <p>
