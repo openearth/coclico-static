@@ -15,13 +15,17 @@
             <layer-legend :dataset="dataset" />
           </VCol>
         </VRow>
-        <VRow>
+        <VRow v-if="dataset['deltares:clickable'] !== false">
           <VCol cols="12" class="pb-8">
             <p class="text-style">
               <VIcon> mdi-cursor-default-click</VIcon>
               Select an element in the map for specific
               <strong>location analysis</strong>.
             </p>
+          </VCol>
+        </VRow>
+        <VRow v-if="dataset['deltares:clickable'] == false">
+          <VCol cols="12" class="pb-8">
           </VCol>
         </VRow>
       </div>
@@ -90,7 +94,7 @@ const datasets = computed(() =>
   justify-content: space-between;
   gap: 5px;
   flex-shrink: 1;
-  box-shadow: 1px -1px 2px 0 hsla(0 0% 0% / 10%);
+  box-shadow: 1px -1px 2px 0 hsla(0 0% 0% / 0%);
   border-radius: 0;
 }
 
