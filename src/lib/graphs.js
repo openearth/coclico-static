@@ -328,7 +328,17 @@ export async function getZarrData(dataset, features, props) {
   }
 }
 
-async function getZarrBarData(dataset, features, props) {
+function normalizeProps(props) {
+  if (Array.isArray(props)) return props;
+  if (props && typeof props === "object") {
+    return Object.entries(props).map(([id, value]) => ({ id, value }));
+  }
+  return [];
+}
+
+async function getZarrBarData(dataset, features, propsIn) {
+  const props = normalizeProps(propsIn);
+  
   const url = dataset?.assets?.data?.href;
   const datasetName = dataset?.id;
   const plotType = dataset?.["deltares:plotType"];
@@ -340,28 +350,47 @@ async function getZarrBarData(dataset, features, props) {
   const plotSeries = get(dataset, "deltares:plotSeries");
   const summaryList = dataset?.summaries;
 
-  const slice = Object.values(variables?.[path[0]]?.dimensions).map(
-    (dimension) => {
-      if (dimension === "stations") {
-        return features?.properties?.locationId || 0;
-      } else if (dimension === "nscenarios" && plotSeries !== "scenarios") {
-        return summaryList
-          .find((object) => object.id === "scenarios")
-          ?.values.findIndex((scenario) => scenario === props.scenarios);
-      } else if (
-        dimension === "rp" &&
-        (plotSeries !== "scenarios" || xAxis === "time")
-      ) {
-        return summaryList
-          .find((object) => object.id === "rp")
-          .values.findIndex((object) => {
-            return object === props.rp;
-          });
-      } else {
-        return 0;
-      }
-    },
-  );
+  const selScenario = props.find(p => p.id === "scenarios")?.value;
+  const selRp = (
+    props.find(p => p.id === "rp") ||
+    props.find(p => p.id === "return period")
+  )?.value;
+  const selTime = props.find(p => p.id === "time")?.value;
+
+  // Prefer cube:dimensions for time/scenarios; fall back to summaries if needed
+  const timeList =
+    dataset?.["cube:dimensions"]?.time?.values ??
+    summaryList?.find?.(o => o.id === "time")?.values ??
+    [];
+  const scenariosList =
+    summaryList?.find?.(o => o.id === "scenarios")?.values ??
+    dataset?.["cube:dimensions"]?.scenarios?.values ??
+    [];
+  const rpList = summaryList?.find?.(o => o.id === "rp")?.values ?? [];
+
+  const timeIdx = (() => {
+    if (selTime == null) return 0;
+    const i = timeList.findIndex(v => Number(v) === Number(selTime));
+    return i >= 0 ? i : 0;
+  })();
+  const scenarioIdx = Math.max(0, scenariosList.findIndex(s => String(s) === String(selScenario)));
+  const rpIdx = Math.max(0, rpList.findIndex(v => v === selRp));
+
+  const slice = Object.values(variables?.[path[0]]?.dimensions).map(dimension => {
+    if (dimension === "stations") {
+      return features?.properties?.locationId ?? 0;
+    }
+    if (dimension === "nscenarios" && plotSeries !== "scenarios") {
+      return scenarioIdx;
+    }
+    if (dimension === "time") {
+      return timeIdx;
+    }
+    if (dimension === "rp" && (plotSeries !== "scenarios" || xAxis === "time")) {
+      return rpIdx;
+    }
+    return 0;
+  });
 
   const xAxisdata = [];
   const series = [];
@@ -373,8 +402,10 @@ async function getZarrBarData(dataset, features, props) {
         mode: "r",
       });
       const data = await res.get(slice);
+      console.log('data', data);
       series.push(data);
       xAxisdata.push(p);
+      console.log('xAxisdata', xAxisdata);
     } catch (error) {
       console.error("Error fetching bar data:", error);
     }
